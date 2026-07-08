@@ -24,7 +24,7 @@
 
 ## Purpose
 
-This document defines the monitoring and observability architecture for AegisIQ.
+This document defines the monitoring and observability architecture for PWNDORA SkillScan X.
 
 It covers:
 
@@ -44,12 +44,9 @@ The objective is to detect, diagnose, and resolve failures quickly.
 
 Every request should answer three questions:
 
-```
-What happened?
-    ↓
-Why did it happen?
-    ↓
-Where did it happen?
+```mermaid
+flowchart TD
+    WH[What happened?] --> WHY[Why did it happen?] --> WHERE[Where did it happen?]
 ```
 
 Observability is built into the platform from the beginning.
@@ -58,18 +55,10 @@ Observability is built into the platform from the beginning.
 
 # 3. Monitoring Architecture
 
-```
-Frontend
-    ↓
-FastAPI
-    ↓
-Structured Logs
-    ↓
-Metrics
-    ↓
-Dashboards
-    ↓
-Alerts
+```mermaid
+flowchart TD
+    FE[Frontend] --> FA[FastAPI] --> SL[Structured Logs]
+    SL --> M[Metrics] --> D[Dashboards] --> A[Alerts]
 ```
 
 Every layer produces telemetry.
@@ -136,16 +125,10 @@ Use Prometheus-compatible metrics where possible.
 
 Each request receives a unique trace ID.
 
-```
-Browser
-    ↓
-API
-    ↓
-Assessment
-    ↓
-AI
-    ↓
-Database
+```mermaid
+flowchart TD
+    B[Browser] --> API[API] --> CIE[Capability Intelligence Engine]
+    CIE --> AI[AI] --> DB[Database]
 ```
 
 Every log entry references:
@@ -183,9 +166,9 @@ Checks:
 Possible states:
 
 ```
-Healthy
-Degraded
-Unavailable
+- Healthy
+- Degraded
+- Unavailable
 ```
 
 ---
@@ -205,16 +188,10 @@ Track:
 
 Example pipeline:
 
-```
-Prompt
-    ↓
-LLM
-    ↓
-Schema Validation
-    ↓
-Business Validation
-    ↓
-Accepted
+```mermaid
+flowchart TD
+    P[Prompt] --> LLM[LLM] --> SV[Schema Validation]
+    SV --> BV[Business Validation] --> A[Accepted]
 ```
 
 Failures are logged separately from application errors.
@@ -290,40 +267,40 @@ Avoid alert fatigue by deduplicating repeated alerts.
 ## Platform Dashboard
 
 ```
-API Health
-AI Health
-Database Health
-Infrastructure
+- API Health
+- AI Health
+- Database Health
+- Infrastructure
 ```
 
-## Assessment Dashboard
+## Capability Assessment Dashboard
 
 ```
-Assessments Started
-Assessments Completed
-Average Duration
-Completion Rate
-AI Latency
+- Assessments Started
+- Assessments Completed
+- Average Duration
+- Completion Rate
+- AI Latency
 ```
 
 ## AI Dashboard
 
 ```
-Prompt Count
-Latency
-Retry Rate
-Schema Failures
-Confidence Distribution
+- Prompt Count
+- Latency
+- Retry Rate
+- Schema Failures
+- Confidence Distribution
 ```
 
 ## Operations Dashboard
 
 ```
-CPU
-Memory
-Disk
-Containers
-Deployments
+- CPU
+- Memory
+- Disk
+- Containers
+- Deployments
 ```
 
 ---
@@ -332,18 +309,10 @@ Deployments
 
 Incident workflow:
 
-```
-Alert
-    ↓
-Identify
-    ↓
-Diagnose
-    ↓
-Mitigate
-    ↓
-Recover
-    ↓
-Postmortem
+```mermaid
+flowchart TD
+    A[Alert] --> I[Identify] --> D[Diagnose]
+    D --> M[Mitigate] --> R[Recover] --> P[Postmortem]
 ```
 
 For every critical incident:
@@ -369,8 +338,15 @@ Future capabilities:
 
 These should be introduced as operational complexity grows.
 
+## Related Documents
+
+- [DevOps Architecture](32-devops-architecture.md)
+- [Deployment Guide](33-deployment-guide.md)
+- [Security Architecture Deep Dive](35-security-architecture-deep-dive.md)
+- [Observability Reference](../docs/reference/observability.md)
+
 ---
 
 # 15. Conclusion
 
-AegisIQ's observability strategy combines structured logging, metrics, tracing, and health monitoring to provide actionable operational insight. The system is designed so that failures can be detected, diagnosed, and resolved using objective telemetry rather than guesswork.
+PWNDORA SkillScan X's observability strategy combines structured logging, metrics, tracing, and health monitoring to provide actionable operational insight. The system is designed so that failures can be detected, diagnosed, and resolved using objective telemetry rather than guesswork.

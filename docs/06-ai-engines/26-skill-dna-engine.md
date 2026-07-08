@@ -1,4 +1,4 @@
-# Role Blueprint Engine
+# Skill DNA Engine
 
 ## Table of Contents
 
@@ -8,8 +8,8 @@
 4. Engine Overview
 5. Inputs
 6. Processing Pipeline
-7. Knowledge Graph Construction
-8. Competency Mapping
+7. Skill DNA Graph Construction
+8. Capability Mapping
 9. Skill Taxonomy
 10. Assessment Objective Generation
 11. Difficulty Estimation
@@ -17,8 +17,9 @@
 13. Validation
 14. Error Handling
 15. Versioning
-16. Future Evolution
-17. Conclusion
+16. AI Mentor Principle
+17. Future Evolution
+18. Conclusion
 
 ---
 
@@ -26,11 +27,11 @@
 
 ## Engine Name
 
-**Role Blueprint Engine (RBE)**
+**Skill DNA Engine (SDE)**
 
 ## Purpose
 
-Transform an unstructured cybersecurity job description into a structured, versioned **Role Blueprint** that becomes the canonical representation of the target role.
+Transform an unstructured cybersecurity role definition into a structured, versioned **Skill DNA Profile** that becomes the canonical representation of the target role.
 
 Every downstream module depends on this output.
 
@@ -40,7 +41,7 @@ Every downstream module depends on this output.
 
 The engine follows one principle:
 
-> **Job Descriptions are unstructured documents. Role Blueprints are structured domain models.**
+> **Role Definitions are unstructured documents. Skill DNA Profiles are structured domain models.**
 
 The engine exists to bridge that gap.
 
@@ -48,24 +49,11 @@ The engine exists to bridge that gap.
 
 # 3. Engine Overview
 
-```
-Job Description
-    ↓
-Parser
-    ↓
-Text Normalization
-    ↓
-Role Extraction
-    ↓
-Competency Mapping
-    ↓
-Knowledge Graph
-    ↓
-Assessment Objectives
-    ↓
-Difficulty Estimation
-    ↓
-Role Blueprint
+```mermaid
+flowchart TD
+    RD[Role Definition] --> P[Parser] --> TN[Text Normalization]
+    TN --> RE[Role Extraction] --> CM[Capability Mapping] --> SDG[Skill DNA Graph]
+    SDG --> AO[Assessment Objectives] --> DE[Difficulty Estimation] --> SDP[Skill DNA Profile]
 ```
 
 ---
@@ -93,29 +81,17 @@ Input fields:
 
 # 5. Processing Pipeline
 
-```
-Upload
-    ↓
-OCR / Parsing
-    ↓
-Normalization
-    ↓
-Entity Extraction
-    ↓
-Role Classification
-    ↓
-Competency Mapping
-    ↓
-Objective Generation
-    ↓
-Blueprint Validation
-    ↓
-Persistence
+```mermaid
+flowchart TD
+    U[Upload] --> OP[OCR / Parsing] --> N[Normalization]
+    N --> EE[Entity Extraction] --> RC[Role Classification]
+    RC --> CM[Capability Mapping] --> OG[Objective Generation]
+    OG --> PV[Profile Validation] --> PER[Persistence]
 ```
 
 ---
 
-# 6. Knowledge Graph Construction
+# 6. Skill DNA Graph Construction
 
 Extract relationships between:
 
@@ -128,7 +104,7 @@ Knowledge Area
     ↓
 Responsibility
     ↓
-Competency
+Capability
     ↓
 Learning Objective
 ```
@@ -149,9 +125,9 @@ Incident Investigation
 
 ---
 
-# 7. Competency Mapping
+# 7. Capability Mapping
 
-Competencies are normalized using a controlled catalog.
+Capabilities are normalized using a controlled catalog.
 
 Example categories:
 
@@ -175,7 +151,7 @@ Hierarchy:
 ```
 Domain
     ↓
-Competency
+Capability
     ↓
 Skill
     ↓
@@ -233,18 +209,18 @@ Output levels:
 | Advanced     | Senior analyst / engineer |
 | Expert       | Architect / Lead          |
 
-Difficulty influences mission complexity and rubric selection.
+Difficulty influences challenge complexity and rubric selection.
 
 ---
 
 # 11. Output Model
 
-The Role Blueprint contains:
+The Skill DNA Profile contains:
 
 ```
 Role Title
 Version
-Competencies
+Capabilities
 Skills
 Knowledge Areas
 Responsibilities
@@ -267,7 +243,7 @@ Schema Validation
     ↓
 Business Rules
     ↓
-Competency Coverage
+Capability Coverage
     ↓
 Consistency Checks
     ↓
@@ -276,10 +252,10 @@ Version Assignment
 
 Checks include:
 
-- Required competencies exist.
+- Required capabilities exist.
 - Objectives align with extracted skills.
 - Difficulty is internally consistent.
-- Duplicate competencies are merged.
+- Duplicate capabilities are merged.
 
 ---
 
@@ -316,7 +292,7 @@ Infer Safely
     ↓
 Flag Assumptions
     ↓
-Generate Blueprint
+Generate Profile
 ```
 
 Assumptions should be explicitly marked rather than hidden.
@@ -327,32 +303,50 @@ Assumptions should be explicitly marked rather than hidden.
 
 Version:
 
-- Role Blueprint
-- Competency mappings
+- Skill DNA Profile
+- Capability mappings
 - Assessment objectives
 
 Rules:
 
-- Never overwrite an existing blueprint.
+- Never overwrite an existing profile.
 - Every regeneration creates a new version.
-- Downstream assessments reference the exact blueprint version used.
+- Downstream assessments reference the exact profile version used.
 
 ---
 
-# 15. Future Evolution
+# 15. AI Mentor Principle
+
+The Skill DNA Engine operates under the **AI Mentor** principle:
+
+> **AI MUST NEVER answer assessments — only mentor and explain.**
+
+The engine extracts role capability signals from role definitions but never generates assessment answers or completes challenges on behalf of professionals. Its purpose is to structure capability requirements, not to perform the assessment itself.
+
+---
+
+# 16. Future Evolution
 
 Potential enhancements:
 
 - NICE Workforce Framework mapping
-- Organization-specific competency libraries
+- Organization-specific capability libraries
 - Industry-specific role templates
 - Multi-language parsing
-- RAG over internal competency repositories
+- RAG over internal capability repositories
 - Automatic rubric generation
 - Historical role comparison
 
+## Related Documents
+
+- [Capability Assessment Engine](27-capability-assessment-engine.md)
+- [Capability Reasoning Engine](29-capability-reasoning-engine.md)
+- [Evidence Intelligence Engine](30-evidence-intelligence-engine.md)
+- [Skill DNA Profile Concept](../docs/concepts/cyber-twin.md)
+- [System Architecture](../docs/04-architecture/16-system-architecture.md)
+
 ---
 
-# 16. Conclusion
+# 17. Conclusion
 
-The Role Blueprint Engine transforms inconsistent, free-form job descriptions into structured, reusable, and versioned role definitions. By making the **Role Blueprint** the canonical domain object, AegisIQ creates a stable foundation for assessment generation, reasoning, reporting, and learning.
+The Skill DNA Engine transforms inconsistent, free-form role definitions into structured, reusable, and versioned skill profiles. By making the **Skill DNA Profile** the canonical domain object, PWNDORA SkillScan X creates a stable foundation for assessment generation, reasoning, reporting, and learning.

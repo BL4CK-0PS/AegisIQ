@@ -1,4 +1,4 @@
-# AegisIQ — Presentation
+# PWNDORA SkillScan X — Presentation
 
 > Slide decks, pitch materials, and demo walkthroughs.
 
@@ -23,7 +23,7 @@ presentation/
 |---|---|---|
 | Product Pitch | Investors, stakeholders | 10 min |
 | Technical Deep Dive | Engineers, architects | 30 min |
-| Demo Walkthrough | Recruiters, hiring managers | 15 min |
+| Demo Walkthrough | Capability analysts, hiring teams | 15 min |
 | Conference Talk | Security community | 45 min |
 
 ---
@@ -31,12 +31,14 @@ presentation/
 ## Demo Flow
 
 1. Upload a Job Description
-2. Review generated Role Blueprint
-3. Start Assessment Session
-4. Complete a Mission (with voice or text)
-5. View Reasoning Evaluation
-6. Explore Explainability Evidence
-7. Review Learning Roadmap
-8. Export Report
+2. Review generated Skill DNA profile
+3. Start Capability Assessment Session
+4. Complete a Practical Challenge (with voice or text)
+5. View Capability Reasoning Evaluation
+6. Explore Evidence Intelligence
+7. Review AI Mentor Recommendations
+8. Explore Cyber Twin Profile
+9. View Career Compass
+10. Export Report
 
 Each demo deck includes speaker notes, timing guides, and setup instructions.

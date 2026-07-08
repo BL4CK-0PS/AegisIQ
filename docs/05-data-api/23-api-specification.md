@@ -7,12 +7,12 @@
 3. API Architecture
 4. Authentication APIs
 5. User APIs
-6. Job Description APIs
-7. Role Blueprint APIs
-8. Assessment APIs
-9. Mission APIs
+6. Role Definition APIs
+7. Skill DNA APIs
+8. Capability Assessment APIs
+9. Challenge APIs
 10. Evaluation APIs
-11. Learning APIs
+11. Career Compass APIs
 12. Report APIs
 13. Error Responses
 14. Versioning
@@ -27,7 +27,7 @@
 
 ## Purpose
 
-This document defines the REST API contract for AegisIQ.
+This document defines the REST API contract for PWNDORA SkillScan X.
 
 Goals:
 
@@ -43,40 +43,22 @@ Goals:
 
 Every endpoint follows:
 
-```
-RESTful
-    ↓
-Versioned
-    ↓
-Stateless
-    ↓
-JSON
-    ↓
-Consistent
-    ↓
-Secure
-    ↓
-Documented
+```mermaid
+flowchart TD
+    R[RESTful] --> V[Versioned] --> S[Stateless] --> J[JSON]
+    J --> C[Consistent] --> SEC[Secure] --> D[Documented]
 ```
 
 ---
 
 # 3. API Architecture
 
-```
-React
-    ↓
-Axios
-    ↓
-FastAPI
-    ↓
-Application Service
-    ↓
-Domain Service
-    ↓
-Repository
-    ↓
-Database
+```mermaid
+flowchart TD
+    R[React / Next.js] --> A[Axios] --> AG[API Gateway]
+    AG --> FA[FastAPI] --> AIL[Adaptive Intelligence Layer]
+    AIL --> ADE[AI Decision Engine] --> LOL[Learning Orchestration Layer]
+    LOL --> CIL[Community Intelligence Layer] --> DP[Data Platform]
 ```
 
 Every API should expose business operations, not CRUD for every table.
@@ -147,12 +129,12 @@ GET    /api/v1/users/history
 
 ---
 
-# 6. Job Description APIs
+# 6. Role Definition APIs
 
-## Upload JD
+## Upload Role Definition
 
 ```
-POST /api/v1/job-descriptions
+POST /api/v1/role-definitions
 ```
 
 Multipart upload
@@ -160,99 +142,99 @@ Multipart upload
 Response:
 ```json
 {
-  "job_description_id": "..."
+  "role_definition_id": "..."
 }
 ```
 
-## Parse JD
+## Parse Role Definition
 
 ```
-POST /api/v1/job-descriptions/{id}/parse
+POST /api/v1/role-definitions/{id}/parse
 ```
 
-## Get JD
+## Get Role Definition
 
 ```
-GET /api/v1/job-descriptions/{id}
+GET /api/v1/role-definitions/{id}
 ```
 
 ---
 
-# 7. Role Blueprint APIs
+# 7. Skill DNA APIs
 
 ## Generate
 
 ```
-POST /api/v1/role-blueprints
+POST /api/v1/skill-dna
 ```
 
 Body:
 ```json
 {
-  "job_description_id": "..."
+  "role_definition_id": "..."
 }
 ```
 
 ## Retrieve
 
 ```
-GET /api/v1/role-blueprints/{id}
+GET /api/v1/skill-dna/{id}
 ```
 
 ## List Versions
 
 ```
-GET /api/v1/role-blueprints/{id}/versions
+GET /api/v1/skill-dna/{id}/versions
 ```
 
 ---
 
-# 8. Assessment APIs
+# 8. Capability Assessment APIs
 
 ## Generate Assessment
 
 ```
-POST /api/v1/assessments
+POST /api/v1/capability-assessments
 ```
 
 ## Start
 
 ```
-POST /api/v1/assessments/{id}/start
+POST /api/v1/capability-assessments/{id}/start
 ```
 
 ## Get Status
 
 ```
-GET /api/v1/assessments/{id}
+GET /api/v1/capability-assessments/{id}
 ```
 
 ## Resume
 
 ```
-POST /api/v1/assessments/{id}/resume
+POST /api/v1/capability-assessments/{id}/resume
 ```
 
 ## Complete
 
 ```
-POST /api/v1/assessments/{id}/complete
+POST /api/v1/capability-assessments/{id}/complete
 ```
 
 ---
 
-# 9. Mission APIs
+# 9. Challenge APIs
 
-## Get Next Mission
+## Get Next Challenge
 
 ```
-GET /api/v1/assessments/{id}/missions/next
+GET /api/v1/capability-assessments/{id}/challenges/next
 ```
 
 ## Submit Response
 
 ```
-POST /api/v1/missions/{id}/responses
+POST /api/v1/challenges/{id}/responses
 ```
 
 Request:
@@ -263,10 +245,10 @@ Request:
 }
 ```
 
-## Retrieve Mission
+## Retrieve Challenge
 
 ```
-GET /api/v1/missions/{id}
+GET /api/v1/challenges/{id}
 ```
 
 ---
@@ -285,26 +267,26 @@ POST /api/v1/evaluations
 GET /api/v1/evaluations/{id}
 ```
 
-## Competency Breakdown
+## Capability Breakdown
 
 ```
-GET /api/v1/evaluations/{id}/competencies
+GET /api/v1/evaluations/{id}/capabilities
 ```
 
 ---
 
-# 11. Learning APIs
+# 11. Career Compass APIs
 
 ## Generate Roadmap
 
 ```
-POST /api/v1/learning-plans
+POST /api/v1/career-compass
 ```
 
 ## Retrieve
 
 ```
-GET /api/v1/learning-plans/{id}
+GET /api/v1/career-compass/{id}
 ```
 
 ---
@@ -392,12 +374,12 @@ Rules:
 
 Suggested limits (MVP):
 
-| Endpoint Type      |              Limit |
-| ------------------ | -----------------: |
-| Authentication     | 10 requests/minute |
-| JD Upload          |   20 requests/hour |
-| Assessment Actions |  120 requests/hour |
-| Report Download    |   60 requests/hour |
+| Endpoint Type           |              Limit |
+| ----------------------- | -----------------: |
+| Authentication          | 10 requests/minute |
+| Role Definition Upload  |   20 requests/hour |
+| Assessment Actions      |  120 requests/hour |
+| Report Download         |   60 requests/hour |
 
 Protect AI-heavy endpoints from abuse.
 
@@ -424,7 +406,7 @@ Future endpoints:
 ```
 /organizations
 /teams
-/recruiters
+/capability-analysts
 /templates
 /analytics
 /certifications
@@ -434,8 +416,15 @@ Future endpoints:
 
 These should follow the same versioning and response conventions.
 
+## Related Documents
+
+- [Authentication & Authorization](24-authentication-authorization.md)
+- [Data Models](25-data-models.md)
+- [Backend Architecture](../docs/04-architecture/18-backend-architecture.md)
+- [System Features](../docs/03-functional-design/12-system-features.md)
+
 ---
 
 # 18. Conclusion
 
-The AegisIQ API is organized around business capabilities rather than database tables. Stable contracts, consistent schemas, and explicit versioning allow the frontend and backend to evolve independently while maintaining compatibility.
+The PWNDORA SkillScan X API is organized around business capabilities rather than database tables. Stable contracts, consistent schemas, and explicit versioning allow the frontend and backend to evolve independently while maintaining compatibility.

@@ -1,6 +1,6 @@
-# AegisIQ — Assets
+# PWNDORA SkillScan X — Assets
 
-> Static assets for the AegisIQ platform — logos, images, icons, and brand resources.
+> Static assets for the PWNDORA SkillScan X platform — logos, images, icons, and brand resources.
 
 ---
 
@@ -10,7 +10,7 @@
 assets/
 ├── images/         PNG, JPG, SVG images
 ├── icons/          Favicon, app icons, platform icons
-├── logos/          AegisIQ logo variations (light, dark, horizontal, vertical)
+├── logos/          PWNDORA SkillScan X logo variations (light, dark, horizontal, vertical)
 ├── fonts/          Custom or licensed fonts
 ├── illustrations/  Illustrations for landing page, empty states
 └── brand/          Brand guidelines, color palette, typography
@@ -39,4 +39,4 @@ assets/
 | Accent Color | `#8b5cf6` |
 | Font | Inter (UI), JetBrains Mono (code) |
 
-All brand assets follow the AegisIQ brand guidelines in `brand/brand-guidelines.pdf`.
+All brand assets follow the PWNDORA SkillScan X brand guidelines in `brand/brand-guidelines.pdf`.

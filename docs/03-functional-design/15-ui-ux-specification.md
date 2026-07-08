@@ -1,4 +1,4 @@
-# AegisIQ — Success Metrics
+# PWNDORA SkillScan X — UI/UX Specification
 
 | | |
 |---|---|
@@ -12,32 +12,27 @@
 
 | Version | Date | Author | Changes |
 |---|---|---|---|
-| 1.0 | 2026-07-08 | Team AegisIQ | Initial release |
+| 1.0 | 2026-07-08 | PWNDORA SkillScan X Team | Initial release |
 
 ---
 
 ## 1. Executive Summary
 
-This document defines the measurable indicators used to evaluate the success of the AegisIQ platform. Without it, AegisIQ becomes another demo that looks cool but has no measurable outcomes. Judges, investors, and engineering teams all ask the same question: **How do you know it's working?**
+This document defines the measurable indicators used to evaluate the success of the PWNDORA SkillScan X platform. Without it, PWNDORA SkillScan X becomes another demo that looks cool but has no measurable outcomes. Judges, investors, and engineering teams all ask the same question: **How do you know it's working?**
 
 Metrics are grouped into Product, User, AI, Cybersecurity Assessment, Engineering, Business, and Operations. Every feature should contribute to at least one measurable outcome.
+
+**Core message:** We do not assess resumes. We assess cybersecurity capability.
 
 ---
 
 ## 2. Success Philosophy
 
-AegisIQ measures success at multiple layers.
+PWNDORA SkillScan X measures success at multiple layers.
 
-```
-Platform
-    ↓
-Assessment
-    ↓
-Candidate
-    ↓
-Recruiter
-    ↓
-Organization
+```mermaid
+flowchart TD
+    P[Platform] --> A[Assessment] --> PR[Professional] --> CA[Capability Analyst] --> O[Organization]
 ```
 
 Success is not a single score. It is the combined improvement across technical quality, user experience, assessment reliability, and operational efficiency.
@@ -46,18 +41,9 @@ Success is not a single score. It is the combined improvement across technical q
 
 ## 3. Success Framework
 
-```
-Business
-    ↓
-Product
-    ↓
-Users
-    ↓
-AI
-    ↓
-Engineering
-    ↓
-Operations
+```mermaid
+flowchart TD
+    B[Business] --> PR[Product] --> U[Users] --> AI[AI] --> EN[Engineering] --> OP[Operations]
 ```
 
 Each layer contains specific Key Performance Indicators (KPIs).
@@ -72,21 +58,21 @@ Each layer contains specific Key Performance Indicators (KPIs).
 | Report Generation Success | ≥ 95% |
 | Reassessment Rate | ≥ 30% |
 | Average Assessment Duration | 20-30 minutes |
-| Candidate Satisfaction | ≥ 4/5 |
+| Professional Satisfaction | ≥ 4/5 |
 
 ---
 
 ## 5. User Success Metrics
 
-### Candidate
+### Professional
 
 - Assessment completion rate
-- Average competency improvement
-- Learning roadmap usage
+- Average capability improvement
+- Career Compass usage
 - Reassessment frequency
 - Report downloads
 
-### Recruiter
+### Capability Analyst
 
 - Time to review report
 - Screening time reduction
@@ -126,15 +112,16 @@ Measure:
 - Adaptive branching frequency
 - Pause/resume usage
 
-```
-Assessment → Mission → Response → Evaluation → Report
+```mermaid
+flowchart LR
+    A[Assessment] --> M[Mission] --> R[Response] --> E[Evaluation] --> REPORT[Report]
 ```
 
 Each stage should be measurable.
 
 ---
 
-## 8. Cyber Reasoning Metrics
+## 8. Capability Reasoning Metrics
 
 Evaluate:
 
@@ -146,9 +133,9 @@ Evaluate:
 - Evidence completeness
 - MITRE ATT&CK alignment
 
-Example competency breakdown:
+Example capability breakdown:
 
-| Competency | Score |
+| Capability | Score |
 |---|---|
 | Incident Response | 82 |
 | Threat Hunting | 74 |
@@ -166,8 +153,8 @@ Track:
 - Assessments created
 - Assessments completed
 - University partnerships
-- Recruiter adoption
-- Candidate retention
+- Capability Analyst adoption
+- Professional retention
 - Organization adoption
 
 For the MVP, these are illustrative goals rather than contractual targets.
@@ -230,26 +217,25 @@ Track:
 
 ## 14. Success Dashboard
 
-```
-Platform Health
-├── API Status
-├── AI Status
-├── Assessment Status
-
-Assessment Analytics
-├── Completion Rate
-├── Mission Duration
-├── Competency Scores
-
-Candidate Analytics
-├── Improvement
-├── Learning Progress
-├── Reassessments
-
-Recruiter Analytics
-├── Reports Reviewed
-├── Screening Time
-├── Assessment Usage
+```mermaid
+mindmap
+  root((Metrics))
+    Platform Health
+      API Status
+      AI Status
+      Assessment Status
+    Assessment Analytics
+      Completion Rate
+      Mission Duration
+      Capability Scores
+    Professional Analytics
+      Improvement
+      Learning Progress
+      Reassessments
+    CapabilityAnalyst Analytics
+      Reports Reviewed
+      Screening Time
+      Assessment Usage
 ```
 
 ---
@@ -266,13 +252,13 @@ Recruiter Analytics
 
 - Every score includes evidence.
 - Every report includes strengths and weaknesses.
-- Every recommendation is linked to an identified competency gap.
+- Every recommendation is linked to an identified capability gap.
 
-### Objective 3: Improve candidate readiness
+### Objective 3: Improve professional readiness
 
-- Learning roadmap generated for every assessment.
+- Career Compass generated for every assessment.
 - Reassessment supported.
-- Competency improvements visible over time.
+- Capability improvements visible over time.
 
 ---
 
@@ -281,11 +267,11 @@ Recruiter Analytics
 The hackathon MVP is successful if it demonstrates:
 
 - Job Description Intelligence
-- Role Blueprint generation
-- Adaptive assessment flow
-- Cyber Reasoning evaluation
+- Skill DNA Profile generation
+- Adaptive capability assessment flow
+- Capability Reasoning evaluation
 - Explainable reports
-- Learning roadmap
+- Career Compass
 - Stable end-to-end demo
 
 It does **not** need enterprise dashboards or organization-wide analytics.
@@ -297,7 +283,7 @@ It does **not** need enterprise dashboards or organization-wide analytics.
 As the platform grows, measure:
 
 - Enterprise adoption
-- Team competency trends
+- Team capability trends
 - Workforce readiness
 - Certification completion
 - Benchmark performance
@@ -308,12 +294,12 @@ As the platform grows, measure:
 
 ## 18. Conclusion
 
-AegisIQ should be evaluated not only by technical correctness but by its ability to provide transparent, consistent, and actionable cybersecurity competency assessments.
+PWNDORA SkillScan X should be evaluated not only by technical correctness but by its ability to provide transparent, consistent, and actionable cybersecurity capability assessments.
 
 A successful platform:
 
-- Helps candidates improve.
-- Helps recruiters make informed decisions.
+- Helps professionals improve.
+- Helps capability analysts make informed decisions.
 - Helps organizations standardize assessments.
 - Provides measurable evidence for every evaluation.
 
@@ -321,21 +307,21 @@ A successful platform:
 
 ## Platform KPI Hierarchy
 
-```
-Vision
-    ↓
-Objectives
-    ↓
-KPIs
-    ↓
-Metrics
-    ↓
-Dashboards
-    ↓
-Continuous Improvement
+```mermaid
+flowchart TD
+    V[Vision] --> O[Objectives] --> K[KPIs] --> M[Metrics] --> D[Dashboards] --> CI[Continuous Improvement]
 ```
 
 Every metric should support a business objective, and every objective should reinforce the product vision.
+
+---
+
+## Related Documents
+
+- [Use Case Specification](14-use-case-specification.md)
+- [System Features](12-system-features.md)
+- [Product Requirements](../docs/01-product/05-product-requirements.md)
+- [Analytics Concept](../docs/concepts/analytics.md)
 
 ---
 
@@ -343,7 +329,7 @@ Every metric should support a business objective, and every objective should rei
 
 | Reference | Document |
 |---|---|
-| User journeys | `../03-experience/11-user-journey.md` |
-| Use cases | `../03-experience/12-use-cases.md` |
-| Feature specification | `../03-experience/14-feature-specification.md` |
-| Product requirements | `../02-product/07-product-requirements.md` |
+| User journeys | `../02-research/09-user-journey.md` |
+| Use cases | `../03-functional-design/14-use-case-specification.md` |
+| Feature specification | `../03-functional-design/12-system-features.md` |
+| Product requirements | `../01-product/05-product-requirements.md` |

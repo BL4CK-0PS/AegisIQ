@@ -8,15 +8,16 @@
 4. Phase 0 – Foundation
 5. Phase 1 – Core Platform
 6. Phase 2 – Intelligence Layer
-7. Phase 3 – Assessment System
+7. Phase 3 – Capability Assessment System
 8. Phase 4 – Reporting & Learning
-9. Phase 5 – Production Readiness
-10. Team Responsibilities
-11. Milestones
-12. Deliverables
-13. Risks
-14. Success Criteria
-15. Conclusion
+9. Phase 5 – Community Intelligence
+10. Phase 6 – Production Readiness
+11. Team Responsibilities
+12. Milestones
+13. Deliverables
+14. Risks
+15. Success Criteria
+16. Conclusion
 
 ---
 
@@ -24,7 +25,7 @@
 
 ## Purpose
 
-This roadmap defines the implementation strategy for AegisIQ from initial repository setup through a production-ready MVP.
+This roadmap defines the implementation strategy for PWNDORA SkillScan X from initial repository setup through a production-ready MVP.
 
 The objective is to maximize delivery while minimizing technical debt and integration risk.
 
@@ -34,18 +35,11 @@ The objective is to maximize delivery while minimizing technical debt and integr
 
 Development follows:
 
-```
-Foundation
-    ↓
-Core Platform
-    ↓
-Intelligence
-    ↓
-Assessment
-    ↓
-Reporting
-    ↓
-Production
+```mermaid
+flowchart TD
+    F[Foundation] --> CP[Core Platform] --> I[Intelligence]
+    I --> CA[Capability Assessment] --> R[Reporting]
+    R --> CI[Community Intelligence] --> P[Production]
 ```
 
 Each phase builds on the previous one.
@@ -85,12 +79,12 @@ Objectives:
 Deliverables:
 
 ```
-Repository
-Docker
-CI
-Database
-Authentication
-Health Endpoint
+- Repository
+- Docker
+- CI
+- Database
+- Authentication
+- Health Endpoint
 ```
 
 Success criteria:
@@ -108,16 +102,16 @@ Duration: **Week 2**
 Modules:
 
 - User Management
-- Job Description Upload
-- Role Blueprint Storage
+- Role Definition Upload
+- Skill DNA Profile Storage
 - API foundation
 - Database migrations
 
 Deliverables:
 
-- Upload JD
-- Persist JD
-- Generate placeholder Role Blueprint
+- Upload Role Definition
+- Persist Role Definition
+- Generate placeholder Skill DNA Profile
 - CRUD APIs
 
 ---
@@ -128,39 +122,39 @@ Duration: **Week 3**
 
 Implement:
 
-- Role Blueprint Engine
-- Competency extraction
+- Skill DNA Engine
+- Capability extraction
 - Skill taxonomy
-- Assessment Blueprint generation
+- Capability Blueprint generation
 - AI orchestration
 
 Deliverables:
 
 ```
-Role Blueprint Engine
-Assessment Planner
-Mission Planner
-Prompt Library
+- Skill DNA Engine
+- Assessment Planner
+- Practical Challenge Planner
+- Prompt Library
 ```
 
 ---
 
-# 7. Phase 3 – Assessment System
+# 7. Phase 3 – Capability Assessment System
 
 Duration: **Week 4**
 
 Modules:
 
-- Assessment Engine
-- Mission Generation
+- Capability Intelligence Engine
+- Practical Challenge Generation
 - Session Management
-- Adaptive flow
-- Cyber Reasoning Engine
+- Adaptive capability assessment flow
+- Capability Reasoning Engine
 
 Deliverables:
 
-- Complete assessment lifecycle
-- Mission execution
+- Complete capability assessment lifecycle
+- Practical challenge execution
 - Evaluation pipeline
 
 ---
@@ -171,26 +165,52 @@ Duration: **Week 5**
 
 Implement:
 
-- Explainability Engine
+- Evidence Intelligence Engine
 - Report generation
 - Learning recommendations
 - PDF export
 - Dashboard
+- Career Compass generation
 
 Deliverables:
 
 ```
-Candidate Report
-Recruiter Report
-Learning Roadmap
-Competency Dashboard
+- Professional Report
+- Capability Analyst Report
+- Career Compass
+- Capability Heatmap
 ```
 
 ---
 
-# 9. Phase 5 – Production Readiness
+# 9. Phase 5 – Community Intelligence
 
 Duration: **Week 6**
+
+Implement:
+
+- Anonymous benchmarking engine
+- Peer group analysis
+- Capability Heatmap aggregation
+- Skill DNA Graph insights
+- Industry trend analytics
+- AI Mentor integration
+
+Deliverables:
+
+```
+- Community Benchmarking
+- Peer Group Comparisons
+- Capability Heatmap
+- Skill DNA Graph
+- AI Mentor Interface
+```
+
+---
+
+# 10. Phase 6 – Production Readiness
+
+Duration: **Week 7**
 
 Tasks:
 
@@ -210,7 +230,7 @@ Deliverables:
 
 ---
 
-# 10. Team Responsibilities
+# 11. Team Responsibilities
 
 ## Member 1 – Full Stack & Security
 
@@ -237,10 +257,10 @@ Responsibilities:
 
 Responsibilities:
 
-- Role Blueprint Engine
-- Mission Engine
-- Cyber Reasoning
-- Explainability
+- Skill DNA Engine
+- Practical Challenge Engine
+- Capability Reasoning
+- Evidence Intelligence
 - Rubrics
 
 ## Member 4 – Integration & QA
@@ -255,20 +275,21 @@ Responsibilities:
 
 ---
 
-# 11. Milestones
+# 12. Milestones
 
-| Milestone | Outcome                 |
-| --------- | ----------------------- |
-| M1        | Foundation Complete     |
-| M2        | Platform Functional     |
-| M3        | AI Pipeline Operational |
-| M4        | Assessment Working      |
-| M5        | Reporting Complete      |
-| M6        | Production Ready        |
+| Milestone | Outcome                          |
+| --------- | -------------------------------- |
+| M1        | Foundation Complete              |
+| M2        | Platform Functional              |
+| M3        | AI Pipeline Operational          |
+| M4        | Capability Assessment Working    |
+| M5        | Reporting Complete               |
+| M6        | Community Intelligence Launched  |
+| M7        | Production Ready                 |
 
 ---
 
-# 12. Deliverables
+# 13. Deliverables
 
 Technical deliverables:
 
@@ -283,7 +304,7 @@ Technical deliverables:
 
 Documentation deliverables:
 
-- 40 architecture documents
+- Architecture documents
 - README
 - API reference
 - Deployment guide
@@ -291,7 +312,7 @@ Documentation deliverables:
 
 ---
 
-# 13. Risks
+# 14. Risks
 
 | Risk                 | Mitigation                        |
 | -------------------- | --------------------------------- |
@@ -303,11 +324,11 @@ Documentation deliverables:
 
 ---
 
-# 14. Success Criteria
+# 15. Success Criteria
 
 Technical:
 
-- End-to-end assessment works
+- End-to-end capability assessment works
 - Stable APIs
 - Reliable report generation
 - Successful deployment
@@ -315,13 +336,20 @@ Technical:
 
 Product:
 
-- Candidate completes assessment
-- Recruiter receives explainable report
-- Learning roadmap generated
+- Professional completes capability assessment
+- Capability Analyst receives explainable report
+- Career Compass generated
 - Demo runs without manual intervention
+
+## Related Documents
+
+- [Project Structure](37-project-structure.md)
+- [Risk Analysis](38-risk-analysis.md)
+- [Future Roadmap](39-future-roadmap.md)
+- [Development Guide](../docs/07-engineering/31-development-guide.md)
 
 ---
 
-# 15. Conclusion
+# 16. Conclusion
 
 The roadmap emphasizes incremental delivery, stable integration points, and early validation of core platform capabilities. By completing foundational engineering before advanced AI features, the team reduces implementation risk and increases the likelihood of delivering a polished, working system.

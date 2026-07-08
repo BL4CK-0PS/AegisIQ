@@ -24,7 +24,7 @@
 
 ## Purpose
 
-This document defines the complete security architecture of AegisIQ.
+This document defines the complete security architecture of PWNDORA SkillScan X.
 
 It covers:
 
@@ -45,18 +45,10 @@ Security is treated as a cross-cutting concern affecting every component.
 
 Every request follows:
 
-```
-Authenticate
-    ↓
-Authorize
-    ↓
-Validate
-    ↓
-Process
-    ↓
-Audit
-    ↓
-Monitor
+```mermaid
+flowchart TD
+    A[Authenticate] --> AU[Authorize] --> V[Validate]
+    V --> P[Process] --> AD[Audit] --> M[Monitor]
 ```
 
 Trust is never assumed.
@@ -65,20 +57,11 @@ Trust is never assumed.
 
 # 3. Security Architecture Overview
 
-```
-Browser
-    ↓
-HTTPS
-    ↓
-Nginx
-    ↓
-FastAPI
-    ↓
-Security Middleware
-    ↓
-Business Services
-    ↓
-Database
+```mermaid
+flowchart TD
+    B[Browser] --> HTTPS[HTTPS] --> N[Nginx]
+    N --> FA[FastAPI] --> SM[Security Middleware]
+    SM --> BS[Business Services] --> DB[Database]
 ```
 
 Cross-cutting controls:
@@ -138,20 +121,11 @@ Future:
 
 Every API request passes through:
 
-```
-HTTPS
-    ↓
-Authentication
-    ↓
-Authorization
-    ↓
-Schema Validation
-    ↓
-Business Validation
-    ↓
-Rate Limiting
-    ↓
-Execution
+```mermaid
+flowchart TD
+    HTTPS[HTTPS] --> A[Authentication] --> AU[Authorization]
+    AU --> SV[Schema Validation] --> BV[Business Validation]
+    BV --> RL[Rate Limiting] --> E[Execution]
 ```
 
 Controls:
@@ -170,20 +144,11 @@ AI introduces additional attack surfaces.
 
 Pipeline:
 
-```
-User Input
-    ↓
-Sanitization
-    ↓
-Prompt Builder
-    ↓
-LLM
-    ↓
-Schema Validation
-    ↓
-Business Validation
-    ↓
-Response
+```mermaid
+flowchart TD
+    UI[User Input] --> S[Sanitization] --> PB[Prompt Builder]
+    PB --> LLM[LLM] --> SV[Schema Validation]
+    SV --> BV[Business Validation] --> R[Response]
 ```
 
 Protections:
@@ -195,7 +160,7 @@ Protections:
 - Prompt versioning
 - Retry limits
 
-The AI never executes arbitrary instructions from user input.
+AI MUST NEVER answer assessments — only mentor and explain. The AI never executes arbitrary instructions from user input.
 
 ---
 
@@ -204,7 +169,7 @@ The AI never executes arbitrary instructions from user input.
 Sensitive data:
 
 - User profiles
-- Assessment responses
+- Capability assessment responses
 - Reports
 - Audit logs
 
@@ -273,7 +238,7 @@ Log:
 
 - Authentication events
 - Authorization failures
-- Assessment lifecycle
+- Capability assessment lifecycle
 - Administrative actions
 - AI failures
 - Security events
@@ -281,13 +246,13 @@ Log:
 Audit entries contain:
 
 ```
-Timestamp
-User
-Action
-Resource
-Outcome
-Request ID
-IP Address
+- Timestamp
+- User
+- Action
+- Resource
+- Outcome
+- Request ID
+- IP Address
 ```
 
 Logs should be immutable after creation.
@@ -298,18 +263,10 @@ Logs should be immutable after creation.
 
 Security incident flow:
 
-```
-Detection
-    ↓
-Classification
-    ↓
-Containment
-    ↓
-Investigation
-    ↓
-Recovery
-    ↓
-Postmortem
+```mermaid
+flowchart TD
+    D[Detection] --> C[Classification] --> CON[Containment]
+    CON --> I[Investigation] --> R[Recovery] --> P[Postmortem]
 ```
 
 Critical incidents:
@@ -337,18 +294,10 @@ Monitor:
 
 Security dashboard:
 
-```
-Authentication
-    ↓
-Authorization
-    ↓
-API Abuse
-    ↓
-AI Abuse
-    ↓
-Infrastructure
-    ↓
-Alerts
+```mermaid
+flowchart TD
+    A[Authentication] --> AU[Authorization] --> AP[API Abuse]
+    AP --> AI[AI Abuse] --> I[Infrastructure] --> AL[Alerts]
 ```
 
 ---
@@ -368,8 +317,16 @@ Future security capabilities:
 
 Adopt these as organizational needs evolve.
 
+## Related Documents
+
+- [Authentication & Authorization](../docs/05-data-api/24-authentication-authorization.md)
+- [Deployment Guide](33-deployment-guide.md)
+- [Monitoring & Observability](34-monitoring-observability.md)
+- [Privacy & Security Model Concept](../docs/concepts/privacy-security-model.md)
+- [Risk Analysis](../docs/08-delivery/38-risk-analysis.md)
+
 ---
 
 # 15. Conclusion
 
-The AegisIQ security architecture applies defense in depth across identity, application, AI, infrastructure, and operations. Rather than relying on a single security mechanism, multiple independent controls reduce the likelihood and impact of failures while preserving usability for legitimate users.
+The PWNDORA SkillScan X security architecture applies defense in depth across identity, application, AI, infrastructure, and operations. Rather than relying on a single security mechanism, multiple independent controls reduce the likelihood and impact of failures while preserving usability for legitimate users.

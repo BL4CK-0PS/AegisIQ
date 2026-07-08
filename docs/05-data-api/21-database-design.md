@@ -27,18 +27,18 @@
 
 ## Purpose
 
-This document defines the relational database architecture for AegisIQ.
+This document defines the relational database architecture for PWNDORA SkillScan X.
 
 The database stores:
 
 - Users
-- Job Descriptions
-- Role Blueprints
-- Assessments
-- Missions
+- Role Definitions
+- Skill DNA Profiles
+- Capability Assessments
+- Practical Challenges
 - Responses
-- Evaluations
-- Learning Plans
+- Capability Evaluations
+- Career Compass
 - Reports
 
 The design emphasizes normalization, immutability, and auditability.
@@ -49,19 +49,12 @@ The design emphasizes normalization, immutability, and auditability.
 
 Every record follows the lifecycle:
 
-```
-Create
-    ↓
-Validate
-    ↓
-Persist
-    ↓
-Reference
-    ↓
-Archive
+```mermaid
+flowchart TD
+    C[Create] --> V[Validate] --> P[Persist] --> R[Reference] --> A[Archive]
 ```
 
-Completed assessments are immutable. Updates create new versions instead of overwriting historical data.
+Completed capability assessments are immutable. Updates create new versions instead of overwriting historical data.
 
 ---
 
@@ -81,79 +74,52 @@ The schema follows these principles:
 
 # 4. High-Level Schema
 
-```
-Users
-    ↓
-Job Descriptions
-    ↓
-Role Blueprints
-    ↓
-Assessment Blueprints
-    ↓
-Assessments
-    ↓
-Missions
-    ↓
-Responses
-    ↓
-Evaluations
-    ↓
-Learning Plans
-    ↓
-Reports
+```mermaid
+flowchart TD
+    U[Users] --> RD[Role Definitions] --> SDP[Skill DNA Profiles]
+    SDP --> CB[Capability Blueprints] --> CA[Capability Assessments]
+    CA --> PC[Practical Challenges] --> R[Responses]
+    R --> CE[Capability Evaluations] --> CC[Career Compass] --> REP[Reports]
 ```
 
-Role Blueprint is the canonical business entity.
+Skill DNA Profile is the canonical business entity.
 
 ---
 
 # 5. Core Entities
 
-| Entity                | Purpose                        |
-| --------------------- | ------------------------------ |
-| users                 | User accounts                  |
-| job_descriptions      | Uploaded job descriptions      |
-| role_blueprints       | Canonical role representation  |
-| competencies          | Normalized competency catalog  |
-| assessment_blueprints | Assessment plans               |
-| assessments           | Candidate assessment sessions  |
-| missions              | Individual assessment missions |
-| responses             | Candidate responses            |
-| evaluations           | Scoring and evidence           |
-| learning_plans        | Personalized recommendations   |
-| reports               | Generated assessment reports   |
-| audit_logs            | System activity                |
+| Entity                  | Purpose                        |
+| ----------------------- | ------------------------------ |
+| users                   | User accounts                  |
+| role_definitions        | Uploaded role definitions      |
+| skill_dna_profiles      | Canonical role representation  |
+| capabilities            | Normalized capability catalog  |
+| capability_blueprints   | Assessment plans               |
+| capability_assessments  | Professional assessment sessions|
+| practical_challenges    | Individual assessment challenges|
+| responses               | Professional responses            |
+| capability_evaluations  | Scoring and evidence           |
+| career_compasses        | Personalized recommendations   |
+| reports                 | Generated assessment reports   |
+| audit_logs              | System activity                |
 
 ---
 
 # 6. Entity Relationships
 
-```
-User
-    │
-    ├── Job Descriptions
-    │
-    ├── Assessments
-    │
-    └── Reports
-
-Job Description
-    ↓
-Role Blueprint
-    ↓
-Assessment Blueprint
-    ↓
-Assessment
-    ↓
-Mission
-    ↓
-Response
-    ↓
-Evaluation
-    ↓
-Learning Plan
-    ↓
-Report
+```mermaid
+flowchart TD
+    U[User] --> RD[Role Definitions]
+    U --> CA[Capability Assessments]
+    U --> REP[Reports]
+    RD --> SDP[Skill DNA Profile]
+    SDP --> CB[Capability Blueprint]
+    CB --> CAS[Capability Assessment]
+    CAS --> PC[Practical Challenge]
+    PC --> R[Response]
+    R --> CE[Capability Evaluation]
+    CE --> CC[Career Compass]
+    CE --> REPORT[Report]
 ```
 
 ---
@@ -165,9 +131,9 @@ Reference data is stored separately.
 Examples:
 
 ```
-competencies
+capabilities
 roles
-mission_types
+challenge_types
 mitre_techniques
 rubric_versions
 ```
@@ -180,14 +146,14 @@ Avoid storing repeated strings across assessment records.
 
 ```
 users
-job_descriptions
-role_blueprints
-assessment_blueprints
-assessments
-missions
+role_definitions
+skill_dna_profiles
+capability_blueprints
+capability_assessments
+practical_challenges
 responses
-evaluations
-learning_plans
+capability_evaluations
+career_compasses
 reports
 audit_logs
 ```
@@ -195,10 +161,10 @@ audit_logs
 Supporting lookup tables:
 
 ```
-competencies
+capabilities
 skills
 knowledge_areas
-mission_templates
+challenge_templates
 rubrics
 ```
 
@@ -220,7 +186,7 @@ rubrics
 
 ---
 
-## job_descriptions
+## role_definitions
 
 | Column      | Type      |
 | ----------- | --------- |
@@ -232,12 +198,12 @@ rubrics
 
 ---
 
-## role_blueprints
+## skill_dna_profiles
 
 | Column             | Type      |
 | ------------------ | --------- |
 | id                 | UUID      |
-| job_description_id | UUID      |
+| role_definition_id | UUID      |
 | version            | INTEGER   |
 | title              | VARCHAR   |
 | summary            | TEXT      |
@@ -246,7 +212,7 @@ rubrics
 
 ---
 
-## competencies
+## capabilities
 
 | Column      | Type    |
 | ----------- | ------- |
@@ -257,40 +223,40 @@ rubrics
 
 ---
 
-## assessment_blueprints
+## capability_blueprints
 
-| Column            | Type    |
-| ----------------- | ------- |
-| id                | UUID    |
-| role_blueprint_id | UUID    |
-| duration_minutes  | INTEGER |
-| mission_count     | INTEGER |
-| rubric_version    | UUID    |
-
----
-
-## assessments
-
-| Column       | Type      |
-| ------------ | --------- |
-| id           | UUID      |
-| blueprint_id | UUID      |
-| candidate_id | UUID      |
-| status       | VARCHAR   |
-| started_at   | TIMESTAMP |
-| completed_at | TIMESTAMP |
+| Column                 | Type    |
+| ---------------------- | ------- |
+| id                     | UUID    |
+| skill_dna_profile_id   | UUID    |
+| duration_minutes       | INTEGER |
+| challenge_count        | INTEGER |
+| rubric_version         | UUID    |
 
 ---
 
-## missions
+## capability_assessments
 
-| Column        | Type    |
-| ------------- | ------- |
-| id            | UUID    |
-| assessment_id | UUID    |
-| mission_type  | VARCHAR |
-| scenario      | TEXT    |
-| sequence      | INTEGER |
+| Column           | Type      |
+| ---------------- | --------- |
+| id               | UUID      |
+| blueprint_id     | UUID      |
+| professional_id  | UUID      |
+| status           | VARCHAR   |
+| started_at       | TIMESTAMP |
+| completed_at     | TIMESTAMP |
+
+---
+
+## practical_challenges
+
+| Column           | Type    |
+| ---------------- | ------- |
+| id               | UUID    |
+| assessment_id    | UUID    |
+| challenge_type   | VARCHAR |
+| scenario         | TEXT    |
+| sequence         | INTEGER |
 
 ---
 
@@ -299,14 +265,14 @@ rubrics
 | Column        | Type      |
 | ------------- | --------- |
 | id            | UUID      |
-| mission_id    | UUID      |
+| challenge_id  | UUID      |
 | transcript    | TEXT      |
 | response_type | VARCHAR   |
 | submitted_at  | TIMESTAMP |
 
 ---
 
-## evaluations
+## capability_evaluations
 
 | Column      | Type    |
 | ----------- | ------- |
@@ -318,14 +284,14 @@ rubrics
 
 ---
 
-## learning_plans
+## career_compasses
 
-| Column        | Type      |
-| ------------- | --------- |
-| id            | UUID      |
-| assessment_id | UUID      |
-| roadmap       | JSONB     |
-| generated_at  | TIMESTAMP |
+| Column          | Type      |
+| --------------- | --------- |
+| id              | UUID      |
+| assessment_id   | UUID      |
+| roadmap         | JSONB     |
+| generated_at    | TIMESTAMP |
 
 ---
 
@@ -347,17 +313,17 @@ Create indexes on:
 
 - user_id
 - assessment_id
-- role_blueprint_id
-- job_description_id
+- skill_dna_profile_id
+- role_definition_id
 - created_at
 - status
 
 Composite indexes:
 
 ```
-(candidate_id, status)
+(professional_id, status)
 (assessment_id, sequence)
-(role_blueprint_id, version)
+(skill_dna_profile_id, version)
 ```
 
 ---
@@ -366,9 +332,9 @@ Composite indexes:
 
 Version these entities:
 
-- Role Blueprints
+- Skill DNA Profiles
 - Rubrics
-- Assessment Blueprints
+- Capability Blueprints
 - Reports
 
 Never overwrite historical records.
@@ -392,7 +358,7 @@ Enforce:
 Track:
 
 - User login
-- JD upload
+- Role Definition upload
 - Assessment start
 - Assessment completion
 - Report generation
@@ -458,7 +424,7 @@ Additional tables may include:
 
 - organizations
 - teams
-- recruiter_invites
+- capability_analyst_invites
 - assessment_templates
 - certification_tracks
 - cohort_results
@@ -467,8 +433,15 @@ Additional tables may include:
 
 These should extend the schema without breaking existing relationships.
 
+## Related Documents
+
+- [Entity Relationship Diagram](22-entity-relationship-diagram.md)
+- [Data Models](25-data-models.md)
+- [Data Flow](../docs/04-architecture/20-data-flow.md)
+- [API Specification](23-api-specification.md)
+
 ---
 
 # 18. Conclusion
 
-The AegisIQ database is centered around immutable assessment history and the **Role Blueprint** as the canonical domain model. This structure supports reproducibility, explainability, and future enterprise capabilities while remaining practical for an MVP.
+The PWNDORA SkillScan X database is centered around immutable assessment history and the **Skill DNA Profile** as the canonical domain model. This structure supports reproducibility, explainability, and future enterprise capabilities while remaining practical for an MVP.

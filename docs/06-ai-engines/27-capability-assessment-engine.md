@@ -1,4 +1,4 @@
-# Assessment Engine
+# Capability Intelligence Engine
 
 ## Table of Contents
 
@@ -8,16 +8,17 @@
 4. Engine Overview
 5. Assessment Lifecycle
 6. Assessment Planning
-7. Mission Orchestration
+7. Challenge Orchestration
 8. Session Management
-9. Adaptive Assessment
+9. Adaptive Capability Assessment
 10. State Machine
 11. Evaluation Pipeline
 12. Persistence
 13. Error Recovery
 14. Performance
-15. Future Evolution
-16. Conclusion
+15. AI Mentor Principle
+16. Future Evolution
+17. Conclusion
 
 ---
 
@@ -25,11 +26,11 @@
 
 ## Engine Name
 
-**Assessment Engine (AE)**
+**Capability Intelligence Engine (CIE)**
 
 ## Purpose
 
-The Assessment Engine is responsible for planning, executing, monitoring, and completing cybersecurity assessments.
+The Capability Intelligence Engine is responsible for planning, executing, monitoring, and completing cybersecurity capability assessments.
 
 It coordinates every assessment stage while remaining independent of AI implementation details.
 
@@ -53,18 +54,18 @@ Adaptive
 Explainable
 ```
 
-The Assessment Engine controls workflow, not scoring.
+The Capability Intelligence Engine controls workflow, not scoring.
 
 ---
 
 # 3. Engine Overview
 
 ```
-Role Blueprint
+Skill DNA Profile
     ↓
 Assessment Planner
     ↓
-Mission Queue
+Challenge Queue
     ↓
 Assessment Session
     ↓
@@ -72,7 +73,7 @@ Response Collection
     ↓
 Evaluation Pipeline
     ↓
-Learning Engine
+Learning Path Engine
     ↓
 Report
 ```
@@ -107,17 +108,17 @@ Each stage is atomic and recoverable.
 
 Input:
 
-- Role Blueprint
-- Candidate Profile (optional)
+- Skill DNA Profile
+- Professional Profile (optional)
 - Assessment Template
 - Difficulty Level
 
 Planner outputs:
 
 ```
-Assessment Blueprint
+Capability Blueprint
     ↓
-Mission Sequence
+Challenge Sequence
     ↓
 Timing
     ↓
@@ -128,21 +129,21 @@ Evaluation Plan
 
 ---
 
-# 6. Mission Orchestration
+# 6. Challenge Orchestration
 
-Mission queue example:
+Challenge queue example:
 
 ```
-Mission 1
+Challenge 1
     ↓
-Mission 2
+Challenge 2
     ↓
-Mission 3
+Challenge 3
     ↓
-Mission 4
+Challenge 4
 ```
 
-Each mission contains:
+Each challenge contains:
 
 - Scenario
 - Objectives
@@ -180,20 +181,20 @@ Capabilities:
 
 ---
 
-# 8. Adaptive Assessment
+# 8. Adaptive Capability Assessment
 
-Adaptive logic adjusts the assessment based on candidate performance.
+Adaptive logic adjusts the assessment based on professional performance.
 
 ```
 Response
     ↓
 Evaluation
     ↓
-Competency Coverage
+Capability Coverage
     ↓
 Difficulty Adjustment
     ↓
-Next Mission Selection
+Next Challenge Selection
 ```
 
 Possible adaptations:
@@ -201,7 +202,7 @@ Possible adaptations:
 - Increase complexity
 - Introduce follow-up questions
 - Skip redundant topics
-- Explore weak competency areas
+- Explore weak capability areas
 
 Adaptive behavior must remain bounded by the assessment objectives.
 
@@ -224,9 +225,9 @@ Paused    Completed
  │           │
  ▼           ▼
 Running   Report Generated
-             │
-             ▼
-          Archived
+              │
+              ▼
+           Archived
 ```
 
 Invalid state transitions must be rejected.
@@ -236,22 +237,22 @@ Invalid state transitions must be rejected.
 # 10. Evaluation Pipeline
 
 ```
-Mission Completed
+Challenge Completed
     ↓
 Response Submitted
     ↓
 Transcript Processing
     ↓
-Cyber Reasoning
+Capability Reasoning
     ↓
 Evidence Generation
     ↓
-Competency Update
+Capability Update
     ↓
 Progress Update
 ```
 
-Evaluation occurs after every completed mission.
+Evaluation occurs after every completed challenge.
 
 ---
 
@@ -260,13 +261,13 @@ Evaluation occurs after every completed mission.
 Persist:
 
 - Assessment metadata
-- Mission progress
-- Candidate responses
+- Challenge progress
+- Professional responses
 - Evaluation snapshots
 - Session state
 - Timing information
 
-Use transactional commits after each mission to minimize data loss.
+Use transactional commits after each challenge to minimize data loss.
 
 ---
 
@@ -313,26 +314,44 @@ Target metrics:
 | Metric                    | Target        |
 | ------------------------- | ------------- |
 | Assessment initialization | < 3 s         |
-| Mission load              | < 1 s         |
+| Challenge load            | < 1 s         |
 | Progress save             | < 500 ms      |
 | Resume session            | < 2 s         |
 | Assessment completion     | ≥ 99% success |
 
 ---
 
-# 14. Future Evolution
+# 14. AI Mentor Principle
+
+The Capability Intelligence Engine operates under the **AI Mentor** principle:
+
+> **AI MUST NEVER answer assessments — only mentor and explain.**
+
+The engine orchestrates assessment flow and adapts challenge difficulty, but never provides answers to challenges or completes assessments on behalf of professionals. Adaptation is limited to structural adjustments (difficulty, coverage) — never answer generation.
+
+---
+
+# 15. Future Evolution
 
 Potential enhancements:
 
 - Parallel assessment branches
 - Collaborative assessments
-- Real-time interviewer participation
+- Real-time analyst participation
 - Adaptive time allocation
 - Multi-stage enterprise assessments
 - Simulation-based exercises
 
+## Related Documents
+
+- [Skill DNA Engine](26-skill-dna-engine.md)
+- [Practical Challenge Engine](28-practical-challenge-engine.md)
+- [Capability Reasoning Engine](29-capability-reasoning-engine.md)
+- [Adaptive Assessment Concept](../docs/concepts/evidence-based-assessment.md)
+- [User Workflows](../docs/03-functional-design/13-user-workflows.md)
+
 ---
 
-# 15. Conclusion
+# 16. Conclusion
 
-The Assessment Engine is the orchestration layer that transforms a static Role Blueprint into a dynamic assessment experience. It coordinates planning, execution, adaptation, persistence, and recovery while delegating evaluation and explanation to specialized engines.
+The Capability Intelligence Engine is the orchestration layer that transforms a static Skill DNA Profile into a dynamic capability assessment experience. It coordinates planning, execution, adaptation, persistence, and recovery while delegating evaluation and explanation to specialized engines.

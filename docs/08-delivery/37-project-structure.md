@@ -25,7 +25,7 @@
 
 ## Purpose
 
-This document defines the official repository structure of AegisIQ.
+This document defines the official repository structure of PWNDORA SkillScan X.
 
 Goals:
 
@@ -45,32 +45,28 @@ Every directory should answer one question:
 
 Repository principles:
 
-```
-Simple
-    ↓
-Modular
-    ↓
-Predictable
-    ↓
-Discoverable
-    ↓
-Scalable
+```mermaid
+flowchart TD
+    S[Simple] --> M[Modular] --> P[Predictable]
+    P --> D[Discoverable] --> SC[Scalable]
 ```
 
 ---
 
 # 3. Monorepo Overview
 
-AegisIQ uses a monorepo.
+PWNDORA SkillScan X uses a monorepo.
 
-```
-aegisiq/
-├── frontend/
-├── backend/
-├── infrastructure/
-├── docs/
-├── scripts/
-└── .github/
+```mermaid
+graph TD
+    subgraph skillscanx[skillscanx/]
+        FE[frontend/]
+        BE[backend/]
+        INF[infrastructure/]
+        DOC[docs/]
+        SCR[scripts/]
+        GH[.github/]
+    end
 ```
 
 One repository. Multiple independently deployable components.
@@ -80,7 +76,7 @@ One repository. Multiple independently deployable components.
 # 4. Root Structure
 
 ```
-aegisiq/
+skillscanx/
 ├── backend/
 ├── frontend/
 ├── infrastructure/
@@ -109,11 +105,12 @@ src/
 ├── features/
 │   ├── auth/
 │   ├── dashboard/
-│   ├── job-description/
-│   ├── role-blueprint/
+│   ├── role-definition/
+│   ├── skill-dna/
 │   ├── assessment/
 │   ├── reports/
 │   ├── learning/
+│   ├── community/
 │   └── settings/
 ├── components/
 │   ├── ui/
@@ -142,14 +139,15 @@ app/
 ├── modules/
 │   ├── auth/
 │   ├── users/
-│   ├── jd/
-│   ├── role_blueprint/
+│   ├── role_definition/
+│   ├── skill_dna/
 │   ├── assessment/
-│   ├── missions/
+│   ├── challenges/
 │   ├── reasoning/
-│   ├── explainability/
-│   ├── learning/
+│   ├── evidence_intelligence/
+│   ├── learning_path/
 │   ├── reports/
+│   ├── community/
 │   └── analytics/
 ├── ai/
 ├── database/
@@ -353,8 +351,15 @@ cli/
 
 These should integrate without restructuring existing modules.
 
+## Related Documents
+
+- [Implementation Roadmap](36-implementation-roadmap.md)
+- [Risk Analysis](38-risk-analysis.md)
+- [Final System Overview](40-final-system-overview.md)
+- [Backend Folder Structure](../docs/04-architecture/18-backend-architecture.md)
+
 ---
 
 # 16. Conclusion
 
-The AegisIQ repository is organized around business capabilities rather than technologies. This structure minimizes coupling, improves discoverability, and enables multiple developers to work concurrently with clear ownership boundaries.
+The PWNDORA SkillScan X repository is organized around business capabilities rather than technologies. This structure minimizes coupling, improves discoverability, and enables multiple developers to work concurrently with clear ownership boundaries.

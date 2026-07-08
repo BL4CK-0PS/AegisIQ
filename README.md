@@ -1,6 +1,6 @@
-# AegisIQ
+# PWNDORA SkillScan X
 
-> **Explainable AI for Cybersecurity Talent Intelligence**
+> **Adaptive Cybersecurity Capability Intelligence Platform**
 
 [![Status](https://img.shields.io/badge/Status-Development-blue)]()
 [![Stack](https://img.shields.io/badge/Stack-React%20%7C%20FastAPI%20%7C%20PostgreSQL-3b82f6)]()
@@ -10,9 +10,11 @@
 
 ---
 
-AegisIQ is an AI-powered cybersecurity assessment platform that transforms traditional technical interviews into structured, competency-driven assessments using explainable artificial intelligence.
+PWNDORA SkillScan X is an AI-powered cybersecurity capability intelligence platform that transforms how organizations evaluate, develop, and deploy cybersecurity talent using adaptive artificial intelligence.
 
-Unlike conventional interview platforms that primarily evaluate final answers, AegisIQ analyzes **how** candidates reason through cybersecurity scenarios, generating transparent evaluations, evidence-backed reports, and personalized learning roadmaps.
+We do not assess resumes. We assess cybersecurity capability.
+
+Unlike traditional screening tools that evaluate credentials and final answers, SkillScan X analyzes **how** professionals reason through cybersecurity challenges, generating transparent evaluations, evidence-backed reports, and personalized capability development roadmaps.
 
 ---
 
@@ -38,11 +40,11 @@ Unlike conventional interview platforms that primarily evaluate final answers, A
 
 ### Vision
 
-To build the world's most trusted explainable cybersecurity talent intelligence platform by combining AI, competency modeling, and deterministic engineering.
+To build the world's most trusted adaptive cybersecurity capability intelligence platform by combining AI, competency modeling, and deterministic engineering.
 
 ### Mission
 
-Empower organizations to identify and develop cybersecurity talent through transparent, competency-driven assessments that respect candidate experience and produce actionable intelligence.
+Empower organizations to identify and develop cybersecurity professionals through transparent, competency-driven capability intelligence that respects professional experience and produces actionable insights.
 
 ---
 
@@ -54,40 +56,40 @@ Cybersecurity hiring today suffers from:
 
 | Challenge | Impact |
 |---|---|
-| Subjective interviews | Inconsistent hiring decisions |
+| Subjective evaluations | Inconsistent hiring decisions |
 | Resume-driven screening | Misses practical capability |
 | Limited technical evidence | No defensible audit trail |
-| Poor candidate feedback | Lost learning opportunity |
+| Poor professional feedback | Lost development opportunity |
 | No learning recommendations | Skills gaps persist |
 
-Organizations struggle to determine whether a candidate truly understands cybersecurity or has simply memorized interview questions.
+Organizations struggle to determine whether a professional truly understands cybersecurity or has simply memorized interview questions.
 
-### Why AegisIQ?
+### Why PWNDORA SkillScan X?
 
 - **Explainable by default** — every score traces to evidence
 - **Competency-driven** — maps to real cybersecurity capabilities
-- **Adaptive** — adjusts difficulty to candidate skill level
+- **Adaptive** — adjusts difficulty to professional skill level
 - **Actionable** — generates learning roadmaps from gaps
 
 ### Solution
 
 ```mermaid
 flowchart TD
-    JD["Job Description"] --> RBE["Role Blueprint Engine"]
-    RBE --> AB["Assessment Blueprint"]
-    AB --> MG["Mission Generation"]
-    MG --> CA["Candidate Assessment"]
-    CA --> CRE["Cyber Reasoning Engine"]
-    CRE --> EE["Explainability Engine"]
-    EE --> LE["Learning Engine"]
-    LE --> AR["Assessment Report"]
+    JD["Job Description"] --> SDE["Skill DNA Engine"]
+    SDE --> AB["Assessment Blueprint"]
+    AB --> PCE["Practical Challenge Engine"]
+    PCE --> PA["Professional Assessment"]
+    PA --> CRE["Capability Reasoning Engine"]
+    CRE --> EIE["Evidence Intelligence Engine"]
+    EIE --> LPE["Learning Path Engine"]
+    LPE --> AR["Capability Report"]
 
     style JD fill:#1e3a5f,color:#fff
     style AR fill:#1e3a5f,color:#fff
-    style RBE fill:#2d5a87,color:#fff
+    style SDE fill:#2d5a87,color:#fff
     style CRE fill:#2d5a87,color:#fff
-    style EE fill:#2d5a87,color:#fff
-    style LE fill:#2d5a87,color:#fff
+    style EIE fill:#2d5a87,color:#fff
+    style LPE fill:#2d5a87,color:#fff
 ```
 
 Every decision produced by the platform is traceable and explainable.
@@ -99,16 +101,16 @@ Every decision produced by the platform is traceable and explainable.
 ### JD Intelligence Engine
 Parse PDF / DOCX / TXT job descriptions and extract skills, responsibilities, competencies, and difficulty estimates.
 
-### Role Blueprint Engine
-Transform unstructured job descriptions into structured cybersecurity competency graphs with knowledge areas, assessment objectives, and rubric references.
+### Skill DNA Engine
+Transform unstructured job descriptions into structured cybersecurity competency graphs — the professional's unique Skill DNA — with knowledge areas, assessment objectives, and rubric references.
 
-### Assessment Engine
-Coordinate the complete assessment lifecycle — planning, session management, adaptive difficulty, mission orchestration, progress tracking, and recovery.
+### Capability Intelligence Engine
+Coordinate the complete assessment lifecycle — planning, session management, adaptive difficulty, scenario orchestration, progress tracking, and recovery.
 
-### Mission Generation Engine
+### Practical Challenge Engine
 Generate realistic cybersecurity scenarios across multiple domains:
 
-| Mission Type | Focus Area |
+| Challenge Type | Focus Area |
 |---|---|
 | SOC Investigation | Detection & triage |
 | Incident Response | Containment & recovery |
@@ -119,23 +121,29 @@ Generate realistic cybersecurity scenarios across multiple domains:
 | DFIR | Digital forensics |
 | Identity Security | IAM & access control |
 
-### Cyber Reasoning Engine
-Evaluate candidate reasoning through technical workflow analysis, decision quality, risk awareness, competency coverage, and MITRE ATT&CK alignment.
+### Capability Reasoning Engine
+Evaluate professional reasoning through technical workflow analysis, decision quality, risk awareness, competency coverage, and MITRE ATT&CK alignment.
 
-### Explainability Engine
+### Evidence Intelligence Engine
 Produce evidence-backed score rationale, confidence estimates, and improvement recommendations — every score is supported by evidence.
 
-### Learning Engine
-Generate personalized learning roadmaps mapped directly to competency gaps identified during assessment.
+### Learning Path Engine
+Generate personalized learning roadmaps mapped directly to competency gaps identified during assessment, powered by the **AI Mentor**.
 
-### Voice Interview
-Capture and process spoken responses with automatic transcription and concept extraction.
+### Career Compass
+AI-driven career progression modeling that maps current capabilities to target roles and shows the shortest development path.
 
-### Cyber Readiness Dashboard
-Visualize competency coverage, strengths, weaknesses, and progress over time.
+### Capability Heatmap
+Visualize competency coverage, strengths, weaknesses, and progress over time across your entire team.
 
-### Recruiter Dashboard
-Compare candidates across competencies, review evidence, and export reports.
+### Cyber Twin
+A digital representation of each professional's verified capabilities — continuously updated as skills are demonstrated and assessed.
+
+### AI Mentor
+Intelligent guidance engine that provides real-time hints, learning recommendations, and career advice based on individual Skill DNA.
+
+### Capability Analyst Dashboard
+Compare professionals across competencies, review evidence, and export reports.
 
 ---
 
@@ -145,48 +153,62 @@ Compare candidates across competencies, review evidence, and export reports.
 
 ```mermaid
 flowchart LR
-    subgraph Frontend["Frontend"]
-        React["React UI"]
+    subgraph Presentation["1. Presentation Layer"]
+        React["React SPA"]
     end
-    subgraph Gateway["API Gateway"]
+    subgraph Gateway["2. API Gateway Layer"]
         FA["FastAPI"]
     end
-    subgraph Services["Application Services"]
+    subgraph Adaptive["3. Adaptive Intelligence Layer"]
         AUTH["Auth"]
-        JD["JD Intelligence"]
-        RB["Role Blueprint"]
-        AE["Assessment Engine"]
+        SDE["Skill DNA Engine"]
+        CIE["Capability Intelligence"]
         RR["Reporting"]
     end
-    subgraph AI["AI Layer"]
+    subgraph AI["4. AI Decision Engine"]
         ORCH["AI Orchestrator"]
-        MGEN["Mission Generator"]
-        CRE2["Cyber Reasoning"]
-        EXPL["Explainability"]
-        LEARN["Learning"]
+        PCE["Practical Challenge Engine"]
+        CRE2["Capability Reasoning"]
+        EIE["Evidence Intelligence"]
     end
-    subgraph Data["Data Layer"]
+    subgraph Learning["5. Learning Orchestration Layer"]
+        LPE["Learning Path Engine"]
+        AM["AI Mentor"]
+    end
+    subgraph Community["6. Community Intelligence Layer"]
+        CT["Cyber Twin"]
+        CC["Career Compass"]
+        CH["Capability Heatmap"]
+    end
+    subgraph Data["7. Data Platform"]
         PG[("PostgreSQL")]
     end
 
-    React -->|"HTTPS/REST"| FA
+    React --> FA
     FA --> AUTH
-    FA --> JD
-    FA --> RB
-    FA --> AE
+    FA --> SDE
+    FA --> CIE
     FA --> RR
-    JD --> ORCH
-    RB --> ORCH
-    AE --> ORCH
-    ORCH --> MGEN
+    SDE --> ORCH
+    CIE --> ORCH
+    ORCH --> PCE
     ORCH --> CRE2
-    ORCH --> EXPL
-    ORCH --> LEARN
-    MGEN --> PG
-    CRE2 --> PG
-    EXPL --> PG
-    LEARN --> PG
+    ORCH --> EIE
+    ORCH --> LPE
+    LPE --> AM
+    AM --> CT
+    CT --> CC
+    CT --> CH
     AUTH --> PG
+    SDE --> PG
+    CIE --> PG
+    PCE --> PG
+    CRE2 --> PG
+    EIE --> PG
+    LPE --> PG
+    CT --> PG
+    CC --> PG
+    CH --> PG
     RR --> PG
 ```
 
@@ -200,23 +222,32 @@ flowchart TD
     subgraph Presentation["Presentation Layer"]
         R["React SPA"]
     end
-    subgraph API["API Layer"]
+    subgraph API["API Gateway Layer"]
         NG["Nginx"]
         FAST["FastAPI"]
     end
-    subgraph App["Application Layer"]
+    subgraph Adaptive["Adaptive Intelligence Layer"]
         MD["Auth Module"]
-        MD2["JD Module"]
-        MD3["Assessment Module"]
+        MD2["Skill DNA Module"]
+        MD3["Capability Assessment Module"]
         MD4["Reports Module"]
     end
-    subgraph AI["AI Orchestration Layer"]
+    subgraph AI["AI Decision Engine"]
         AIO["AI Orchestrator"]
         PM["Prompt Manager"]
         SC["Schema Validator"]
         PV["Provider Abstraction"]
     end
-    subgraph Storage["Persistence Layer"]
+    subgraph Learning["Learning Orchestration Layer"]
+        LPE["Learning Path Engine"]
+        AM["AI Mentor"]
+    end
+    subgraph Community["Community Intelligence Layer"]
+        CT["Cyber Twin Registry"]
+        CC["Career Compass"]
+        CH["Capability Heatmap"]
+    end
+    subgraph Storage["Data Platform"]
         PG[("PostgreSQL")]
     end
 
@@ -237,13 +268,21 @@ flowchart TD
     MD2 --> PG
     MD3 --> PG
     MD4 --> PG
+    AIO --> LPE
+    LPE --> AM
+    AM --> CT
+    CT --> CC
+    CT --> CH
+    CT --> PG
+    CC --> PG
+    CH --> PG
 ```
 
 ### Backend Architecture
 
 ```mermaid
 flowchart TD
-    subgraph API["API Layer"]
+    subgraph API["API Gateway Layer"]
         R["/api/v1/routers"]
         MW["Middleware"]
         DEP["Dependencies"]
@@ -259,23 +298,25 @@ flowchart TD
         AUTH["auth/"]
         USR["users/"]
         JD["jd/"]
-        RB["role_blueprint/"]
-        ASM["assessment/"]
-        MIS["missions/"]
-        REA["reasoning/"]
-        EXP["explainability/"]
-        LRN["learning/"]
+        SDE["skill_dna/"]
+        CIE["capability_assessment/"]
+        PCE["practical_challenges/"]
+        CRE["capability_reasoning/"]
+        EIE["evidence_intelligence/"]
+        LPE["learning_path/"]
         REP["reports/"]
         ANL["analytics/"]
+        CT["cyber_twin/"]
+        CC["career_compass/"]
     end
-    subgraph AI["AI Layer"]
+    subgraph AI["AI Decision Engine"]
         ORC["orchestrator/"]
         PRO["prompts/"]
         SCH["schemas/"]
         VAL["validators/"]
         PRV["providers/"]
     end
-    subgraph DB["Database Layer"]
+    subgraph DB["Data Platform"]
         MOD["models/"]
         MIG["migrations/"]
         SES["session.py"]
@@ -285,9 +326,9 @@ flowchart TD
     MW --> R
     Core --> Modules
     Modules --> AI
-    ASM --> ORC
-    JD --> ORC
-    REA --> ORC
+    CIE --> ORC
+    SDE --> ORC
+    CRE --> ORC
     Modules --> DB
 ```
 
@@ -301,21 +342,25 @@ flowchart TD
         RG["Register"]
         DB["Dashboard"]
         JD["Job Description"]
-        RB["Role Blueprint"]
-        AS["Assessment"]
+        SD["Skill DNA"]
+        AS["Capability Assessment"]
         RP["Reports"]
         LN["Learning"]
+        CT["Cyber Twin"]
+        CC["Career Compass"]
         ST["Settings"]
     end
     subgraph Features["Feature Modules"]
         FA["auth/"]
         FD["dashboard/"]
         FJ["job-description/"]
-        FR["role-blueprint/"]
+        FS["skill-dna/"]
         FAS["assessment/"]
-        FM["missions/"]
+        FM["practical-challenges/"]
         FRP["reports/"]
         FL["learning/"]
+        FC["cyber-twin/"]
+        FCP["career-compass/"]
     end
     subgraph Shared["Shared Layer"]
         UI["ui/ (Button, Card, Modal...)"]
@@ -349,15 +394,15 @@ flowchart TD
 flowchart TD
     subgraph Input["Input"]
         JD["Job Description"]
-        CR["Candidate Response"]
+        PR["Professional Response"]
     end
     subgraph Engines["AI Engines"]
-        RBE["Role Blueprint Engine"]
+        SDE["Skill DNA Engine"]
         AP["Assessment Planner"]
-        MG["Mission Generator"]
-        CRE["Cyber Reasoning Engine"]
-        EE["Explainability Engine"]
-        LE["Learning Engine"]
+        PCE["Practical Challenge Generator"]
+        CRE["Capability Reasoning Engine"]
+        EIE["Evidence Intelligence Engine"]
+        LPE["Learning Path Engine"]
     end
     subgraph Orchestrator["AI Orchestrator"]
         PM["Prompt Builder"]
@@ -366,27 +411,27 @@ flowchart TD
         RT["Retry Logic"]
     end
     subgraph Output["Output"]
-        BP["Blueprint"]
+        SD["Skill DNA"]
         APO["Assessment Plan"]
-        MSO["Mission Package"]
+        MSO["Challenge Package"]
         EV["Evaluation"]
-        EX["Explanation"]
+        EX["Evidence Report"]
         LR["Learning Roadmap"]
     end
 
-    JD --> RBE
-    RBE --> AP
-    AP --> MG
-    CR --> CRE
-    CRE --> EE
-    EE --> LE
-    RBE --> Orchestrator
+    JD --> SDE
+    SDE --> AP
+    AP --> PCE
+    PR --> CRE
+    CRE --> EIE
+    EIE --> LPE
+    SDE --> Orchestrator
     AP --> Orchestrator
-    MG --> Orchestrator
+    PCE --> Orchestrator
     CRE --> Orchestrator
-    EE --> Orchestrator
-    LE --> Orchestrator
-    Orchestrator --> BP
+    EIE --> Orchestrator
+    LPE --> Orchestrator
+    Orchestrator --> SD
     Orchestrator --> APO
     Orchestrator --> MSO
     Orchestrator --> EV
@@ -400,19 +445,23 @@ flowchart TD
 erDiagram
     User ||--o{ Assessment : "undergoes"
     User ||--o{ JobDescription : "uploads"
-    JobDescription ||--|| RoleBlueprint : "generates"
-    RoleBlueprint ||--o{ Assessment : "defines"
-    Assessment ||--o{ Mission : "contains"
+    User ||--|| CyberTwin : "has"
+    JobDescription ||--|| SkillDNA : "generates"
+    SkillDNA ||--o{ Assessment : "defines"
+    Assessment ||--o{ PracticalChallenge : "contains"
     Assessment ||--|| Report : "produces"
-    Mission ||--o{ Response : "elicits"
+    PracticalChallenge ||--o{ Response : "elicits"
     Response ||--|| Evaluation : "receives"
     Evaluation ||--|| Evidence : "produces"
     Evaluation ||--o{ LearningPath : "generates"
+    CyberTwin ||--|| CareerCompass : "feeds"
+    CyberTwin ||--|| CapabilityHeatmap : "feeds"
+    User ||--o{ CapabilityHeatmap : "visualizes"
 
     User {
         uuid id PK
         string email
-        string role "admin | recruiter | candidate"
+        string role "admin | capability_analyst | professional | reviewer"
         datetime created_at
     }
 
@@ -423,7 +472,7 @@ erDiagram
         datetime uploaded_at
     }
 
-    RoleBlueprint {
+    SkillDNA {
         uuid id PK
         jsonb competencies
         jsonb knowledge_areas
@@ -441,7 +490,7 @@ erDiagram
         datetime completed_at
     }
 
-    Mission {
+    PracticalChallenge {
         uuid id PK
         string type "soc | ir | threat_hunting | ..."
         jsonb scenario
@@ -481,6 +530,28 @@ erDiagram
         uuid id PK
         jsonb recommendations
         jsonb resources
+    }
+
+    CyberTwin {
+        uuid id PK
+        jsonb capability_profile
+        jsonb verified_skills
+        jsonb experience_graph
+        datetime last_updated
+    }
+
+    CapabilityHeatmap {
+        uuid id PK
+        jsonb coverage_data
+        jsonb strength_areas
+        jsonb gap_areas
+    }
+
+    CareerCompass {
+        uuid id PK
+        jsonb target_roles
+        jsonb progression_paths
+        jsonb recommended_milestones
     }
 ```
 
@@ -523,20 +594,20 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    JD["Job Description"] --> RBE["Role Blueprint\nEngine"]
-    RBE --> AP["Assessment\nPlanner"]
-    AP --> MG["Mission\nGenerator"]
-    MG --> CR["Candidate\nResponse"]
-    CR --> CRE["Cyber\nReasoning"]
-    CRE --> EE["Explainability\nEngine"]
-    EE --> LE["Learning\nEngine"]
-    LE --> REPO["Report\nGenerator"]
+    JD["Job Description"] --> SDE["Skill DNA\nEngine"]
+    SDE --> AP["Assessment\nPlanner"]
+    AP --> PCE["Practical\nChallenge Engine"]
+    PCE --> PR["Professional\nResponse"]
+    PR --> CRE["Capability\nReasoning"]
+    CRE --> EIE["Evidence\nIntelligence"]
+    EIE --> LPE["Learning Path\nEngine"]
+    LPE --> REPO["Report\nGenerator"]
 
     style JD fill:#1e3a5f,color:#fff
-    style MG fill:#2d5a87,color:#fff
+    style PCE fill:#2d5a87,color:#fff
     style CRE fill:#2d5a87,color:#fff
-    style EE fill:#2d5a87,color:#fff
-    style LE fill:#2d5a87,color:#fff
+    style EIE fill:#2d5a87,color:#fff
+    style LPE fill:#2d5a87,color:#fff
     style REPO fill:#1e3a5f,color:#fff
 ```
 
@@ -545,19 +616,19 @@ flowchart LR
 ```mermaid
 flowchart TD
     START(["Start Assessment"]) --> PLAN["Load Assessment Blueprint"]
-    PLAN --> M1["Present Mission 1"]
-    M1 --> R1["Candidate Responds"]
+    PLAN --> M1["Present Challenge 1"]
+    M1 --> R1["Professional Responds"]
     R1 --> E1["Evaluate Response"]
     E1 --> ADJ{"Adjust Difficulty?"}
-    ADJ -->|"Low Score"| EASY["Easier Mission"]
-    ADJ -->|"High Score"| HARD["Harder Mission"]
+    ADJ -->|"Low Score"| EASY["Easier Challenge"]
+    ADJ -->|"High Score"| HARD["Harder Challenge"]
     ADJ -->|"Adequate"| NORM["Same Difficulty"]
-    EASY --> M2["Present Mission 2"]
+    EASY --> M2["Present Challenge 2"]
     HARD --> M2
     NORM --> M2
     M2 --> R2["Next Response..."]
     R2 --> E2["Evaluate"]
-    E2 --> DONE{"All Missions\nComplete?"}
+    E2 --> DONE{"All Challenges\nComplete?"}
     DONE -->|"Yes"| FINAL["Generate Final Report"]
     DONE -->|"No"| M2
     FINAL --> END(["Assessment Complete"])
@@ -665,7 +736,7 @@ flowchart TD
 
 ---
 
-## Project Modules
+## Project Structure
 
 ### Frontend Modules
 
@@ -678,10 +749,12 @@ frontend/
 │   ├── auth/         Login, register, password reset
 │   ├── dashboard/    Main dashboard, stats
 │   ├── job-description/  JD upload & analysis
-│   ├── role-blueprint/   Blueprint review
-│   ├── assessment/   Assessment session
+│   ├── skill-dna/    Skill DNA profile view
+│   ├── assessment/   Capability assessment session
 │   ├── reports/      Report viewing & export
 │   ├── learning/     Learning roadmap
+│   ├── cyber-twin/   Cyber Twin visualization
+│   ├── career-compass/  Career progression paths
 │   └── settings/     User settings
 ├── components/       Shared UI library
 │   ├── ui/           Primitives
@@ -703,12 +776,14 @@ backend/
 │   ├── auth/         Authentication & authorization
 │   ├── users/        User management
 │   ├── jd/           Job description intelligence
-│   ├── role_blueprint/  Competency blueprint generation
-│   ├── assessment/   Assessment lifecycle
-│   ├── missions/     Mission/scenario generation
-│   ├── reasoning/    Cyber reasoning & evaluation
-│   ├── explainability/  Evidence & explanation
-│   ├── learning/     Learning recommendations
+│   ├── skill_dna/    Skill DNA profile generation
+│   ├── capability_assessment/  Assessment lifecycle
+│   ├── practical_challenges/   Scenario generation
+│   ├── capability_reasoning/   Reasoning & evaluation
+│   ├── evidence_intelligence/  Evidence & explanation
+│   ├── learning_path/          Learning recommendations
+│   ├── cyber_twin/   Cyber Twin management
+│   ├── career_compass/  Career progression engine
 │   ├── reports/      Report generation
 │   └── analytics/    Analytics aggregation
 ├── ai/               AI orchestration layer
@@ -731,8 +806,8 @@ backend/
 | Member | Primary Domain | Secondary Domain | Ownership |
 |---|---|---|---|
 | **Jos** | ⚙️ Backend Architecture | AI Platform | FastAPI, APIs, Database, AI Orchestrator, Session Management |
-| **Mithra** | 🎨 Frontend & UI/UX | Frontend Architecture | Next.js, Tailwind, shadcn/ui, Dashboard, Reports, Charts |
-| **KC** | 🧠 AI Engineering + Cybersecurity | Prompt Engineering | LLM Logic, Evaluation Engine, Rubrics, MITRE Mapping, Adaptive Questions |
+| **Mithra** | 🎨 Frontend & UI/UX | Frontend Architecture | React, Tailwind, shadcn/ui, Dashboard, Reports, Charts |
+| **KC** | 🧠 AI Engineering + Cybersecurity | Prompt Engineering | LLM Logic, Evaluation Engine, Rubrics, MITRE Mapping, Adaptive Challenges |
 | **AV** | 🔗 AI Integration & System Reliability | Testing & DevOps | AI Provider Layer, Voice, Integration, Deployment, Testing, Performance |
 
 ---
@@ -743,23 +818,23 @@ backend/
 
 Owns FastAPI, REST APIs, Database, Session Management, AI Orchestrator, Backend Architecture.
 
-**Deliverables:** `/parse-jd`, `/generate-interview`, `/evaluate-answer`, `/generate-report`
+**Deliverables:** `/parse-jd`, `/generate-assessment`, `/evaluate-response`, `/generate-report`
 
 **Learns:** FastAPI, Pydantic, Async Python, API Design, Database Design
 
 #### 🎨 Mithra — Frontend Lead
 
-Owns Next.js, Tailwind CSS, shadcn/ui, Dashboard, Landing Page, Interview Screen, Report Screen, Charts, Animations.
+Owns React, Tailwind CSS, shadcn/ui, Dashboard, Landing Page, Assessment Screen, Report Screen, Charts, Animations.
 
-**Deliverables:** Beautiful UI, Responsive Layout, Mission Timeline, Skill Radar, Report Dashboard
+**Deliverables:** Beautiful UI, Responsive Layout, Challenge Timeline, Skill Radar, Report Dashboard
 
-**Learns:** Next.js, React, Tailwind, shadcn/ui, Recharts, UX Principles
+**Learns:** React, Tailwind, shadcn/ui, Recharts, UX Principles
 
 #### 🧠 KC — AI + Cybersecurity Lead
 
-Owns Prompt Engineering, Cybersecurity Knowledge, Evaluation Logic, Rubrics, MITRE Mapping, Question Generation, Follow-up Logic, Learning Roadmap.
+Owns Prompt Engineering, Cybersecurity Knowledge, Evaluation Logic, Rubrics, MITRE Mapping, Challenge Generation, Follow-up Logic, Learning Path.
 
-**Deliverables:** Prompt Library, Rubric Engine, Explainable Scoring, Adaptive Interview Logic, Cyber Readiness Report
+**Deliverables:** Prompt Library, Rubric Engine, Explainable Scoring, Adaptive Assessment Logic, Capability Readiness Report
 
 **Learns:** Prompt Engineering, LLM Evaluation, SOC Workflow, MITRE ATT&CK, Incident Response, Threat Hunting
 
@@ -787,6 +862,9 @@ Owns AI Provider Layer, Mistral Integration, Ollama Fallback, Web Speech API, De
 | Prompt Engineering | KC | AV |
 | Cyber Rubrics | KC | Jos |
 | Evaluation Engine | KC | Jos |
+| Learning Path Engine | KC | Jos |
+| Cyber Twin | KC | Jos |
+| Career Compass | KC | Mithra |
 | Deployment | AV | Jos |
 | Testing | Everyone | Everyone |
 
@@ -797,8 +875,8 @@ Owns AI Provider Layer, Mistral Integration, Ollama Fallback, Web Speech API, De
 | Role | Permissions | Description |
 |---|---|---|
 | **Admin** | Full system access | Manage users, configure system, view all data |
-| **Recruiter** | Create assessments, view reports | Design assessments, evaluate candidates |
-| **Candidate** | Take assessments, view own reports | Complete missions, review feedback |
+| **Capability Analyst** | Create assessments, view reports | Design assessments, evaluate professionals |
+| **Professional** | Take assessments, view own reports | Complete challenges, review feedback |
 | **Reviewer** | View reports, add notes | Secondary evaluation, quality review |
 
 ---
@@ -825,9 +903,9 @@ No one should end the day without pulling the latest code.
 | Days | Focus | Milestone |
 |---|---|---|
 | 1–3 | Project setup, frontend skeleton, backend skeleton, AI provider setup, voice prototype | Frontend successfully calls the backend |
-| 4–6 | JD parser, question generator, interview UI, prompt library | One complete interview flow works |
+| 4–6 | JD parser, challenge generator, assessment UI, prompt library | One complete assessment flow works |
 | 7–10 | Evaluation engine, explainable scoring, MITRE mapping, voice integration, report generation | End-to-end demo is functional |
-| 11–13 | Adaptive follow-up questions, learning roadmap, UI polish, performance improvements | — |
+| 11–13 | Adaptive follow-up challenges, learning roadmap, UI polish, performance improvements | — |
 | 14–16 | Bug fixing only, prompt tuning, demo rehearsal, judge Q&A preparation | — |
 
 ### Team Rules (Non-Negotiable)
@@ -850,7 +928,7 @@ No one should end the day without pulling the latest code.
 ## Repository Structure
 
 ```
-aegisiq/
+skillscanx/
 ├── frontend/          React SPA
 ├── backend/           FastAPI application
 ├── infrastructure/    Docker, Nginx, deployment
@@ -870,15 +948,19 @@ aegisiq/
 
 ```
 docs/
-├── 01-product/        Overview, problem, vision, requirements
-├── 02-research/       Market analysis, personas, user journey
+├── 01-product/            Overview, problem, vision, requirements
+├── 02-research/           Market analysis, personas, user journey
 ├── 03-functional-design/  Features, workflows, use cases, UI/UX
-├── 04-architecture/   System, AI, backend, frontend, data flow
-├── 05-data-api/       Database design, API spec, auth, models
-├── 06-ai-engines/     Blueprint, assessment, missions, reasoning, explainability
-├── 07-engineering/    Testing, devops, deployment, monitoring, security
-└── 08-delivery/       Roadmap, project structure, risk, future vision
+├── 04-architecture/       System, AI, backend, frontend, data flow
+├── 05-data-api/           Database design, API spec, auth, models
+├── 06-ai-engines/         Skill DNA, assessment, challenges, reasoning, evidence
+├── 07-engineering/        Testing, devops, deployment, monitoring, security
+├── 08-delivery/           Roadmap, project structure, risk, future vision
+├── concepts/              Deep-dive docs: Cyber Twin, AI Mentor, Gamification +20
+└── reference/             Glossary, FAQ, Scalability, Observability, Monitoring
 ```
+
+Full documentation index → [`docs/README.md`](docs/README.md)
 
 ---
 
@@ -896,7 +978,7 @@ docs/
 
 ```bash
 # Backend
-DATABASE_URL=postgresql://user:pass@localhost:5432/aegisiq
+DATABASE_URL=postgresql://user:pass@localhost:5432/skillscanx
 JWT_SECRET=your-secret-key
 LLM_API_KEY=your-api-key
 LLM_PROVIDER=openai  # or anthropic, etc.
@@ -1011,7 +1093,7 @@ Browser → Nginx (SSL) → FastAPI (Uvicorn) → PostgreSQL
 
 ```mermaid
 gantt
-    title AegisIQ Development Roadmap
+    title PWNDORA SkillScan X Development Roadmap
     dateFormat  YYYY-MM-DD
     section Foundation
     Project Setup        :done, 2026-07-01, 7d
@@ -1019,17 +1101,19 @@ gantt
     section Core Platform
     Auth & Users         :active, 2026-07-08, 14d
     JD Intelligence      :2026-07-15, 14d
-    Role Blueprint       :2026-07-22, 14d
+    Skill DNA            :2026-07-22, 14d
     section AI Engines
-    Mission Generator    :2026-08-01, 21d
-    Cyber Reasoning      :2026-08-15, 21d
-    Explainability       :2026-09-01, 14d
+    Practical Challenges   :2026-08-01, 21d
+    Capability Reasoning   :2026-08-15, 21d
+    Evidence Intelligence  :2026-09-01, 14d
     section Assessment
-    Assessment Engine    :2026-09-15, 21d
-    Frontend UX          :2026-09-22, 21d
-    section Reporting
+    Capability Assessment  :2026-09-15, 21d
+    Frontend UX            :2026-09-22, 21d
+    section Intelligence
     Report Generator     :2026-10-15, 14d
-    Learning Engine      :2026-10-22, 14d
+    Learning Path Engine :2026-10-22, 14d
+    Cyber Twin           :2026-10-29, 14d
+    Career Compass       :2026-11-05, 14d
     section Production
     Testing & Polish     :2026-11-01, 21d
     Launch               :2026-11-22, 7d
@@ -1040,10 +1124,10 @@ gantt
 | Phase | Focus | Deliverables |
 |---|---|---|
 | **Phase 1** Foundation | Project setup, docs, CI/CD | Repository, Docker, Architecture |
-| **Phase 2** Core Platform | Auth, users, JD intelligence | Auth system, JD parser, Role Blueprint |
-| **Phase 3** AI Engines | Mission gen, reasoning, explainability | AI pipeline, evaluation, evidence |
+| **Phase 2** Core Platform | Auth, users, JD intelligence | Auth system, JD parser, Skill DNA |
+| **Phase 3** AI Engines | Challenge gen, reasoning, evidence | AI pipeline, evaluation, evidence |
 | **Phase 4** Assessment | Assessment lifecycle, frontend | Assessment UX, adaptive flow |
-| **Phase 5** Reporting | Reports, learning, dashboards | PDF reports, learning roadmaps |
+| **Phase 5** Intelligence | Reports, learning, Cyber Twin, Career Compass | PDF reports, learning roadmaps, Cyber Twin profiles |
 | **Phase 6** Production | Testing, security, launch | Production deployment |
 
 ### Future Vision
@@ -1056,6 +1140,8 @@ gantt
 - Workforce analytics
 - AI agent collaboration
 - NICE Workforce Framework alignment
+- Cyber Twin marketplace
+- Cross-organization capability benchmarking
 
 ---
 
@@ -1064,7 +1150,7 @@ gantt
 | Control | Implementation |
 |---|---|
 | Authentication | JWT with refresh tokens |
-| Authorization | RBAC (Admin, Recruiter, Candidate, Reviewer) |
+| Authorization | RBAC (Admin, Capability Analyst, Professional, Reviewer) |
 | Prompt Injection | Input sanitization, output validation |
 | SQL Injection | ORM parameterized queries |
 | AI Validation | Structured JSON schemas, confidence thresholds |
@@ -1094,7 +1180,7 @@ This project is released under the MIT License.
 
 ## Acknowledgements
 
-Built using modern software engineering principles, explainable artificial intelligence, and cybersecurity competency modeling.
+Built using modern software engineering principles, adaptive artificial intelligence, and cybersecurity competency modeling.
 
 ---
 

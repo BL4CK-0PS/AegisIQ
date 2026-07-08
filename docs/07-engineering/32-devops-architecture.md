@@ -25,7 +25,7 @@
 
 ## Purpose
 
-This document defines the DevOps architecture for AegisIQ.
+This document defines the DevOps architecture for PWNDORA SkillScan X.
 
 It covers:
 
@@ -43,18 +43,9 @@ It covers:
 
 Every change follows:
 
-```
-Develop
-    ↓
-Commit
-    ↓
-Test
-    ↓
-Build
-    ↓
-Deploy
-    ↓
-Monitor
+```mermaid
+flowchart TD
+    D[Develop] --> C[Commit] --> T[Test] --> B[Build] --> DEP[Deploy] --> M[Monitor]
 ```
 
 Automation replaces manual deployment wherever possible.
@@ -63,20 +54,10 @@ Automation replaces manual deployment wherever possible.
 
 # 3. Development Workflow
 
-```
-Issue
-    ↓
-Feature Branch
-    ↓
-Development
-    ↓
-Pull Request
-    ↓
-Review
-    ↓
-Merge
-    ↓
-Deploy
+```mermaid
+flowchart TD
+    I[Issue] --> FB[Feature Branch] --> DEV[Development]
+    DEV --> PR[Pull Request] --> R[Review] --> M[Merge] --> DEP[Deploy]
 ```
 
 No direct commits to `main`.
@@ -109,22 +90,10 @@ Rules:
 
 # 5. CI/CD Pipeline
 
-```
-Git Push
-    ↓
-GitHub Actions
-    ↓
-Lint
-    ↓
-Type Check
-    ↓
-Unit Tests
-    ↓
-Integration Tests
-    ↓
-Docker Build
-    ↓
-Deploy
+```mermaid
+flowchart TD
+    GP[Git Push] --> GA[GitHub Actions] --> L[Lint] --> TC[Type Check]
+    TC --> UT[Unit Tests] --> IT[Integration Tests] --> DB[Docker Build] --> DEP[Deploy]
 ```
 
 Every stage must succeed before deployment.
@@ -135,26 +104,16 @@ Every stage must succeed before deployment.
 
 Frontend:
 
-```
-Install
-    ↓
-Type Check
-    ↓
-Build
-    ↓
-Bundle
+```mermaid
+flowchart TD
+    I[Install] --> TC[Type Check] --> B[Build] --> BU[Bundle]
 ```
 
 Backend:
 
-```
-Install
-    ↓
-Lint
-    ↓
-Tests
-    ↓
-Package
+```mermaid
+flowchart TD
+    I[Install] --> L[Lint] --> T[Tests] --> P[Package]
 ```
 
 Artifacts:
@@ -167,26 +126,22 @@ Artifacts:
 
 # 7. Container Architecture
 
-```
-Docker Compose
-├── frontend
-├── backend
-├── postgres
-└── nginx
+```mermaid
+graph TD
+    subgraph DockerCompose[Docker Compose]
+        FE[frontend]
+        BE[backend]
+        PG[postgres]
+        NX[nginx]
+    end
 ```
 
 Future:
 
-```
-Ingress
-    ↓
-Frontend
-    ↓
-Backend
-    ↓
-AI Worker
-    ↓
-Database
+```mermaid
+flowchart TD
+    IN[Ingress] --> FE[Frontend] --> BE[Backend]
+    BE --> AW[AI Worker] --> DB[Database]
 ```
 
 One service per container.
@@ -229,20 +184,11 @@ Rules:
 
 # 10. Infrastructure Layout
 
-```
-Developer
-    ↓
-GitHub
-    ↓
-GitHub Actions
-    ↓
-Container Registry
-    ↓
-Deployment Server
-    ↓
-Docker
-    ↓
-AegisIQ
+```mermaid
+flowchart TD
+    DEV[Developer] --> GH[GitHub] --> GHA[GitHub Actions]
+    GHA --> CR[Container Registry] --> DS[Deployment Server]
+    DS --> D[Docker] --> SYS[PWNDORA SkillScan X]
 ```
 
 For the MVP, a single deployment host is sufficient.
@@ -253,16 +199,10 @@ For the MVP, a single deployment host is sufficient.
 
 Release flow:
 
-```
-Feature Complete
-    ↓
-Release Branch
-    ↓
-Regression Tests
-    ↓
-Tag Release
-    ↓
-Deploy
+```mermaid
+flowchart TD
+    FC[Feature Complete] --> RB[Release Branch] --> RT[Regression Tests]
+    RT --> TR[Tag Release] --> DEP[Deploy]
 ```
 
 Versioning:
@@ -279,16 +219,11 @@ Follow Semantic Versioning.
 
 # 12. Rollback Strategy
 
-```
-Deploy
-    ↓
-Health Check
-    ↓
-Failure?
-    ↓
-Rollback Previous Image
-    ↓
-Restore Service
+```mermaid
+flowchart TD
+    DEP[Deploy] --> HC[Health Check] --> F{Failure?}
+    F -->|Yes| RPI[Rollback Previous Image] --> RS[Restore Service]
+    F -->|No| OK[OK]
 ```
 
 Keep the previous deployment artifact available until the new release is verified.
@@ -340,8 +275,15 @@ Potential additions:
 
 Only introduce these when they solve a real operational problem.
 
+## Related Documents
+
+- [Testing Strategy](31-testing-strategy.md)
+- [Deployment Guide](33-deployment-guide.md)
+- [Monitoring & Observability](34-monitoring-observability.md)
+- [CI/CD Pipeline](../docs/07-engineering/34-ci-cd-pipeline.md)
+
 ---
 
 # 16. Conclusion
 
-The DevOps architecture emphasizes automation, reproducibility, and reliability while remaining appropriately simple for a four-person team. A modular deployment pipeline with automated testing and containerized services provides a strong foundation for both the hackathon MVP and future production growth.
+The DevOps architecture emphasizes automation, reproducibility, and reliability while remaining appropriately simple for the PWNDORA SkillScan X Team. A modular deployment pipeline with automated testing and containerized services provides a strong foundation for both the hackathon MVP and future production growth.

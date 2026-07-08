@@ -26,7 +26,7 @@
 
 ## Purpose
 
-This document defines the testing strategy for AegisIQ.
+This document defines the testing strategy for PWNDORA SkillScan X.
 
 Objectives:
 
@@ -42,16 +42,9 @@ Objectives:
 
 Every feature must satisfy:
 
-```
-Build
-    ↓
-Test
-    ↓
-Review
-    ↓
-Deploy
-    ↓
-Monitor
+```mermaid
+flowchart TD
+    B[Build] --> T[Test] --> R[Review] --> D[Deploy] --> M[Monitor]
 ```
 
 Testing is continuous, not a final phase.
@@ -74,10 +67,14 @@ The platform should provide:
 
 # 4. Testing Pyramid
 
-```
-          E2E
-      Integration
-        Unit Tests
+```mermaid
+graph TD
+    subgraph TestingPyramid
+        UT[Unit Tests]
+        IT[Integration Tests]
+        E2E[End-to-End Tests]
+    end
+    UT --> IT --> E2E
 ```
 
 Approximate distribution:
@@ -101,7 +98,7 @@ Test:
 Example modules:
 
 ```
-assessment/
+capability/
 reasoning/
 learning/
 reports/
@@ -120,19 +117,15 @@ Validate interactions between modules.
 
 Examples:
 
-```
-Assessment
-    ↓
-Mission
-    ↓
-Reasoning
-    ↓
-Report
+```mermaid
+flowchart TD
+    CIE[Capability Intelligence Engine] --> PCE[Practical Challenge Engine]
+    PCE --> CRE[Capability Reasoning Engine] --> R[Report]
 ```
 
 Scenarios:
 
-- Complete assessment flow
+- Complete capability assessment flow
 - Database persistence
 - AI orchestration
 - Session recovery
@@ -179,16 +172,10 @@ Validate:
 
 Example:
 
-```
-Prompt
-    ↓
-LLM Output
-    ↓
-Schema Validation
-    ↓
-Business Validation
-    ↓
-Accepted
+```mermaid
+flowchart TD
+    P[Prompt] --> LO[LLM Output] --> SV[Schema Validation]
+    SV --> BV[Business Validation] --> A[Accepted]
 ```
 
 Do **not** test for exact natural-language responses.
@@ -217,18 +204,10 @@ Recommended tools:
 
 Critical user journeys:
 
-```
-Login
-    ↓
-Upload JD
-    ↓
-Generate Blueprint
-    ↓
-Assessment
-    ↓
-Evaluation
-    ↓
-Report
+```mermaid
+flowchart TD
+    L[Login] --> UR[Upload Role Definition] --> GS[Generate Skill DNA Profile]
+    GS --> CA[Capability Assessment] --> E[Evaluation] --> R[Report]
 ```
 
 Every MVP demo flow should have an E2E test.
@@ -252,8 +231,8 @@ Targets:
 
 Stress-test:
 
-- Concurrent assessments
-- Large JD uploads
+- Concurrent capability assessments
+- Large Role Definition uploads
 - Multiple report generations
 
 ---
@@ -278,18 +257,10 @@ Every release should include a basic security regression pass.
 
 Create reusable fixtures for:
 
-```
-Users
-    ↓
-Job Descriptions
-    ↓
-Role Blueprints
-    ↓
-Assessments
-    ↓
-Responses
-    ↓
-Reports
+```mermaid
+flowchart TD
+    U[Users] --> RD[Role Definitions] --> SDP[Skill DNA Profiles]
+    SDP --> A[Assessments] --> R[Responses] --> REP[Reports]
 ```
 
 Use deterministic sample data where possible.
@@ -302,20 +273,10 @@ Never use production data in automated tests.
 
 Pipeline:
 
-```
-Commit
-    ↓
-Lint
-    ↓
-Type Check
-    ↓
-Unit Tests
-    ↓
-Integration Tests
-    ↓
-Build
-    ↓
-Deploy Preview
+```mermaid
+flowchart TD
+    C[Commit] --> L[Lint] --> TC[Type Check] --> UT[Unit Tests]
+    UT --> IT[Integration Tests] --> B[Build] --> DP[Deploy Preview]
 ```
 
 Pull requests should fail if mandatory tests fail.
@@ -347,8 +308,15 @@ Future additions:
 - AI regression benchmark suite
 - Synthetic production monitoring
 
+## Related Documents
+
+- [DevOps Architecture](32-devops-architecture.md)
+- [Deployment Guide](33-deployment-guide.md)
+- [API Specification](../docs/05-data-api/23-api-specification.md)
+- [System Architecture](../docs/04-architecture/16-system-architecture.md)
+
 ---
 
 # 17. Conclusion
 
-AegisIQ's testing strategy prioritizes business correctness, API stability, and AI reliability over raw coverage numbers. By validating contracts, workflows, and deterministic logic, the platform minimizes regressions while remaining practical for a small engineering team.
+PWNDORA SkillScan X's testing strategy prioritizes business correctness, API stability, and AI reliability over raw coverage numbers. By validating contracts, workflows, and deterministic logic, the platform minimizes regressions while remaining practical for a small engineering team.

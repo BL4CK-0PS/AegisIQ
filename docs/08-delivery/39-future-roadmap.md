@@ -6,16 +6,17 @@
 2. Vision
 3. Product Evolution Strategy
 4. Phase 1 – MVP
-5. Phase 2 – Intelligent Assessment
+5. Phase 2 – Adaptive Capability Assessment
 6. Phase 3 – Enterprise Platform
-7. Phase 4 – Cyber Intelligence Ecosystem
-8. Research Directions
-9. AI Evolution
-10. Platform Expansion
-11. Business Opportunities
-12. Technical Evolution
-13. Success Metrics
-14. Conclusion
+7. Phase 4 – Cyber Twin & Skill DNA Ecosystem
+8. Phase 5 – Community Intelligence Network
+9. Research Directions
+10. AI Evolution
+11. Platform Expansion
+12. Business Opportunities
+13. Technical Evolution
+14. Success Metrics
+15. Conclusion
 
 ---
 
@@ -23,7 +24,7 @@
 
 ## Purpose
 
-This document defines the long-term evolution of AegisIQ beyond the initial MVP.
+This document defines the long-term evolution of PWNDORA SkillScan X beyond the initial MVP.
 
 It outlines:
 
@@ -39,30 +40,25 @@ It outlines:
 
 ## Long-Term Vision
 
-Transform AegisIQ from an AI-powered cybersecurity assessment platform into a comprehensive cybersecurity talent intelligence platform.
+Transform PWNDORA SkillScan X from an AI-powered capability intelligence platform into the definitive global cybersecurity capability verification ecosystem.
 
 Core principles:
 
-- Explainable AI
-- Competency-first assessments
-- Continuous learning
-- Enterprise readiness
-- Open architecture
+- **Capability over Certification**
+- **Evidence over Resume**
+- **Learning over Testing**
+- **Explainability over Black-Box AI**
 
 ---
 
 # 3. Product Evolution Strategy
 
-```
-MVP
-    ↓
-Assessment Platform
-    ↓
-Enterprise Platform
-    ↓
-Cyber Talent Intelligence Platform
-    ↓
-Autonomous Skills Intelligence Ecosystem
+```mermaid
+flowchart TD
+    MVP[MVP] --> ACA[Adaptive Capability Assessment]
+    ACA --> EP[Enterprise Platform]
+    EP --> CTSDE[Cyber Twin & Skill DNA Ecosystem]
+    CTSDE --> CIN[Community Intelligence Network]
 ```
 
 Each stage extends the previous one instead of replacing it.
@@ -73,20 +69,20 @@ Each stage extends the previous one instead of replacing it.
 
 Primary goals:
 
-- JD parsing
-- Role Blueprint Engine
-- Assessment Engine
-- Mission Generation
-- Cyber Reasoning
-- Explainability
+- Role Definition parsing
+- Skill DNA Engine
+- Capability Intelligence Engine
+- Practical Challenge Generation
+- Capability Reasoning
+- Evidence Intelligence
 - PDF reports
 
 Deliverables:
 
 ```
-Candidate Assessment
-Recruiter Report
-Learning Roadmap
+Professional Capability Assessment
+Capability Analyst Report
+Career Compass
 Deployment
 ```
 
@@ -98,24 +94,25 @@ Target users:
 
 ---
 
-# 5. Phase 2 – Intelligent Assessment
+# 5. Phase 2 – Adaptive Capability Assessment
 
 Enhancements:
 
-- Adaptive assessment
+- Adaptive capability assessment
 - Multi-turn conversations
-- Better competency mapping
+- Better capability mapping
 - Organization-specific rubrics
 - Historical performance tracking
-- Personalized mission generation
+- Personalized challenge generation
 
 New modules:
 
 ```
 Benchmark Engine
 Skill Gap Engine
-Competency Graph
+Skill DNA Graph
 Trend Analysis
+AI Mentor
 ```
 
 ---
@@ -127,39 +124,33 @@ Enterprise capabilities:
 - Multi-tenancy
 - Organization management
 - Team dashboards
-- Recruiter workspaces
-- Assessment templates
+- Capability Analyst workspaces
+- Capability assessment templates
 - Cohort analytics
 - Enterprise SSO
 - Compliance reporting
 
 Enterprise architecture:
 
-```
-Organizations
-    ↓
-Departments
-    ↓
-Teams
-    ↓
-Candidates
-    ↓
-Assessments
+```mermaid
+flowchart TD
+    O[Organizations] --> D[Departments] --> T[Teams]
+    T --> P[Professionals] --> CA[Capability Assessments]
 ```
 
 ---
 
-# 7. Phase 4 – Cyber Intelligence Ecosystem
+# 7. Phase 4 – Cyber Twin & Skill DNA Ecosystem
 
-Future vision:
+The Cyber Twin is a digital representation of verified cybersecurity capability — a living profile that grows with every capability assessment.
 
-- Continuous skills monitoring
-- AI career advisor
-- Cyber certification pathways
-- Live cyber range integration
-- Workforce planning
-- Threat-informed learning
-- Competency forecasting
+Capabilities:
+
+- **Cyber Twin**: Portable, verified digital capability profile owned by the professional
+- **Skill DNA**: Unique capability fingerprint generated from assessment evidence
+- **Career Compass**: AI-driven career pathways derived from capability gaps
+- **Capability Heatmap**: Visualization of verified strengths and gaps over time
+- **AI Mentor**: Learning companion that explains without ever answering assessments
 
 Potential integrations:
 
@@ -168,20 +159,40 @@ Potential integrations:
 - SIEM platforms
 - Cyber ranges
 - Certification providers
+- Professional networking platforms
 
 ---
 
-# 8. Research Directions
+# 8. Phase 5 – Community Intelligence Network
+
+Future vision:
+
+- **Community Intelligence**: Anonymous benchmarking against peer groups
+- Continuous skills monitoring
+- AI career advisor
+- Cyber certification pathways
+- Live cyber range integration
+- Workforce planning
+- Threat-informed learning
+- Capability forecasting
+- Skill DNA Graph insights
+- Industry trend analytics
+
+The platform evolves from a capability assessment tool into a global intelligence network for cybersecurity capability.
+
+---
+
+# 9. Research Directions
 
 Potential research areas:
 
-- Explainable cybersecurity assessment
+- Explainable cybersecurity capability assessment
 - Multi-agent evaluation
 - Graph-based reasoning analysis
-- Knowledge graph learning
+- Skill DNA Graph learning
 - Behavioral cybersecurity assessment
 - Adaptive educational systems
-- AI fairness in technical interviews
+- AI fairness in technical capability assessments
 
 Potential academic outputs:
 
@@ -192,59 +203,43 @@ Potential academic outputs:
 
 ---
 
-# 9. AI Evolution
+# 10. AI Evolution
 
 Current:
 
-```
-Single LLM
-    ↓
-Structured Outputs
+```mermaid
+flowchart TD
+    SLLM[Single LLM] --> SO[Structured Outputs]
 ```
 
 Future:
 
-```
-Planner Agent
-    ↓
-Mission Agent
-    ↓
-Reasoning Agent
-    ↓
-Verification Agent
-    ↓
-Explainability Agent
+```mermaid
+flowchart TD
+    PA[Planner Agent] --> CA[Challenge Agent] --> RA[Reasoning Agent]
+    RA --> VA[Verification Agent] --> EIA[Evidence Intelligence Agent]
 ```
 
 Every agent has a narrow, well-defined responsibility.
 
 ---
 
-# 10. Platform Expansion
+# 11. Platform Expansion
 
 Future products:
 
-```
-Web Platform
-    ↓
-Mobile App
-    ↓
-Recruiter Portal
-    ↓
-Trainer Dashboard
-    ↓
-Candidate Companion
-    ↓
-Public API
-    ↓
-SDK
+```mermaid
+flowchart TD
+    WP[Web Platform] --> MA[Mobile App] --> CAP[Capability Analyst Portal]
+    CAP --> TD[Trainer Dashboard] --> AMC[AI Mentor Companion]
+    AMC --> PAPI[Public API] --> SDK[SDK]
 ```
 
-The core assessment engine remains shared.
+The core capability intelligence engine remains shared.
 
 ---
 
-# 11. Business Opportunities
+# 12. Business Opportunities
 
 Potential offerings:
 
@@ -260,34 +255,34 @@ Potential offerings:
 Potential revenue streams:
 
 - Subscription
-- Per-assessment pricing
+| Per-assessment pricing
 - Enterprise licensing
 - API usage
 - Professional services
 
 ---
 
-# 12. Technical Evolution
+# 13. Technical Evolution
 
 Possible architectural improvements:
 
 - Event-driven architecture
 - Worker queues
 - Vector search
-- Graph database for competency relationships
+- Graph database for capability relationships
 - Real-time collaboration
-- Offline assessment support
+- Offline capability assessment support
 - Federated AI providers
 
 Adopt only when justified by measurable needs.
 
 ---
 
-# 13. Success Metrics
+# 14. Success Metrics
 
 Technical:
 
-- Assessment completion rate
+- Capability assessment completion rate
 - Average latency
 - Platform availability
 - AI validation success rate
@@ -295,20 +290,29 @@ Technical:
 Product:
 
 - User retention
-- Recruiter satisfaction
-- Candidate satisfaction
-- Assessment completion time
-- Learning roadmap engagement
+- Capability Analyst satisfaction
+- Professional satisfaction
+- Capability assessment completion time
+- Career Compass engagement
 
 Business:
 
 - Active organizations
-- Assessments completed
+- Capability assessments completed
 - Monthly recurring revenue
 - Enterprise adoption
 
 ---
 
-# 14. Conclusion
+## Related Documents
 
-The future roadmap positions AegisIQ as a long-term cybersecurity talent intelligence platform. Each phase builds upon the previous architecture, ensuring that future capabilities emerge from a stable, modular foundation rather than repeated rewrites.
+- [Implementation Roadmap](36-implementation-roadmap.md)
+- [Risk Analysis](38-risk-analysis.md)
+- [Final System Overview](40-final-system-overview.md)
+- [Technical Evolution Concept](../docs/concepts/technical-evolution.md)
+
+---
+
+# 15. Conclusion
+
+The future roadmap positions PWNDORA SkillScan X as a long-term cybersecurity capability intelligence ecosystem. Each phase builds upon the previous architecture, ensuring that future capabilities emerge from a stable, modular foundation rather than repeated rewrites.

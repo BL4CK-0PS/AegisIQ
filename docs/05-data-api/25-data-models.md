@@ -25,7 +25,7 @@
 
 ## Purpose
 
-This document defines every canonical data model used within AegisIQ.
+This document defines every canonical data model used within PWNDORA SkillScan X.
 
 These models represent the platform's business objects independently of any specific implementation.
 
@@ -35,16 +35,10 @@ These models represent the platform's business objects independently of any spec
 
 Every model follows this lifecycle:
 
-```
-Input
-    ↓
-Validation
-    ↓
-Domain Model
-    ↓
-Persistence
-    ↓
-Output
+```mermaid
+flowchart TD
+    I[Input] --> V[Validation] --> DM[Domain Model]
+    DM --> P[Persistence] --> O[Output]
 ```
 
 A single model should have a single responsibility.
@@ -77,10 +71,10 @@ User
 - status
 ```
 
-## Job Description
+## Role Definition
 
 ```
-JobDescription
+RoleDefinition
 - id
 - owner
 - filename
@@ -88,14 +82,14 @@ JobDescription
 - uploaded_at
 ```
 
-## Role Blueprint
+## Skill DNA Profile
 
 ```
-RoleBlueprint
+SkillDNAProfile
 - id
 - version
 - title
-- competencies
+- capabilities
 - knowledge_areas
 - responsibilities
 - assessment_objectives
@@ -103,33 +97,33 @@ RoleBlueprint
 
 This is the canonical domain object.
 
-## Assessment Blueprint
+## Capability Blueprint
 
 ```
-AssessmentBlueprint
+CapabilityBlueprint
 - id
-- role_blueprint_id
+- skill_dna_profile_id
 - difficulty
 - duration
-- missions
+- challenges
 - rubric_version
 ```
 
-## Assessment
+## Capability Assessment
 
 ```
-Assessment
+CapabilityAssessment
 - id
-- candidate
+- professional
 - status
 - started_at
 - completed_at
 ```
 
-## Mission
+## Practical Challenge
 
 ```
-Mission
+PracticalChallenge
 - id
 - type
 - scenario
@@ -142,28 +136,28 @@ Mission
 ```
 Response
 - id
-- mission_id
+- challenge_id
 - transcript
 - response_type
 - submitted_at
 ```
 
-## Evaluation
+## Capability Evaluation
 
 ```
-Evaluation
+CapabilityEvaluation
 - id
 - score
 - confidence
-- competencies
+- capabilities
 - evidence
 - mitre_mapping
 ```
 
-## Learning Plan
+## Career Compass
 
 ```
-LearningPlan
+CareerCompass
 - id
 - weak_skills
 - recommendations
@@ -177,7 +171,7 @@ LearningPlan
 Report
 - id
 - summary
-- competency_scores
+- capability_scores
 - recommendations
 - generated_at
 ```
@@ -192,11 +186,11 @@ Examples:
 
 ```
 UserEntity
-JobDescriptionEntity
-RoleBlueprintEntity
-AssessmentEntity
-MissionEntity
-EvaluationEntity
+RoleDefinitionEntity
+SkillDNAProfileEntity
+CapabilityAssessmentEntity
+PracticalChallengeEntity
+CapabilityEvaluationEntity
 ```
 
 Persistence models may include database-specific metadata:
@@ -217,7 +211,7 @@ Examples:
 ```
 RegisterRequest
 LoginRequest
-UploadJDRequest
+UploadRoleDefinitionRequest
 StartAssessmentRequest
 SubmitResponseRequest
 ```
@@ -228,9 +222,9 @@ Examples:
 
 ```
 LoginResponse
-RoleBlueprintResponse
-AssessmentResponse
-EvaluationResponse
+SkillDNAProfileResponse
+CapabilityAssessmentResponse
+CapabilityEvaluationResponse
 ReportResponse
 ```
 
@@ -249,12 +243,12 @@ Every AI interaction uses structured schemas.
   "role": "",
   "skills": [],
   "responsibilities": [],
-  "competencies": [],
+  "capabilities": [],
   "difficulty": ""
 }
 ```
 
-## Mission Generation
+## Challenge Generation
 
 ```json
 {
@@ -299,10 +293,10 @@ All AI outputs must validate against schemas before entering business logic.
 Examples:
 
 ```
-CreateAssessmentRequest
-GenerateRoleBlueprintRequest
+CreateCapabilityAssessmentRequest
+GenerateSkillDNAProfileRequest
 GenerateReportRequest
-GenerateLearningPlanRequest
+GenerateCareerCompassRequest
 ```
 
 Validation includes:
@@ -341,9 +335,9 @@ Internal events:
 
 ```
 AssessmentStarted
-MissionCompleted
+ChallengeCompleted
 EvaluationGenerated
-LearningPlanGenerated
+CareerCompassGenerated
 ReportGenerated
 ```
 
@@ -361,23 +355,23 @@ These are internal domain events and need not be externally exposed.
 
 # 11. Report Models
 
-## Candidate Report
+## Professional Report
 
 Contains:
 
 - Summary
-- Competency scores
-- Mission timeline
+- Capability scores
+- Challenge timeline
 - Evidence
-- Learning roadmap
+- Career Compass
 
-## Recruiter Report
+## Capability Analyst Report
 
 Contains:
 
-- Candidate overview
-- Competency matrix
-- Interview focus areas
+- Professional overview
+- Capability matrix
+- Capability assessment focus areas
 - Assessment summary
 
 ## Analytics Report (Future)
@@ -394,14 +388,9 @@ Contains:
 
 Validation hierarchy:
 
-```
-Client
-    ↓
-API Validation
-    ↓
-Business Validation
-    ↓
-Database Constraints
+```mermaid
+flowchart TD
+    C[Client] --> AV[API Validation] --> BV[Business Validation] --> DC[Database Constraints]
 ```
 
 Examples:
@@ -410,7 +399,7 @@ Examples:
 - UUID validation
 - Enum validation
 - Maximum transcript length
-- Required competency lists
+- Required capability lists
 
 Never rely solely on frontend validation.
 
@@ -420,8 +409,8 @@ Never rely solely on frontend validation.
 
 Version the following models:
 
-- RoleBlueprint
-- AssessmentBlueprint
+- SkillDNAProfile
+- CapabilityBlueprint
 - Rubric
 - ReportSchema
 - AIOutputSchema
@@ -466,8 +455,15 @@ AuditEvent
 
 These should extend the domain without changing existing contracts.
 
+## Related Documents
+
+- [Database Design](21-database-design.md)
+- [Entity Relationship Diagram](22-entity-relationship-diagram.md)
+- [API Specification](23-api-specification.md)
+- [AI Cognitive Architecture](../docs/04-architecture/17-ai-cognitive-architecture.md)
+
 ---
 
 # 16. Conclusion
 
-AegisIQ's data model architecture separates domain concepts from persistence, API transport, and AI interaction. This separation ensures consistency across the frontend, backend, database, and AI pipeline while allowing each layer to evolve independently.
+PWNDORA SkillScan X's data model architecture separates domain concepts from persistence, API transport, and AI interaction. This separation ensures consistency across the frontend, backend, database, and AI pipeline while allowing each layer to evolve independently.

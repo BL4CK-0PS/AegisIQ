@@ -1,4 +1,4 @@
-# Cyber Reasoning Engine
+# Capability Reasoning Engine
 
 ## Table of Contents
 
@@ -11,13 +11,14 @@
 7. Concept Extraction
 8. Workflow Validation
 9. Decision Analysis
-10. Competency Scoring
+10. Capability Scoring
 11. Evidence Generation
 12. Confidence Estimation
 13. Validation
 14. Failure Recovery
-15. Future Evolution
-16. Conclusion
+15. AI Mentor Principle
+16. Future Evolution
+17. Conclusion
 
 ---
 
@@ -25,13 +26,13 @@
 
 ## Engine Name
 
-**Cyber Reasoning Engine (CRE)**
+**Capability Reasoning Engine (CRE)**
 
 ## Purpose
 
-The Cyber Reasoning Engine evaluates a candidate's cybersecurity reasoning process rather than simply checking for correct answers.
+The Capability Reasoning Engine evaluates a professional's cybersecurity reasoning process rather than simply checking for correct answers.
 
-It transforms structured candidate responses into competency scores, evidence, confidence estimates, and explainable assessments.
+It transforms structured professional responses into capability scores, evidence, confidence estimates, and explainable assessments.
 
 ---
 
@@ -51,14 +52,14 @@ Evaluate
 Explain
 ```
 
-Candidates are assessed on reasoning quality, not keyword matching.
+Professionals are assessed on reasoning quality, not keyword matching.
 
 ---
 
 # 3. Engine Overview
 
 ```
-Candidate Response
+Professional Response
     ↓
 Transcript Processing
     ↓
@@ -68,11 +69,11 @@ Workflow Validation
     ↓
 Decision Analysis
     ↓
-Competency Scoring
+Capability Scoring
     ↓
 Evidence Builder
     ↓
-Explainability Engine
+Evidence Intelligence Engine
 ```
 
 Each stage produces structured outputs for the next stage.
@@ -83,16 +84,16 @@ Each stage produces structured outputs for the next stage.
 
 Required inputs:
 
-- Candidate transcript
-- Mission Package
-- Role Blueprint
-- Assessment Blueprint
+- Professional transcript
+- Challenge Package
+- Skill DNA Profile
+- Capability Blueprint
 - Rubric Version
 
 Optional inputs:
 
-- Previous mission evaluations
-- Historical competency profile
+- Previous challenge evaluations
+- Historical capability profile
 - Adaptive assessment context
 
 ---
@@ -112,7 +113,7 @@ Decision Analysis
     ↓
 Risk Assessment
     ↓
-Competency Mapping
+Capability Mapping
     ↓
 Evidence Generation
     ↓
@@ -148,13 +149,13 @@ SIEM Investigation
 Threat Detection
 ```
 
-Concepts are mapped to a normalized competency catalog.
+Concepts are mapped to a normalized capability catalog.
 
 ---
 
 # 7. Workflow Validation
 
-Evaluate whether the candidate follows a valid cybersecurity process.
+Evaluate whether the professional follows a valid cybersecurity process.
 
 Example Incident Response workflow:
 
@@ -207,21 +208,21 @@ Decision Quality
 
 ---
 
-# 9. Competency Scoring
+# 9. Capability Scoring
 
-Competencies are scored independently.
+Capabilities are scored independently.
 
 Example:
 
-| Competency        | Weight | Score |
-| ----------------- | -----: | ----: |
-| Incident Response |    30% |    86 |
-| Threat Hunting    |    20% |    74 |
-| Network Security  |    20% |    91 |
-| Communication     |    15% |    82 |
-| Risk Analysis     |    15% |    79 |
+| Capability         | Weight | Score |
+| ------------------ | -----: | ----: |
+| Incident Response  |    30% |    86 |
+| Threat Hunting     |    20% |    74 |
+| Network Security   |    20% |    91 |
+| Communication      |    15% |    82 |
+| Risk Analysis      |    15% |    79 |
 
-Final assessment combines weighted competency scores.
+Final assessment combines weighted capability scores.
 
 ---
 
@@ -247,7 +248,7 @@ Supporting Evidence
     ↓
 Observed Transcript
     ↓
-Competency
+Capability
 ```
 
 Evidence is immutable once generated.
@@ -259,7 +260,7 @@ Evidence is immutable once generated.
 Confidence depends on:
 
 - Transcript quality
-- Competency coverage
+- Capability coverage
 - Evaluation completeness
 - Ambiguity level
 
@@ -267,7 +268,7 @@ Levels:
 
 | Confidence | Meaning                                      |
 | ---------- | -------------------------------------------- |
-| High       | Strong evidence across competencies          |
+| High       | Strong evidence across capabilities          |
 | Medium     | Minor ambiguity                              |
 | Low        | Insufficient evidence or conflicting signals |
 
@@ -284,7 +285,7 @@ Schema Validation
     ↓
 Rubric Validation
     ↓
-Competency Coverage
+Capability Coverage
     ↓
 Evidence Consistency
     ↓
@@ -293,7 +294,7 @@ Final Evaluation
 
 Rules:
 
-- Every competency score requires evidence.
+- Every capability score requires evidence.
 - Every recommendation references an observed gap.
 - No score is generated without rubric alignment.
 
@@ -335,20 +336,38 @@ Reject
 
 ---
 
-# 14. Future Evolution
+# 14. AI Mentor Principle
+
+The Capability Reasoning Engine operates under the **AI Mentor** principle:
+
+> **AI MUST NEVER answer assessments — only mentor and explain.**
+
+The engine evaluates professional reasoning processes but never generates answers or completes challenges. Scoring is based solely on the professional's own responses. The engine provides structured feedback on reasoning quality to support the mentoring process.
+
+---
+
+# 15. Future Evolution
 
 Potential enhancements:
 
 - Graph-based reasoning validation
-- Knowledge graph traversal
+- Skill DNA Graph traversal
 - Multi-agent evaluation
 - Temporal reasoning analysis
-- Cross-mission competency tracking
+- Cross-challenge capability tracking
 - Behavioral pattern analysis
 - Organization-specific rubrics
 
+## Related Documents
+
+- [Capability Assessment Engine](27-capability-assessment-engine.md)
+- [Evidence Intelligence Engine](30-evidence-intelligence-engine.md)
+- [Skill DNA Engine](26-skill-dna-engine.md)
+- [Explainable AI Concept](../docs/concepts/explainable-ai.md)
+- [AI Cognitive Architecture](../docs/04-architecture/17-ai-cognitive-architecture.md)
+
 ---
 
-# 15. Conclusion
+# 16. Conclusion
 
-The Cyber Reasoning Engine is the analytical core of AegisIQ. By evaluating reasoning processes instead of isolated answers, it provides fairer, more explainable, and more actionable assessments than traditional interview scoring systems.
+The Capability Reasoning Engine is the analytical core of PWNDORA SkillScan X. By evaluating reasoning processes instead of isolated answers, it provides fairer, more explainable, and more actionable assessments than traditional scoring systems.

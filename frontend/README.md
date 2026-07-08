@@ -1,6 +1,6 @@
-# AegisIQ — Frontend
+# PWNDORA SkillScan X — Frontend
 
-> React SPA for explainable cybersecurity assessments.
+> React SPA for the adaptive cybersecurity capability intelligence platform.
 
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://typescriptlang.org)
@@ -18,19 +18,23 @@ flowchart TD
         LG["Login"]
         DB["Dashboard"]
         JD["Job Description"]
-        RB["Role Blueprint"]
-        AS["Assessment"]
+        SD["Skill DNA"]
+        AS["Capability Assessment"]
         RP["Reports"]
         LN["Learning"]
+        CT["Cyber Twin"]
+        CC["Career Compass"]
     end
     subgraph Features["Feature Modules"]
         FA["auth/"]
         FD["dashboard/"]
         FJ["job-description/"]
-        FR["role-blueprint/"]
+        FS["skill-dna/"]
         FAS["assessment/"]
         FRP["reports/"]
         FL["learning/"]
+        FC["cyber-twin/"]
+        FCP["career-compass/"]
     end
     subgraph Shared["Shared Components"]
         UI["ui/ (Button, Card, Modal...)"]
@@ -98,13 +102,15 @@ src/
 │   ├── auth/           Login, register, password reset
 │   ├── dashboard/      Main dashboard, stats, recent activity
 │   ├── job-description/    JD upload, parsing results
-│   ├── role-blueprint/     Competency graph, blueprint review
-│   ├── assessment/     Mission session, timer, voice recording
+│   ├── skill-dna/          Skill DNA profile, competency graph
+│   ├── assessment/     Capability assessment session, timer, voice recording
 │   ├── reports/        Report viewer, export, evidence review
-│   └── learning/       Learning roadmap, recommendations
+│   ├── learning/       Learning roadmap, AI Mentor recommendations
+│   ├── cyber-twin/     Cyber Twin profile visualization
+│   └── career-compass/ Career progression paths, capability heatmap
 ├── components/         Shared UI component library
 │   ├── ui/             Primitives (Button, Card, Input, Badge, Modal, Progress)
-│   ├── charts/         Data viz (RadarChart, BarChart, LineChart)
+│   ├── charts/         Data viz (RadarChart, BarChart, LineChart, Heatmap)
 │   ├── forms/          Reusable form components
 │   └── feedback/       ErrorBoundary, Toast, Loading states
 ├── services/           Axios-based API client layer
@@ -134,11 +140,13 @@ Each feature module owns:
 | `/register` | Auth | Public |
 | `/dashboard` | Dashboard | Protected |
 | `/job-description` | JD Intelligence | Protected |
-| `/role-blueprint/:id` | Role Blueprint | Protected |
-| `/assessment/:id` | Assessment | Protected |
-| `/assessment/:id/mission/:mid` | Mission | Protected |
+| `/skill-dna/:id` | Skill DNA | Protected |
+| `/assessment/:id` | Capability Assessment | Protected |
+| `/assessment/:id/challenge/:mid` | Practical Challenge | Protected |
 | `/reports/:id` | Reports | Protected |
 | `/learning` | Learning | Protected |
+| `/cyber-twin` | Cyber Twin | Protected |
+| `/career-compass` | Career Compass | Protected |
 | `/settings` | Settings | Protected |
 
 ---
@@ -174,9 +182,9 @@ Primitives (Button, Card, Input...)
 
 ```
 AssessmentPage
-├── Header (mission title, timer)
+├── Header (challenge title, timer)
 ├── ProgressIndicator
-├── MissionPanel (scenario, questions)
+├── ChallengePanel (scenario, questions)
 ├── VoiceRecorder
 ├── TranscriptPanel
 └── NavigationControls (next, back, submit)
@@ -187,12 +195,13 @@ AssessmentPage
 ```
 ReportPage
 ├── SummaryHeader
-├── CompetencyRadarChart
-├── MissionTimeline
+├── CapabilityRadarChart
+├── ChallengeTimeline
 ├── EvidencePanel
 ├── ScoreBreakdown
 ├── Recommendations
-└── LearningRoadmap
+├── LearningRoadmap
+└── AI Mentor Feedback
 ```
 
 ---
@@ -219,7 +228,7 @@ pnpm preview
 
 ```
 VITE_API_URL=http://localhost:8000/api/v1
-VITE_APP_NAME=AegisIQ
+VITE_APP_NAME=PWNDORA SkillScan X
 VITE_ENABLE_VOICE=true
 ```
 

@@ -1,22 +1,23 @@
-# Explainability Engine
+# Evidence Intelligence Engine
 
 ## Table of Contents
 
 1. Executive Summary
 2. Purpose
-3. Explainability Philosophy
+3. Evidence Intelligence Philosophy
 4. Engine Overview
 5. Inputs
 6. Evidence Pipeline
 7. Score Explanation
-8. Competency Explanation
+8. Capability Explanation
 9. Recommendation Generation
 10. Confidence Explanation
 11. Report Construction
 12. Validation
 13. Failure Recovery
-14. Future Evolution
-15. Conclusion
+14. AI Mentor Principle
+15. Future Evolution
+16. Conclusion
 
 ---
 
@@ -24,7 +25,7 @@
 
 ## Engine Name
 
-**Explainability Engine (EE)**
+**Evidence Intelligence Engine (EIE)**
 
 ## Purpose
 
@@ -34,7 +35,7 @@ The engine never changes scores. It only explains them.
 
 ---
 
-# 2. Explainability Philosophy
+# 2. Evidence Intelligence Philosophy
 
 Every assessment should answer five questions:
 
@@ -55,11 +56,11 @@ How can it improve?
 # 3. Engine Overview
 
 ```
-Evaluation
+Capability Evaluation
     ↓
 Evidence Builder
     ↓
-Competency Analysis
+Capability Analysis
     ↓
 Recommendation Engine
     ↓
@@ -74,12 +75,12 @@ Final Report
 
 Required:
 
-- Evaluation
+- Capability Evaluation
 - Evidence
-- Competency Scores
-- Mission Results
+- Capability Scores
+- Challenge Results
 - Rubric Version
-- Role Blueprint
+- Skill DNA Profile
 
 Optional:
 
@@ -92,7 +93,7 @@ Optional:
 # 5. Evidence Pipeline
 
 ```
-Evaluation
+Capability Evaluation
     ↓
 Evidence Collection
     ↓
@@ -115,10 +116,10 @@ Evidence sources:
 
 # 6. Score Explanation
 
-Every competency score includes:
+Every capability score includes:
 
 ```
-Competency
+Capability
     ↓
 Observed Behaviors
     ↓
@@ -141,9 +142,9 @@ Example structure:
 
 ---
 
-# 7. Competency Explanation
+# 7. Capability Explanation
 
-Each competency includes:
+Each capability includes:
 
 - Observed strengths
 - Missing concepts
@@ -173,7 +174,7 @@ Recommendation
 Pipeline:
 
 ```
-Weak Competency
+Weak Capability
     ↓
 Gap Analysis
     ↓
@@ -183,14 +184,14 @@ Recommended Topics
     ↓
 Suggested Labs
     ↓
-Roadmap
+Career Compass
 ```
 
 Rules:
 
 - Recommendations must map to observed gaps.
 - Avoid generic advice.
-- Reference competency identifiers where possible.
+- Reference capability identifiers where possible.
 
 ---
 
@@ -201,7 +202,7 @@ Explain why confidence was assigned.
 Factors:
 
 - Transcript clarity
-- Competency coverage
+- Capability coverage
 - Evidence quantity
 - Evidence consistency
 - Ambiguity level
@@ -227,21 +228,21 @@ Reliable Score
 ```
 Summary
     ↓
-Competencies
+Capabilities
     ↓
 Evidence
     ↓
-Mission Timeline
+Challenge Timeline
     ↓
 Recommendations
     ↓
-Learning Roadmap
+Career Compass
 ```
 
 Reports should be readable by:
 
-- Candidates
-- Recruiters
+- Professionals
+- Capability Analysts
 - Hiring Managers
 - Trainers
 
@@ -266,7 +267,7 @@ Publish
 Checks:
 
 - Every score has evidence.
-- Every recommendation references a competency gap.
+- Every recommendation references a capability gap.
 - Confidence aligns with available evidence.
 - No unexplained score is published.
 
@@ -308,20 +309,38 @@ Reports should never silently hide uncertainty.
 
 ---
 
-# 13. Future Evolution
+# 13. AI Mentor Principle
+
+The Evidence Intelligence Engine operates under the **AI Mentor** principle:
+
+> **AI MUST NEVER answer assessments — only mentor and explain.**
+
+The engine explains scores, surfaces evidence, and generates structured feedback for professional development. It never changes scores, generates answers, or provides assessment content that would compromise evaluation integrity. Every explanation is designed to mentor and guide improvement.
+
+---
+
+# 14. Future Evolution
 
 Future enhancements:
 
 - Interactive evidence exploration
-- Competency trend visualizations
+- Capability trend visualizations
 - Explainable AI dashboards
 - Cross-assessment comparisons
 - Organization benchmark explanations
-- Recruiter interview guidance
+- Capability Analyst guidance
 - Natural language "Why?" queries
+
+## Related Documents
+
+- [Capability Reasoning Engine](29-capability-reasoning-engine.md)
+- [Skill DNA Engine](26-skill-dna-engine.md)
+- [Capability Assessment Engine](27-capability-assessment-engine.md)
+- [Explainable AI Concept](../docs/concepts/explainable-ai.md)
+- [Reporting Concept](../docs/concepts/analytics.md)
 
 ---
 
-# 14. Conclusion
+# 15. Conclusion
 
-The Explainability Engine ensures every evaluation produced by AegisIQ is transparent, traceable, and actionable. By separating explanation from evaluation, the platform maintains deterministic scoring while providing understandable narratives that build user trust.
+The Evidence Intelligence Engine ensures every evaluation produced by PWNDORA SkillScan X is transparent, traceable, and actionable. By separating explanation from evaluation, the platform maintains deterministic scoring while providing understandable narratives that build user trust.

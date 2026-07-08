@@ -1,4 +1,4 @@
-# Frontend Architecture
+# PWNDORA SkillScan X — Frontend Architecture
 
 ## Table of Contents
 
@@ -26,18 +26,20 @@
 
 ## Purpose
 
-This document defines the frontend architecture of AegisIQ.
+This document defines the frontend architecture of PWNDORA SkillScan X.
 
 The frontend is responsible for:
 
 - User interaction
 - Assessment experience
-- Data visualization
+- Data visualization (Capability Heatmap, Skill DNA Graph)
 - Report presentation
 - Voice interaction
 - Communication with backend APIs
 
 It is **not** responsible for business logic or AI reasoning.
+
+**Core message:** We do not assess resumes. We assess cybersecurity capability.
 
 ---
 
@@ -45,20 +47,10 @@ It is **not** responsible for business logic or AI reasoning.
 
 Every frontend decision follows these principles.
 
-```
-Simple UI
-    ↓
-Feature-Based
-    ↓
-API Driven
-    ↓
-Reusable
-    ↓
-Accessible
-    ↓
-Responsive
-    ↓
-Performant
+```mermaid
+flowchart TD
+    SU[Simple UI] --> FB[Feature-Based] --> AD[API Driven]
+    AD --> R[Reusable] --> A[Accessible] --> RESP[Responsive] --> P[Performant]
 ```
 
 ---
@@ -79,38 +71,20 @@ The frontend should:
 
 # 4. High-Level Architecture
 
-```
-Browser
-    ↓
-React Application
-    ↓
-Feature Modules
-    ↓
-Shared Components
-    ↓
-TanStack Query
-    ↓
-FastAPI
-    ↓
-PostgreSQL
+```mermaid
+flowchart TD
+    B[Browser] --> RA[React Application] --> FM[Feature Modules]
+    FM --> SC[Shared Components] --> TQ[TanStack Query]
+    TQ --> FA[FastAPI] --> AIL[Adaptive Intelligence Layer] --> DP[Data Platform]
 ```
 
 ---
 
 # 5. Layered Architecture
 
-```
-Pages
-    ↓
-Features
-    ↓
-Components
-    ↓
-Hooks
-    ↓
-Services
-    ↓
-API Client
+```mermaid
+flowchart TD
+    P[Pages] --> F[Features] --> C[Components] --> H[Hooks] --> S[Services] --> AC[API Client]
 ```
 
 Each layer has exactly one responsibility.
@@ -123,11 +97,12 @@ Each layer has exactly one responsibility.
 auth/
 dashboard/
 job-description/
-role-blueprint/
+skill-dna-profile/
 assessment/
 missions/
 reports/
 learning/
+cyber-twin/
 settings/
 ```
 
@@ -148,10 +123,11 @@ Each feature owns:
 /login
 /dashboard
 /job-description
-/role-blueprint
+/skill-dna-profile
 /assessment
 /report
 /learning
+/cyber-twin
 /settings
 ```
 
@@ -162,6 +138,7 @@ Dashboard
 Assessment
 Reports
 Learning
+Cyber Twin
 ```
 
 Public routes
@@ -192,16 +169,10 @@ Avoid storing server data in global state.
 
 # 9. API Communication
 
-```
-React Component
-    ↓
-Feature Hook
-    ↓
-API Service
-    ↓
-Axios Client
-    ↓
-FastAPI
+```mermaid
+flowchart TD
+    RC[React Component] --> FH[Feature Hook] --> AS[API Service]
+    AS --> AC[Axios Client] --> FA[FastAPI]
 ```
 
 Responsibilities:
@@ -218,16 +189,9 @@ Responsibilities:
 
 Component hierarchy
 
-```
-Pages
-    ↓
-Layouts
-    ↓
-Sections
-    ↓
-Components
-    ↓
-Primitives
+```mermaid
+flowchart TD
+    P[Pages] --> L[Layouts] --> S[Sections] --> C[Components] --> PR[Primitives]
 ```
 
 Examples
@@ -239,7 +203,8 @@ Input
 Badge
 Modal
 Progress
-RadarChart
+CapabilityHeatmap
+SkillDNATree
 ```
 
 Reusable components belong in a shared UI library.
@@ -266,11 +231,24 @@ Report screen
 ```
 Report Page
 ├── Summary
-├── Competency Radar
+├── Capability Heatmap
 ├── Mission Timeline
 ├── Evidence Panel
+├── AI Mentor Feedback
 ├── Recommendations
-└── Learning Roadmap
+└── Career Compass
+```
+
+Cyber Twin screen
+
+```
+Cyber Twin Page
+├── Skill DNA Overview
+├── Capability Heatmap
+├── Assessment History
+├── Career Compass
+├── Growth Trajectory
+└── AI Mentor Chat
 ```
 
 ---
@@ -287,16 +265,9 @@ Frontend should gracefully handle:
 
 Example flow
 
-```
-Error
-    ↓
-Friendly Message
-    ↓
-Retry
-    ↓
-Fallback
-    ↓
-Continue
+```mermaid
+flowchart TD
+    E[Error] --> FM[Friendly Message] --> R[Retry] --> F[Fallback] --> C[Continue]
 ```
 
 ---
@@ -308,7 +279,7 @@ Guidelines:
 - Lazy-load routes
 - Code-split feature modules
 - Cache API responses
-- Memoize expensive visualizations
+- Memoize expensive visualizations (Capability Heatmap, Skill DNA Graph)
 - Virtualize long lists if needed
 - Optimize bundle size
 
@@ -334,10 +305,11 @@ src/
 │   ├── auth/
 │   ├── dashboard/
 │   ├── job-description/
-│   ├── role-blueprint/
+│   ├── skill-dna-profile/
 │   ├── assessment/
 │   ├── reports/
 │   ├── learning/
+│   ├── cyber-twin/
 │   └── settings/
 ├── components/
 │   ├── ui/
@@ -382,10 +354,12 @@ Future improvements:
 - Internationalization
 - Accessibility audits
 - Real-time collaboration
+- Cyber Twin interactive dashboard
+- AI Mentor conversation history
 - Micro-frontend exploration (only if justified)
 
 ---
 
 # 17. Conclusion
 
-The frontend architecture prioritizes modularity, responsiveness, and maintainability. By organizing the application around business features rather than technical layers, AegisIQ remains easier to scale and easier for multiple developers to work on simultaneously.
+The frontend architecture prioritizes modularity, responsiveness, and maintainability. By organizing the application around business features rather than technical layers, PWNDORA SkillScan X remains easier to scale and easier for multiple developers to work on simultaneously.

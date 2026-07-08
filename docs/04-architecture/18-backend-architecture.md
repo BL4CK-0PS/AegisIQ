@@ -1,4 +1,4 @@
-# AegisIQ — Backend Architecture
+# PWNDORA SkillScan X — Backend Architecture
 
 | | |
 |---|---|
@@ -12,15 +12,17 @@
 
 | Version | Date | Author | Changes |
 |---|---|---|---|
-| 1.0 | 2026-07-08 | Team AegisIQ | Initial release |
+| 1.0 | 2026-07-08 | PWNDORA SkillScan X Team | Initial release |
 
 ---
 
 ## 1. Executive Summary
 
-This document defines the backend architecture of AegisIQ. The backend is responsible for business logic, AI orchestration, assessment lifecycle, security, data persistence, and report generation.
+This document defines the backend architecture of PWNDORA SkillScan X. The backend is responsible for business logic, AI orchestration, assessment lifecycle, security, data persistence, and report generation.
 
-The architecture follows a **modular monolith** pattern, allowing future extraction into microservices without changing public APIs.
+The architecture follows a **modular monolith** pattern aligned to the 7-layer stack, allowing future extraction into microservices without changing public APIs.
+
+**Core message:** We do not assess resumes. We assess cybersecurity capability.
 
 ---
 
@@ -28,20 +30,17 @@ The architecture follows a **modular monolith** pattern, allowing future extract
 
 The backend follows these principles:
 
+```mermaid
+flowchart TD
+    C[Capability over Certification] --> E[Evidence over Resume]
+    E --> L[Learning over Testing]
+    L --> EX[Explainability over Black-Box AI]
 ```
-API First
-    ↓
-Domain Driven
-    ↓
-Modular
-    ↓
-Stateless
-    ↓
-Secure
-    ↓
-Observable
-    ↓
-AI Orchestrated
+
+```mermaid
+flowchart TD
+    AF[API First] --> DD[Domain Driven] --> M[Modular]
+    M --> S[Stateless] --> SEC[Secure] --> O[Observable] --> AIO[AI Orchestrated]
 ```
 
 Business rules never exist in the frontend.
@@ -50,45 +49,26 @@ Business rules never exist in the frontend.
 
 ## 3. High-Level Backend Architecture
 
-```
-                React Frontend
-                      │
-                HTTPS / REST
-                      │
-                      ▼
-              FastAPI Gateway
-                      │
-──────────────────────────────────────────────
-      │        │        │        │
-      ▼        ▼        ▼        ▼
-  Auth     Assessment   AI     Reports
-  Module     Module    Module   Module
-      │        │        │        │
-──────────────────────────────────────────────
-      │
-      ▼
- Repository Layer
-      │
-      ▼
- PostgreSQL
+```mermaid
+flowchart TD
+    RS[React SPA] --> FA[FastAPI Gateway]
+    FA --> AIL[Adaptive Intelligence Layer] & IS[Intelligence Services] & ADE[AI Decision Engine] & LO[Learning Orchestration]
+    AIL & IS & ADE & LO --> CIL[Community Intelligence Layer]
+    CIL --> DP[Data Platform<br/>PostgreSQL]
 ```
 
 ---
 
-## 4. Architectural Layers
+## 4. Architectural Layers (7-Layer Context)
 
-```
-Presentation Layer
-    ↓
-API Routers
-    ↓
-Application Services
-    ↓
-Domain Services
-    ↓
-Repositories
-    ↓
-Database
+```mermaid
+flowchart TD
+    1[1. Presentation Layer] --> 2[2. API Gateway Layer]
+    2 --> 3[3. Adaptive Intelligence Layer]
+    3 --> 4[4. AI Decision Engine]
+    4 --> 5[5. Learning Orchestration Layer]
+    5 --> 6[6. Community Intelligence Layer]
+    6 --> 7[7. Data Platform]
 ```
 
 Responsibilities are strictly separated.
@@ -103,12 +83,13 @@ modules/
 ├── auth/
 ├── users/
 ├── jd/
-├── role_blueprint/
+├── skill_dna_profile/
 ├── assessment/
 ├── missions/
 ├── reasoning/
-├── explainability/
+├── evidence_intelligence/
 ├── learning/
+├── community/
 ├── reports/
 ├── analytics/
 └── common/
@@ -120,24 +101,11 @@ Each module is independently testable. Each module owns its router, service, rep
 
 ## 6. Request Lifecycle
 
-```
-HTTP Request
-    ↓
-API Router
-    ↓
-Validation
-    ↓
-Application Service
-    ↓
-Domain Service
-    ↓
-Repository
-    ↓
-Database
-    ↓
-Response DTO
-    ↓
-Frontend
+```mermaid
+flowchart TD
+    HR[HTTP Request] --> AR[API Router] --> V[Validation] --> AIL[Adaptive Intelligence Layer]
+    AIL --> AS[Application Service] --> DS[Domain Service] --> R[Repository]
+    R --> DB[Database] --> RD[Response DTO] --> FE[Frontend]
 ```
 
 ---
@@ -153,7 +121,7 @@ Example: `assessment/services/`
 - `session_service.py`
 - `evaluation_service.py`
 
-Service responsibilities: business rules, workflow orchestration, transactions, validation, AI coordination.
+Service responsibilities: business rules, workflow orchestration, transactions, validation, AI coordination via AI Decision Engine.
 
 ---
 
@@ -175,23 +143,16 @@ Services never execute raw SQL.
 
 ## 9. AI Integration Layer
 
-The backend isolates LLM interaction.
+The backend isolates LLM interaction through the AI Decision Engine.
 
-```
-Application
-    ↓
-AI Orchestrator
-    ↓
-Prompt Builder
-    ↓
-LLM Client
-    ↓
-Schema Validator
-    ↓
-Structured Response
+```mermaid
+flowchart TD
+    AIL[Adaptive Intelligence Layer] --> ADE[AI Decision Engine] --> PB[Prompt Builder]
+    PB --> LC[LLM Client] --> SV[Schema Validator] --> SR[Structured Response]
+    SR --> LOL[Learning Orchestration Layer]
 ```
 
-Components: prompt templates, JSON validation, retry logic, rate limiting, model routing.
+Components: prompt templates, JSON validation, retry logic, rate limiting, model routing, AI Mentor orchestration.
 
 ---
 
@@ -199,22 +160,11 @@ Components: prompt templates, JSON validation, retry logic, rate limiting, model
 
 Primary entities:
 
-```
-Users
-    ↓
-Job Descriptions
-    ↓
-Role Blueprints
-    ↓
-Assessments
-    ↓
-Missions
-    ↓
-Responses
-    ↓
-Evaluations
-    ↓
-Reports
+```mermaid
+flowchart TD
+    U[Users] --> JD[Job Descriptions] --> SDP[Skill DNA Profiles]
+    SDP --> A[Assessments] --> M[Missions] --> R[Responses]
+    R --> E[Evaluations] --> REP[Reports] --> CTP[Cyber Twin Profiles]
 ```
 
 Use SQLAlchemy models with Alembic migrations.
@@ -230,12 +180,15 @@ Endpoint structure:
 /auth
 /users
 /jd
-/role-blueprints
+/skill-dna-profiles
 /assessments
 /missions
 /reasoning
+/evidence
 /reports
 /learning
+/community
+/cyber-twin
 ```
 
 Guidelines: RESTful design, versioned endpoints, consistent error responses, Pydantic request/response schemas.
@@ -251,6 +204,7 @@ Tasks suitable for async execution:
 - Analytics aggregation
 - Audit log cleanup
 - Long-running AI jobs
+- Community Intelligence aggregation
 
 For MVP, FastAPI background tasks are sufficient.
 
@@ -258,8 +212,9 @@ For MVP, FastAPI background tasks are sufficient.
 
 ## 13. Error Handling
 
-```
-Request → Validation → Service → Exception Handler → Standard Error Response
+```mermaid
+flowchart LR
+    R[Request] --> V[Validation] --> S[Service] --> EH[Exception Handler] --> SER[Standard Error Response]
 ```
 
 Error response format:
@@ -300,14 +255,20 @@ app/
 │   ├── auth/
 │   ├── users/
 │   ├── jd/
-│   ├── role_blueprint/
+│   ├── skill_dna_profile/
 │   ├── assessment/
 │   ├── missions/
 │   ├── reasoning/
-│   ├── explainability/
+│   ├── evidence_intelligence/
 │   ├── learning/
+│   ├── community/
 │   ├── reports/
 │   └── analytics/
+├── layers/
+│   ├── adaptive_intelligence/
+│   ├── ai_decision_engine/
+│   ├── learning_orchestration/
+│   └── community_intelligence/
 ├── database/
 │   ├── models/
 │   ├── migrations/
@@ -316,6 +277,7 @@ app/
 │   ├── orchestrator/
 │   ├── prompts/
 │   ├── schemas/
+│   ├── mentor/
 │   └── providers/
 ├── tests/
 └── main.py
@@ -327,47 +289,53 @@ app/
 
 ### MVP
 
-```
-React → Nginx → FastAPI → PostgreSQL
+```mermaid
+flowchart LR
+    RE[React] --> NG[Nginx] --> FA[FastAPI] --> PG[PostgreSQL]
 ```
 
 ### Future
 
-```
-Load Balancer → API Cluster → AI Workers → Redis → PostgreSQL Cluster
+```mermaid
+flowchart LR
+    LB[Load Balancer] --> AC[API Cluster] --> AW[AI Workers]
+    AW --> R[Redis] --> PGC[PostgreSQL Cluster] --> CA[Community Analytics]
 ```
 
 ---
 
 ## 17. Future Evolution
 
-Future enhancements: CQRS for analytics, event bus for module communication, worker queue (Celery or Dramatiq), distributed tracing, multi-region deployment, multi-tenant architecture, separate AI inference service.
+Future enhancements: CQRS for analytics, event bus for module communication, worker queue (Celery or Dramatiq), distributed tracing, multi-region deployment, multi-tenant architecture, separate AI inference service, Community Intelligence data lake.
 
 ---
 
 ## 18. Conclusion
 
-The backend architecture is designed to maximize correctness, maintainability, and future extensibility while remaining simple enough for a four-person team to build within a hackathon timeline. A modular monolith gives clean boundaries today and a practical migration path tomorrow.
+The backend architecture is designed to maximize correctness, maintainability, and future extensibility while remaining simple enough for a small team to build within a hackathon timeline. The 7-layer stack gives clean boundaries today and a practical migration path tomorrow.
 
 ---
 
 ## Backend Dependency Flow
 
-```
-Router
-    ↓
-Application Service
-    ↓
-Domain Service
-    ↓
-Repository
-    ↓
-Database
-    ↓
-Response
+```mermaid
+flowchart TD
+    R[Router] --> AIL[Adaptive Intelligence Layer] --> AS[Application Service]
+    AS --> DS[Domain Service] --> CIL[Community Intelligence Layer]
+    CIL --> REP[Repository] --> DP[Data Platform] --> RES[Response]
 ```
 
 Every dependency points downward. Lower layers never depend on higher layers.
+
+---
+
+## Related Documents
+
+- [System Architecture](16-system-architecture.md)
+- [AI Cognitive Architecture](17-ai-cognitive-architecture.md)
+- [Frontend Architecture](19-frontend-architecture.md)
+- [Data Flow](20-data-flow.md)
+- [Database Design](../docs/05-data-api/21-database-design.md)
 
 ---
 

@@ -1,12 +1,27 @@
-# AegisIQ — Documentation
+# PWNDORA SkillScan X — Documentation
 
-> Complete architecture and design documentation for the AegisIQ platform.
+> Complete architecture and design documentation for the **PWNDORA SkillScan X** Adaptive Cybersecurity Capability Intelligence Platform.
 
 ---
 
-## Structure
+## Documentation Map
 
-The documentation is organized into 8 numbered sections (40 documents total).
+```mermaid
+graph TD
+    PR["01-Product"] --> RS["02-Research"]
+    RS --> FD["03-Functional Design"]
+    FD --> AR["04-Architecture"]
+    AR --> DA["05-Data & API"]
+    AR --> AI["06-AI Engines"]
+    DA --> EN["07-Engineering"]
+    AI --> EN
+    EN --> DE["08-Delivery"]
+    
+    style PR fill:#1e3a5f,color:#fff
+    style DE fill:#1e3a5f,color:#fff
+```
+
+The documentation is organized into 8 numbered sections (40 documents total) following the product lifecycle: from conception through research, design, architecture, engineering, and delivery.
 
 ```
 docs/
@@ -15,9 +30,11 @@ docs/
 ├── 03-functional-design/ Features, workflows, use cases, UI/UX specification
 ├── 04-architecture/      System, AI, backend, frontend, data flow
 ├── 05-data-api/          Database design, ERD, API spec, auth, data models
-├── 06-ai-engines/        Role blueprint, assessment, missions, reasoning, explainability
+├── 06-ai-engines/        Skill DNA, capability assessment, practical challenges, reasoning, evidence intelligence
 ├── 07-engineering/       Testing, devops, deployment, monitoring, security
-└── 08-delivery/          Roadmap, project structure, risk, future vision
+├── 08-delivery/          Roadmap, project structure, risk, future vision
+├── concepts/             Deep-dives: Cyber Twin, Skill Decay, AI Mentor, Gamification +20 more
+└── reference/            Glossary, FAQ, Scalability, Observability, Monitoring
 ```
 
 ---
@@ -25,6 +42,7 @@ docs/
 ## Document Index
 
 ### 01 — Product
+*Foundation documents defining the platform's purpose, problem domain, and requirements.*
 
 | # | Document | Description |
 |---|---|---|
@@ -35,6 +53,7 @@ docs/
 | 05 | `05-product-requirements.md` | Product requirements |
 
 ### 02 — Research
+*Market intelligence, competitive positioning, user understanding, and functional specifications.*
 
 | # | Document | Description |
 |---|---|---|
@@ -45,6 +64,7 @@ docs/
 | 10 | `10-functional-requirements.md` | Functional requirements |
 
 ### 03 — Functional Design
+*Feature definitions, workflows, use cases, and user experience specifications.*
 
 | # | Document | Description |
 |---|---|---|
@@ -55,6 +75,7 @@ docs/
 | 15 | `15-ui-ux-specification.md` | UI/UX design spec |
 
 ### 04 — Architecture
+*System architecture, AI cognitive pipeline, backend and frontend module design, data flow.*
 
 | # | Document | Description |
 |---|---|---|
@@ -65,6 +86,7 @@ docs/
 | 20 | `20-data-flow.md` | End-to-end data flow |
 
 ### 05 — Data & API
+*Database schema, entity relationships, API contracts, authentication, and data models.*
 
 | # | Document | Description |
 |---|---|---|
@@ -75,16 +97,18 @@ docs/
 | 25 | `25-data-models.md` | Data model definitions |
 
 ### 06 — AI Engines
+*Specialized AI modules powering the capability intelligence pipeline.*
 
 | # | Document | Description |
 |---|---|---|
-| 26 | `26-role-blueprint-engine.md` | Role blueprint generation |
-| 27 | `27-assessment-engine.md` | Assessment lifecycle |
-| 28 | `28-mission-generation-engine.md` | Mission/scenario generation |
-| 29 | `29-cyber-reasoning-engine.md` | Cyber reasoning & evaluation |
-| 30 | `30-explainability-engine.md` | Explainability pipeline |
+| 26 | `26-skill-dna-engine.md` | Skill DNA blueprint generation |
+| 27 | `27-capability-assessment-engine.md` | Assessment lifecycle |
+| 28 | `28-practical-challenge-engine.md` | Practical challenge scenario generation |
+| 29 | `29-capability-reasoning-engine.md` | Capability reasoning & evaluation |
+| 30 | `30-evidence-intelligence-engine.md` | Evidence intelligence pipeline |
 
 ### 07 — Engineering
+*Testing strategy, DevOps, deployment, monitoring, and security architecture.*
 
 | # | Document | Description |
 |---|---|---|
@@ -95,6 +119,7 @@ docs/
 | 35 | `35-security-architecture-deep-dive.md` | Security architecture |
 
 ### 08 — Delivery
+*Implementation roadmap, project structure, risk analysis, and future vision.*
 
 | # | Document | Description |
 |---|---|---|
@@ -103,6 +128,39 @@ docs/
 | 38 | `38-risk-analysis.md` | Risk assessment |
 | 39 | `39-future-roadmap.md` | Future features |
 | 40 | `40-final-system-overview.md` | Complete system overview |
+
+---
+
+## Concepts & Reference
+
+Beyond the 40 numbered specification documents, the documentation includes:
+
+### Concepts (deep-dives)
+| Document | Description |
+|---|---|
+| [Cyber Twin](concepts/cyber-twin.md) | Digital user capability representation |
+| [Capability Heatmap](concepts/capability-heatmap.md) | Skill density and gap visualization |
+| [AI Mentor](concepts/ai-mentor.md) | AI-powered coaching companion |
+| [Career Intelligence](concepts/career-intelligence.md) | AI-driven career pathway generation |
+| [Career Compass](concepts/career-compass.md) | Strategic career exploration tool |
+| [Learning Path Engine](concepts/learning-path-engine.md) | Dynamic personalized learning paths |
+| [Evidence-Based Assessment](concepts/evidence-based-assessment.md) | Core assessment methodology |
+| [Confidence Tracking](concepts/confidence-tracking.md) | Statistical certainty in scores |
+| [Skill Decay](concepts/skill-decay.md) | Capability attrition modeling |
+| [Gamification](concepts/gamification.md) | Engagement and progression systems |
+| [Explainable AI](concepts/explainable-ai.md) | AI decision transparency |
+| [Privacy & Security Model](concepts/privacy-security-model.md) | Data privacy and security |
+| [Community Intelligence](concepts/community-intelligence.md) | Aggregated capability insights |
+| ... and 10+ more | See [concepts/](concepts/) |
+
+### Reference
+| Document | Description |
+|---|---|
+| [Glossary](reference/glossary.md) | 40+ terminology definitions |
+| [FAQ](reference/faq.md) | Frequently asked questions |
+| [Scalability](reference/scalability.md) | Scaling architecture and strategy |
+| [Observability](reference/observability.md) | Metrics, logs, traces |
+| [Monitoring](reference/monitoring.md) | Alerting and incident response |
 
 ---
 
@@ -120,12 +178,31 @@ docs/
 
 ---
 
+## AI Pipeline Overview
+
+```mermaid
+flowchart LR
+    JD["Job Description"] --> SDE["Skill DNA Engine"]
+    SDE --> CIE["Capability Intelligence"]
+    CIE --> PCE["Practical Challenge Engine"]
+    PCE --> PR["Professional Response"]
+    PR --> CRE["Capability Reasoning"]
+    CRE --> EIE["Evidence Intelligence"]
+    EIE --> LPE["Learning Path Engine"]
+    LPE --> REP["Report"]
+
+    style JD fill:#1e3a5f,color:#fff
+    style REP fill:#1e3a5f,color:#fff
+```
+
+---
+
 ## Architecture Decisions
 
 | ADR | Decision | Rationale |
 |---|---|---|
 | ADR-001 | API-first architecture | Clear frontend/backend separation |
-| ADR-002 | Role Blueprint as canonical model | Reusable across all modules |
+| ADR-002 | Skill DNA as canonical model | Reusable across all modules |
 | ADR-003 | Modular monolith (MVP) | Faster iteration, easy extraction later |
-| ADR-004 | Explainability pipeline | Transparent, auditable assessments |
+| ADR-004 | Evidence intelligence pipeline | Transparent, auditable assessments |
 | ADR-005 | Structured AI outputs | Reliable downstream processing |

@@ -26,7 +26,7 @@
 
 ## Purpose
 
-This document defines the authentication and authorization architecture for AegisIQ.
+This document defines the authentication and authorization architecture for PWNDORA SkillScan X.
 
 It specifies:
 
@@ -44,16 +44,9 @@ It specifies:
 
 Security follows the principle of:
 
-```
-Authenticate
-    ↓
-Authorize
-    ↓
-Validate
-    ↓
-Audit
-    ↓
-Monitor
+```mermaid
+flowchart TD
+    A[Authenticate] --> AU[Authorize] --> V[Validate] --> AD[Audit] --> M[Monitor]
 ```
 
 Every request is authenticated, authorized, validated, and logged.
@@ -62,20 +55,11 @@ Every request is authenticated, authorized, validated, and logged.
 
 # 3. Authentication Architecture
 
-```
-Browser
-    ↓
-Login Request
-    ↓
-FastAPI
-    ↓
-Authentication Service
-    ↓
-Password Verification
-    ↓
-JWT Generation
-    ↓
-Authenticated Session
+```mermaid
+flowchart TD
+    B[Browser] --> LR[Login Request] --> AG[API Gateway]
+    AG --> AS[Authentication Service] --> PV[Password Verification]
+    PV --> JWT[JWT Generation] --> ASES[Authenticated Session]
 ```
 
 Authentication is stateless using JWT access tokens.
@@ -92,60 +76,46 @@ Future versions may introduce Attribute-Based Access Control (ABAC), but RBAC is
 
 # 5. User Roles
 
-| Role           | Description                                       |
-| -------------- | ------------------------------------------------- |
-| Candidate      | Completes assessments and views personal reports  |
-| Recruiter      | Creates assessments and reviews candidate reports |
-| Hiring Manager | Reviews assessment reports                        |
-| Trainer        | Assigns assessments and monitors cohorts          |
-| Administrator  | Full platform management                          |
+| Role                | Description                                         |
+| ------------------- | --------------------------------------------------- |
+| Professional        | Completes capability assessments and views reports |
+| Capability Analyst  | Creates assessments and reviews professional reports|
+| Hiring Manager      | Reviews assessment reports                          |
+| Trainer             | Assigns assessments and monitors cohorts            |
+| Administrator       | Full platform management                            |
 
 ---
 
 # 6. Permission Matrix
 
-| Action                | Candidate | Recruiter | Hiring Manager | Trainer | Admin |
-| --------------------- | :-------: | :-------: | :------------: | :-----: | :---: |
-| Register              |     ✓     |     ✓     |        ✓       |    ✓    |   ✓   |
-| Upload JD             |     ✓     |     ✓     |        ✗       |    ✗    |   ✓   |
-| Create Assessment     |     ✗     |     ✓     |        ✗       |    ✓    |   ✓   |
-| Complete Assessment   |     ✓     |     ✗     |        ✗       |    ✗    |   ✓   |
-| View Own Report       |     ✓     |     ✗     |        ✗       |    ✗    |   ✓   |
-| View Candidate Report |     ✗     |     ✓     |        ✓       |    ✓    |   ✓   |
-| Manage Users          |     ✗     |     ✗     |        ✗       |    ✗    |   ✓   |
-| Manage Rubrics        |     ✗     |     ✗     |        ✗       |    ✗    |   ✓   |
-| View Audit Logs       |     ✗     |     ✗     |        ✗       |    ✗    |   ✓   |
+| Action                     | Professional | Capability Analyst | Hiring Manager | Trainer | Admin |
+| -------------------------- | :----------: | :----------------: | :------------: | :-----: | :---: |
+| Register                   |      ✓       |         ✓          |       ✓        |    ✓    |   ✓   |
+| Upload Role Definition     |      ✓       |         ✓          |       ✗        |    ✗    |   ✓   |
+| Create Assessment          |      ✗       |         ✓          |       ✗        |    ✓    |   ✓   |
+| Complete Assessment        |      ✓       |         ✗          |       ✗        |    ✗    |   ✓   |
+| View Own Report            |      ✓       |         ✗          |       ✗        |    ✗    |   ✓   |
+| View Professional Report   |      ✗       |         ✓          |       ✓        |    ✓    |   ✓   |
+| Manage Users               |      ✗       |         ✗          |       ✗        |    ✗    |   ✓   |
+| Manage Rubrics             |      ✗       |         ✗          |       ✗        |    ✗    |   ✓   |
+| View Audit Logs            |      ✗       |         ✗          |       ✗        |    ✗    |   ✓   |
 
 ---
 
 # 7. Authentication Flow
 
-```
-User Login
-    ↓
-Credential Validation
-    ↓
-Password Verification
-    ↓
-JWT Creation
-    ↓
-Refresh Token Creation
-    ↓
-Authenticated Session
+```mermaid
+flowchart TD
+    UL[User Login] --> CV[Credential Validation] --> PV[Password Verification]
+    PV --> JC[JWT Creation] --> RTC[Refresh Token Creation] --> ASES[Authenticated Session]
 ```
 
 Protected requests:
 
-```
-Request
-    ↓
-Authorization Header
-    ↓
-JWT Validation
-    ↓
-Permission Check
-    ↓
-API Execution
+```mermaid
+flowchart TD
+    R[Request] --> AH[Authorization Header] --> JV[JWT Validation]
+    JV --> PC[Permission Check] --> AE[API Execution]
 ```
 
 ---
@@ -177,7 +147,7 @@ Claims:
 {
   "sub": "user_uuid",
   "email": "user@example.com",
-  "role": "candidate",
+  "role": "professional",
   "iat": 1720435200,
   "exp": 1720436100
 }
@@ -237,11 +207,11 @@ Protected routes:
 
 ```
 /dashboard
-/job-descriptions
-/role-blueprints
-/assessments
+/role-definitions
+/skill-dna
+/capability-assessments
 /reports
-/learning
+/career-compass
 ```
 
 Admin routes:
@@ -263,7 +233,7 @@ Record:
 - Logout
 - Failed login
 - Password reset
-- JD upload
+- Role Definition upload
 - Assessment start
 - Assessment completion
 - Report generation
@@ -327,6 +297,12 @@ Future authentication methods:
 - Passkeys (WebAuthn)
 
 These should integrate through a common identity abstraction layer.
+
+## Related Documents
+
+- [API Specification](23-api-specification.md)
+- [Security Architecture Deep Dive](../docs/07-engineering/35-security-architecture-deep-dive.md)
+- [User Roles](../docs/02-research/08-user-personas.md)
 
 ---
 

@@ -1,6 +1,6 @@
-# AegisIQ — Backend
+# PWNDORA SkillScan X — Backend
 
-> FastAPI-powered modular monolith for explainable cybersecurity assessment.
+> FastAPI-powered modular monolith for adaptive cybersecurity capability intelligence.
 
 [![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?logo=fastapi)](https://fastapi.tiangolo.com)
@@ -12,7 +12,7 @@
 
 ```mermaid
 flowchart TD
-    subgraph API["API Layer"]
+    subgraph API["API Gateway Layer"]
         R["/api/v1/routers"]
         MW["Middleware"]
         DEP["Dependencies"]
@@ -27,23 +27,25 @@ flowchart TD
         AUTH["auth/"]
         USR["users/"]
         JD["jd/"]
-        RB["role_blueprint/"]
-        ASM["assessment/"]
-        MIS["missions/"]
-        REA["reasoning/"]
-        EXP["explainability/"]
-        LRN["learning/"]
+        SD["skill_dna/"]
+        CA["capability_assessment/"]
+        PC["practical_challenges/"]
+        CR["capability_reasoning/"]
+        EI["evidence_intelligence/"]
+        LP["learning_path/"]
         REP["reports/"]
         ANL["analytics/"]
+        CT["cyber_twin/"]
+        CCP["career_compass/"]
     end
-    subgraph AI["AI Layer"]
+    subgraph AI["AI Decision Engine"]
         ORC["orchestrator/"]
         PRO["prompts/"]
         SCH["schemas/"]
         VAL["validators/"]
         PRV["providers/"]
     end
-    subgraph DB["Data Layer"]
+    subgraph DB["Data Platform"]
         MOD["models/"]
         MIG["migrations/"]
         SES["session.py"]
@@ -107,12 +109,14 @@ backend/
 │   │   ├── auth/         Authentication & authorization
 │   │   ├── users/        User management
 │   │   ├── jd/           Job description intelligence
-│   │   ├── role_blueprint/  Competency blueprint
-│   │   ├── assessment/   Assessment lifecycle
-│   │   ├── missions/     Mission/scenario generation
-│   │   ├── reasoning/    Cyber reasoning evaluation
-│   │   ├── explainability/  Evidence generation
-│   │   ├── learning/     Learning recommendations
+│   │   ├── skill_dna/    Skill DNA profile generation
+│   │   ├── capability_assessment/  Assessment lifecycle
+│   │   ├── practical_challenges/   Challenge/scenario generation
+│   │   ├── capability_reasoning/   Capability reasoning evaluation
+│   │   ├── evidence_intelligence/  Evidence generation
+│   │   ├── learning_path/          Learning recommendations
+│   │   ├── cyber_twin/   Cyber Twin management
+│   │   ├── career_compass/  Career progression engine
 │   │   ├── reports/      Report generation
 │   │   └── analytics/    Analytics aggregation
 │   ├── ai/               AI orchestration layer
@@ -153,12 +157,14 @@ Each module owns its own:
 | `/api/v1/auth` | auth | Login, register, refresh, logout |
 | `/api/v1/users` | users | Profile, CRUD, roles |
 | `/api/v1/jd` | jd | Upload, parse, analyze |
-| `/api/v1/role-blueprints` | role_blueprint | CRUD, versioning |
-| `/api/v1/assessments` | assessment | Lifecycle, sessions |
-| `/api/v1/missions` | missions | Generate, serve scenarios |
-| `/api/v1/reasoning` | reasoning | Evaluate responses |
+| `/api/v1/skill-dna` | skill_dna | CRUD, versioning, profile |
+| `/api/v1/assessments` | capability_assessment | Lifecycle, sessions |
+| `/api/v1/challenges` | practical_challenges | Generate, serve scenarios |
+| `/api/v1/reasoning` | capability_reasoning | Evaluate responses |
 | `/api/v1/reports` | reports | Generate, export |
-| `/api/v1/learning` | learning | Roadmaps |
+| `/api/v1/learning` | learning_path | Roadmaps, AI Mentor |
+| `/api/v1/cyber-twin` | cyber_twin | Profile, updates, queries |
+| `/api/v1/career-compass` | career_compass | Career paths, heatmap |
 | `/api/v1/analytics` | analytics | Aggregated data |
 
 ---
@@ -207,7 +213,7 @@ uvicorn app.main:app --reload --port 8000
 ### Environment Variables
 
 ```
-DATABASE_URL=postgresql://user:pass@localhost:5432/aegisiq
+DATABASE_URL=postgresql://user:pass@localhost:5432/skillscanx
 JWT_SECRET=your-secret-key
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
@@ -228,7 +234,7 @@ pytest
 pytest --cov=app --cov-report=term-missing
 
 # Specific module
-pytest tests/unit/test_assessment.py
+pytest tests/unit/test_capability_assessment.py
 ```
 
 ---

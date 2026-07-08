@@ -1,4 +1,4 @@
-# Mission Generation Engine
+# Practical Challenge Engine
 
 ## Table of Contents
 
@@ -7,16 +7,17 @@
 3. Design Philosophy
 4. Engine Overview
 5. Inputs
-6. Mission Planning Pipeline
-7. Mission Templates
+6. Challenge Planning Pipeline
+7. Challenge Templates
 8. Adaptive Generation
 9. Difficulty Scaling
 10. Rubric Association
 11. Validation
 12. Output Model
 13. Failure Recovery
-14. Future Evolution
-15. Conclusion
+14. AI Mentor Principle
+15. Future Evolution
+16. Conclusion
 
 ---
 
@@ -24,54 +25,54 @@
 
 ## Engine Name
 
-**Mission Generation Engine (MGE)**
+**Practical Challenge Engine (PCE)**
 
 ## Purpose
 
-Generate realistic cybersecurity assessment missions based on a Role Blueprint and Assessment Blueprint.
+Generate realistic cybersecurity assessment challenges based on a Skill DNA Profile and Capability Blueprint.
 
-Each mission is designed to evaluate one or more competencies using structured scenarios rather than isolated interview questions.
+Each challenge is designed to evaluate one or more capabilities using structured scenarios rather than isolated interview questions.
 
 ---
 
 # 2. Design Philosophy
 
-Mission generation follows:
+Challenge generation follows:
 
 ```
-Role Blueprint
+Skill DNA Profile
     ↓
 Assessment Objectives
     ↓
-Mission Planning
+Challenge Planning
     ↓
 Scenario Generation
     ↓
 Evaluation Rubric
     ↓
-Mission Package
+Challenge Package
 ```
 
-Missions evaluate reasoning, not memorization.
+Challenges evaluate reasoning, not memorization.
 
 ---
 
 # 3. Engine Overview
 
 ```
-Role Blueprint
+Skill DNA Profile
     ↓
-Assessment Blueprint
+Capability Blueprint
     ↓
-Mission Planner
+Challenge Planner
     ↓
-Mission Generator
+Challenge Generator
     ↓
 Validation
     ↓
-Mission Package
+Challenge Package
     ↓
-Assessment Engine
+Capability Intelligence Engine
 ```
 
 ---
@@ -80,29 +81,29 @@ Assessment Engine
 
 Required inputs:
 
-- Role Blueprint
-- Assessment Blueprint
-- Competency coverage targets
+- Skill DNA Profile
+- Capability Blueprint
+- Capability coverage targets
 - Difficulty level
-- Mission template library
+- Challenge template library
 
 Optional inputs:
 
-- Candidate history
+- Professional history
 - Organization preferences
 - Assessment duration
 - Industry domain
 
 ---
 
-# 5. Mission Planning Pipeline
+# 5. Challenge Planning Pipeline
 
 ```
-Assessment Blueprint
+Capability Blueprint
     ↓
-Competency Selection
+Capability Selection
     ↓
-Mission Template
+Challenge Template
     ↓
 Scenario Generation
     ↓
@@ -112,14 +113,14 @@ Expected Reasoning
     ↓
 Rubric Mapping
     ↓
-Mission Package
+Challenge Package
 ```
 
-Each mission must satisfy at least one assessment objective.
+Each challenge must satisfy at least one assessment objective.
 
 ---
 
-# 6. Mission Templates
+# 6. Challenge Templates
 
 Supported templates:
 
@@ -140,23 +141,23 @@ Templates define structure, not content.
 
 # 7. Adaptive Generation
 
-Mission selection adapts using:
+Challenge selection adapts using:
 
 ```
 Previous Responses
     ↓
-Competency Coverage
+Capability Coverage
     ↓
 Confidence
     ↓
 Remaining Objectives
     ↓
-Next Mission
+Next Challenge
 ```
 
 Adaptive rules:
 
-- Cover uncovered competencies.
+- Cover uncovered capabilities.
 - Increase difficulty after consistently strong performance.
 - Explore weak reasoning areas.
 - Avoid unnecessary repetition.
@@ -188,23 +189,23 @@ Difficulty should evolve without violating assessment fairness.
 
 # 9. Rubric Association
 
-Every mission references one rubric version.
+Every challenge references one rubric version.
 
 Example:
 
 ```
-Mission
+Challenge
     ↓
 Assessment Objective
     ↓
-Competencies
+Capabilities
     ↓
 Evaluation Criteria
     ↓
 Rubric Version
 ```
 
-The mission never embeds scoring logic directly.
+The challenge never embeds scoring logic directly.
 
 ---
 
@@ -215,13 +216,13 @@ Validation stages:
 ```
 Schema Validation
     ↓
-Competency Coverage
+Capability Coverage
     ↓
 Difficulty Check
     ↓
 Template Validation
     ↓
-Mission Approval
+Challenge Approval
 ```
 
 Checks include:
@@ -236,14 +237,14 @@ Checks include:
 
 # 11. Output Model
 
-Mission Package:
+Challenge Package:
 
 ```
-Mission ID
+Challenge ID
 Title
 Scenario
 Objectives
-Competencies
+Capabilities
 Questions
 Hints (optional)
 Expected Reasoning
@@ -251,7 +252,7 @@ Rubric Reference
 Estimated Duration
 ```
 
-Mission Packages are immutable once an assessment begins.
+Challenge Packages are immutable once an assessment begins.
 
 ---
 
@@ -264,7 +265,7 @@ Retry
     ↓
 Fallback Template
     ↓
-Generate Mission
+Generate Challenge
 ```
 
 ### Invalid Output
@@ -277,30 +278,48 @@ Repair
 Retry
 ```
 
-### Missing Competency Coverage
+### Missing Capability Coverage
 
 ```
 Coverage Analysis
     ↓
-Generate Supplemental Mission
+Generate Supplemental Challenge
 ```
 
 ---
 
-# 13. Future Evolution
+# 13. AI Mentor Principle
+
+The Practical Challenge Engine operates under the **AI Mentor** principle:
+
+> **AI MUST NEVER answer assessments — only mentor and explain.**
+
+The engine generates realistic cybersecurity scenarios and questions designed to evaluate professional reasoning, but never provides answers, hints that reveal solutions, or completes challenges on behalf of professionals. All generated challenges must maintain assessment integrity.
+
+---
+
+# 14. Future Evolution
 
 Future capabilities:
 
 - Multi-stage attack simulations
-- Branching mission trees
+- Branching challenge trees
 - Cyber range integration
 - Threat intelligence enrichment
-- Organization-specific mission libraries
+- Organization-specific challenge libraries
 - Red Team / Blue Team exercises
 - Live SOC replay scenarios
 
+## Related Documents
+
+- [Skill DNA Engine](26-skill-dna-engine.md)
+- [Capability Assessment Engine](27-capability-assessment-engine.md)
+- [Capability Reasoning Engine](29-capability-reasoning-engine.md)
+- [Gamification Concept](../docs/concepts/gamification.md)
+- [System Features](../docs/03-functional-design/12-system-features.md)
+
 ---
 
-# 14. Conclusion
+# 15. Conclusion
 
-The Mission Generation Engine converts assessment objectives into structured, competency-driven cybersecurity scenarios. By separating templates, scenario generation, and rubric association, missions remain reusable, explainable, and aligned with business goals.
+The Practical Challenge Engine converts assessment objectives into structured, competency-driven cybersecurity scenarios. By separating templates, scenario generation, and rubric association, challenges remain reusable, explainable, and aligned with business goals.

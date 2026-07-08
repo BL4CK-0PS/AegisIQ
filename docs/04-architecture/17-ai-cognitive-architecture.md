@@ -1,4 +1,4 @@
-# AegisIQ — AI Cognitive Architecture
+# PWNDORA SkillScan X — AI Cognitive Architecture
 
 | | |
 |---|---|
@@ -12,15 +12,17 @@
 
 | Version | Date | Author | Changes |
 |---|---|---|---|
-| 1.0 | 2026-07-08 | Team AegisIQ | Initial release |
+| 1.0 | 2026-07-08 | PWNDORA SkillScan X Team | Initial release |
 
 ---
 
 ## 1. Executive Summary
 
-This document defines the AI Cognitive Architecture powering AegisIQ. Unlike traditional AI interview systems that directly ask an LLM to score candidates, AegisIQ separates generation, reasoning, validation, explainability, and recommendation into independent AI modules.
+This document defines the AI Cognitive Architecture powering PWNDORA SkillScan X. Unlike traditional AI interview systems that directly ask an LLM to score professionals, PWNDORA SkillScan X separates generation, reasoning, validation, evidence intelligence, and recommendation into independent AI modules.
 
 This architecture improves transparency, consistency, and maintainability.
+
+**AI Principle:** AI MUST NEVER answer assessments — only mentor and explain.
 
 ---
 
@@ -28,16 +30,10 @@ This architecture improves transparency, consistency, and maintainability.
 
 The AI subsystem follows five principles.
 
-```
-AI Assists
-    ↓
-Rules Validate
-    ↓
-Evidence Explains
-    ↓
-Humans Decide
-    ↓
-Learning Improves
+```mermaid
+flowchart TD
+    AA[AI Assists] --> RV[Rules Validate] --> EE[Evidence Explains]
+    EE --> HD[Humans Decide] --> LI[Learning Improves]
 ```
 
 Large Language Models are **reasoning assistants**, not autonomous decision makers.
@@ -46,56 +42,27 @@ Large Language Models are **reasoning assistants**, not autonomous decision make
 
 ## 3. Cognitive Architecture
 
-```
-                Job Description
-                        │
-                        ▼
-           Role Blueprint Intelligence
-                        │
-                        ▼
-             Assessment Planner
-                        │
-                        ▼
-              Mission Generator
-                        │
-                        ▼
-             Assessment Session
-                        │
-                        ▼
-          Transcript Processing
-                        │
-                        ▼
-          Cyber Reasoning Engine
-                        │
-                        ▼
-          Explainability Engine
-                        │
-                        ▼
-             Learning Engine
-                        │
-                        ▼
-                Report Generator
+```mermaid
+flowchart TD
+    JD[Job Description] --> RIE[Role Intelligence Engine] --> AP[Assessment Planner]
+    AP --> PCG[Practical Challenge Generator] --> AS[Assessment Session]
+    AS --> TP[Transcript Processing] --> CRE[Capability Reasoning Engine]
+    CRE --> EIE[Evidence Intelligence Engine] --> LPE[Learning Path Engine]
+    LPE --> RG[Report Generator]
 ```
 
 ---
 
 ## 4. AI Layer
 
-```
-                AI Orchestrator
-                       │
-     ┌─────────────────┼─────────────────┐
-     ▼                 ▼                 ▼
-Role Intelligence   Mission AI    Evaluation AI
-     │                 │                 │
-     └─────────────────┼─────────────────┘
-                       ▼
-              Explainability AI
-                       ▼
-                Learning AI
+```mermaid
+flowchart TD
+    ADE[AI Decision Engine] --> RIE[Role Intelligence] & CA[Challenge AI] & EA[Evaluation AI]
+    RIE & CA & EA --> EIA[Evidence Intelligence AI]
+    EIA --> LO[Learning Orchestration] --> CI[Community Intelligence]
 ```
 
-The orchestrator coordinates specialized AI tasks rather than relying on a single prompt.
+The AI Decision Engine coordinates specialized AI tasks rather than relying on a single prompt.
 
 ---
 
@@ -103,56 +70,39 @@ The orchestrator coordinates specialized AI tasks rather than relying on a singl
 
 | Component | Responsibility |
 |---|---|
-| Role Intelligence | Parse job descriptions |
-| Assessment Planner | Build assessment blueprint |
-| Mission Generator | Generate cyber scenarios |
-| Transcript Analyzer | Normalize candidate responses |
+| Role Intelligence Engine | Parse job descriptions, build Skill DNA Profile |
+| Assessment Planner | Build Capability Blueprint |
+| Practical Challenge Generator | Generate cyber scenarios |
+| Transcript Analyzer | Normalize professional responses |
 | Concept Extractor | Identify cybersecurity concepts |
-| Cyber Reasoning | Evaluate technical reasoning |
-| Explainability | Generate evidence-backed explanations |
-| Learning Engine | Produce improvement roadmap |
+| Capability Reasoning Engine | Evaluate technical reasoning |
+| Evidence Intelligence Engine | Generate evidence-backed explanations |
+| Learning Path Engine | Produce Career Compass |
+| AI Mentor | Guided learning companion, never answers assessments |
 
 ---
 
 ## 6. End-to-End AI Pipeline
 
-```
-Job Description
-    ↓
-Parser
-    ↓
-Role Blueprint
-    ↓
-Assessment Plan
-    ↓
-Mission Generation
-    ↓
-Candidate Response
-    ↓
-Transcript
-    ↓
-Concept Extraction
-    ↓
-Reasoning
-    ↓
-Evidence
-    ↓
-Learning
-    ↓
-Report
+```mermaid
+flowchart TD
+    JD[Job Description] --> P[Parser] --> SDP[Skill DNA Profile] --> AP[Assessment Plan]
+    AP --> PCG[Practical Challenge Generation] --> PR[Professional Response]
+    PR --> T[Transcript] --> CE[Concept Extraction] --> R[Reasoning]
+    R --> E[Evidence] --> L[Learning] --> REPORT[Report]
 ```
 
 Each stage produces structured output consumed by the next stage.
 
 ---
 
-## 7. Role Blueprint Intelligence
+## 7. Role Intelligence Engine
 
 **Inputs:** Job Description, role title, responsibilities, required skills
 
-**Processing — Extract:** Competencies, seniority, knowledge domains, assessment objectives
+**Processing — Extract:** Capabilities, seniority, knowledge domains, assessment objectives
 
-**Outputs:** Role Blueprint, Competency Graph, Assessment Objectives
+**Outputs:** Skill DNA Profile, Skill DNA Graph, Assessment Objectives
 
 ---
 
@@ -162,99 +112,62 @@ The planner determines:
 
 - Number of missions
 - Difficulty progression
-- Competency coverage
+- Capability coverage
 - Estimated duration
 - Evaluation rubric selection
 
 Example:
 
-```
-SOC Analyst
-    ↓
-4 Missions
-    ↓
-12 Questions
-    ↓
-45 Minutes
+```mermaid
+flowchart TD
+    SA[SOC Analyst] --> M[4 Missions] --> Q[12 Questions] --> MIN[45 Minutes]
 ```
 
 ---
 
-## 9. Mission Generation
+## 9. Practical Challenge Generation
 
-Mission creation pipeline:
+Challenge creation pipeline:
 
-```
-Role Blueprint
-    ↓
-Mission Template
-    ↓
-Scenario Context
-    ↓
-Adaptive Questions
-    ↓
-Expected Reasoning
-    ↓
-Evaluation Criteria
+```mermaid
+flowchart TD
+    SDP[Skill DNA Profile] --> MT[Mission Template] --> SC[Scenario Context]
+    SC --> AQ[Adaptive Questions] --> ER[Expected Reasoning] --> EC[Evaluation Criteria]
 ```
 
 Mission categories: SOC Operations, Digital Forensics, Incident Response, Threat Hunting, Malware Analysis, Cloud Security, Identity and Access Management.
 
 ---
 
-## 10. Cyber Reasoning Engine
+## 10. Capability Reasoning Engine
 
-This is the core intelligence of AegisIQ.
+This is the core intelligence of PWNDORA SkillScan X.
 
-```
-Transcript
-    ↓
-Normalize
-    ↓
-Concept Extraction
-    ↓
-Workflow Validation
-    ↓
-Decision Analysis
-    ↓
-Risk Evaluation
-    ↓
-MITRE Mapping
-    ↓
-Competency Scoring
-    ↓
-Evidence Generation
+```mermaid
+flowchart TD
+    T[Transcript] --> N[Normalize] --> CE[Concept Extraction] --> WV[Workflow Validation]
+    WV --> DA[Decision Analysis] --> RE[Risk Evaluation] --> MM[MITRE Mapping]
+    MM --> CS[Capability Scoring] --> EG[Evidence Generation]
 ```
 
 Unlike generic AI scoring, evaluation is constrained by cybersecurity workflows and structured rubrics.
 
-The LLM should extract information, summarize, and generate explanations. The deterministic parts should calculate scores, validate workflows, enforce rubrics, and determine competency levels.
+The LLM should extract information, summarize, and generate explanations. The deterministic parts should calculate scores, validate workflows, enforce rubrics, and determine capability levels.
 
 ### Hybrid Evaluation Pipeline
 
-```
-Candidate Response
-    ↓
-LLM Extraction
-    ↓
-Structured Concepts
-    ↓
-Rule Engine
-    ↓
-Rubric Engine
-    ↓
-Competency Calculator
-    ↓
-Evidence Builder
-    ↓
-LLM Explainability
+```mermaid
+flowchart TD
+    PR[Professional Response] --> LE[LLM Extraction] --> SC[Structured Concepts]
+    SC --> RE[Rule Engine] --> RBE[Rubric Engine] --> CC[Capability Calculator]
+    CC --> EB[Evidence Builder] --> LME[LLM Explainability]
 ```
 
 ---
 
-## 11. Explainability Engine
+## 11. Evidence Intelligence Engine
 
-Purpose: Transform evaluation results into transparent explanations.
+Purpose: Transform evaluation results into transparent explanations with traceable evidence.
 
 **Outputs:** Strengths, weaknesses, missing concepts, supporting evidence, confidence level, improvement recommendations.
 
@@ -262,25 +175,17 @@ Every score must be traceable to observed evidence.
 
 ---
 
-## 12. Learning Engine
+## 12. Learning Path Engine
 
 Pipeline:
 
-```
-Competency Scores
-    ↓
-Weak Skills
-    ↓
-Learning Objectives
-    ↓
-Recommended Topics
-    ↓
-Suggested Labs
-    ↓
-Reassessment Plan
+```mermaid
+flowchart TD
+    CS[Capability Scores] --> GC[Gap Capabilities] --> LO[Learning Objectives]
+    LO --> RT[Recommended Topics] --> SL[Suggested Labs] --> CC[Career Compass]
 ```
 
-Recommendations are linked to specific competency gaps.
+Recommendations are linked to specific capability gaps. The AI Mentor provides guidance without answering assessment questions.
 
 ---
 
@@ -291,12 +196,13 @@ Instead of one monolithic prompt, use specialized prompts:
 | Prompt | Purpose |
 |---|---|
 | System Prompt | Global platform rules |
-| Role Extraction Prompt | Build Role Blueprint |
+| Role Extraction Prompt | Build Skill DNA Profile |
 | Assessment Planning Prompt | Generate assessment plan |
-| Mission Prompt | Create scenarios |
+| Challenge Prompt | Create scenarios |
 | Evaluation Prompt | Analyze responses |
-| Explainability Prompt | Produce evidence-backed feedback |
-| Learning Prompt | Generate roadmap |
+| Evidence Intelligence Prompt | Produce evidence-backed feedback |
+| Learning Prompt | Generate Career Compass |
+| AI Mentor Prompt | Provide coaching without answering assessments |
 
 Each prompt returns structured JSON validated before downstream processing.
 
@@ -374,29 +280,30 @@ Future AI capabilities:
 
 ## 18. Conclusion
 
-The AegisIQ AI architecture is intentionally modular. Each stage has a single responsibility, produces structured outputs, and feeds validated information into the next stage. This approach increases transparency, reduces coupling, and makes the platform easier to test, maintain, and evolve.
+The PWNDORA SkillScan X AI architecture is intentionally modular. Each stage has a single responsibility, produces structured outputs, and feeds validated information into the next stage. This approach increases transparency, reduces coupling, and makes the platform easier to test, maintain, and evolve.
 
 ---
 
 ## AI Pipeline Summary
 
-```
-Role Intelligence
-    ↓
-Assessment Planning
-    ↓
-Mission Generation
-    ↓
-Cyber Reasoning
-    ↓
-Explainability
-    ↓
-Learning
-    ↓
-Reporting
+```mermaid
+flowchart TD
+    RI[Role Intelligence] --> AP[Assessment Planning] --> PCG[Practical Challenge Generation]
+    PCG --> CR[Capability Reasoning] --> EI[Evidence Intelligence]
+    EI --> L[Learning] --> R[Reporting]
 ```
 
 Each module can be tested independently while contributing to the overall assessment workflow.
+
+---
+
+## Related Documents
+
+- [System Architecture](16-system-architecture.md)
+- [Backend Architecture](18-backend-architecture.md)
+- [Data Flow](20-data-flow.md)
+- [Skill DNA Engine](../docs/06-ai-engines/26-skill-dna-engine.md)
+- [Capability Reasoning Engine](../docs/06-ai-engines/29-capability-reasoning-engine.md)
 
 ---
 
@@ -405,6 +312,6 @@ Each module can be tested independently while contributing to the overall assess
 | Reference | Document |
 |---|---|
 | System architecture | `../04-architecture/16-system-architecture.md` |
-| Feature specification | `../03-experience/14-feature-specification.md` |
+| Feature specification | `../03-functional-design/12-system-features.md` |
 | Backend architecture | `../04-architecture/18-backend-architecture.md` |
 | Data flow | `../04-architecture/20-data-flow.md` |

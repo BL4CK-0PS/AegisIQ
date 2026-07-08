@@ -24,7 +24,7 @@
 
 ## Purpose
 
-This document identifies, evaluates, and mitigates the major risks associated with the development and operation of AegisIQ.
+This document identifies, evaluates, and mitigates the major risks associated with the development and operation of PWNDORA SkillScan X.
 
 Objectives:
 
@@ -39,16 +39,10 @@ Objectives:
 
 Every identified risk follows this lifecycle:
 
-```
-Identify
-    ↓
-Assess
-    ↓
-Mitigate
-    ↓
-Monitor
-    ↓
-Review
+```mermaid
+flowchart TD
+    I[Identify] --> A[Assess] --> M[Mitigate]
+    M --> MON[Monitor] --> R[Review]
 ```
 
 Risks should be tracked continuously, not only during planning.
@@ -111,6 +105,7 @@ Rules:
 
 - AI never bypasses business rules.
 - AI outputs are treated as untrusted until validated.
+- AI MUST NEVER answer capability assessments — only mentor and explain.
 
 ---
 
@@ -128,16 +123,10 @@ Threats:
 
 Mitigations:
 
-```
-Authentication
-    ↓
-Authorization
-    ↓
-Validation
-    ↓
-Encryption
-    ↓
-Audit
+```mermaid
+flowchart TD
+    A[Authentication] --> AU[Authorization] --> V[Validation]
+    V --> E[Encryption] --> AD[Audit]
 ```
 
 Security is enforced at multiple layers.
@@ -193,8 +182,8 @@ Examples:
 Potential concerns:
 
 - Personal data retention
-- Uploaded job description ownership
-- Candidate assessment privacy
+- Uploaded Role Definition ownership
+- Professional capability assessment privacy
 - Report access control
 
 Mitigations:
@@ -227,16 +216,10 @@ Review this matrix throughout development.
 
 General process:
 
-```
-Risk
-    ↓
-Detection
-    ↓
-Mitigation
-    ↓
-Validation
-    ↓
-Documentation
+```mermaid
+flowchart TD
+    R[Risk] --> D[Detection] --> M[Mitigation]
+    M --> V[Validation] --> DOC[Documentation]
 ```
 
 Each high-priority risk should have:
@@ -252,44 +235,31 @@ Each high-priority risk should have:
 
 ### AI Provider Failure
 
-```
-Provider Unavailable
-    ↓
-Retry
-    ↓
-Fallback Provider
-    ↓
-Graceful Degradation
+```mermaid
+flowchart TD
+    PU[Provider Unavailable] --> R[Retry] --> FP[Fallback Provider]
+    FP --> GD[Graceful Degradation]
 ```
 
 ### Database Failure
 
-```
-Restore Backup
-    ↓
-Run Integrity Checks
-    ↓
-Resume Service
+```mermaid
+flowchart TD
+    RB[Restore Backup] --> IC[Run Integrity Checks] --> RS[Resume Service]
 ```
 
 ### Deployment Failure
 
-```
-Health Check
-    ↓
-Rollback
-    ↓
-Notify Team
+```mermaid
+flowchart TD
+    HC[Health Check] --> R[Rollback] --> NT[Notify Team]
 ```
 
 ### Team Availability
 
-```
-Module Documentation
-    ↓
-Shared Ownership
-    ↓
-Task Reassignment
+```mermaid
+flowchart TD
+    MD[Module Documentation] --> SO[Shared Ownership] --> TR[Task Reassignment]
 ```
 
 ---
@@ -314,6 +284,15 @@ Track:
 
 ---
 
+## Related Documents
+
+- [Implementation Roadmap](36-implementation-roadmap.md)
+- [Project Structure](37-project-structure.md)
+- [Future Roadmap](39-future-roadmap.md)
+- [Security Architecture Deep Dive](../docs/07-engineering/35-security-architecture-deep-dive.md)
+
+---
+
 # 15. Conclusion
 
-AegisIQ adopts proactive risk management by identifying technical, operational, security, AI, and organizational risks early in the development lifecycle. Continuous review and documented mitigation plans reduce uncertainty and improve delivery confidence.
+PWNDORA SkillScan X adopts proactive risk management by identifying technical, operational, security, AI, and organizational risks early in the development lifecycle. Continuous review and documented mitigation plans reduce uncertainty and improve delivery confidence.

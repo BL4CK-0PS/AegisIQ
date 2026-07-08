@@ -1,6 +1,6 @@
-# AegisIQ — Datasets
+# PWNDORA SkillScan X — Datasets
 
-> Sample data, test fixtures, and benchmark datasets for the AegisIQ platform.
+> Sample data, test fixtures, and benchmark datasets for the PWNDORA SkillScan X platform.
 
 ---
 
@@ -24,9 +24,9 @@ datasets/
 │   ├── incident-responder/
 │   ├── threat-hunter/
 │   └── cloud-security-engineer/
-├── blueprints/          Example role blueprints (JSON)
-├── missions/            Sample mission scenarios
-├── responses/           Sample candidate responses for testing
+├── skill-dna/           Example Skill DNA profiles (JSON)
+├── challenges/          Sample practical challenge scenarios
+├── responses/           Sample professional responses for testing
 ├── rubrics/             Evaluation rubrics by role
 └── benchmarks/          Benchmark datasets for evaluation accuracy
 ```
@@ -40,9 +40,9 @@ Each dataset includes a metadata file describing source, format, and intended us
 | Data Type | Format | Description |
 |---|---|---|
 | Job descriptions | PDF, DOCX, TXT | Raw input files |
-| Blueprints | JSON | Structured competency models |
-| Missions | JSON | Scenarios with objectives and rubrics |
-| Responses | JSON | Candidate transcripts and extracted concepts |
+| Skill DNA | JSON | Structured competency profiles |
+| Challenges | JSON | Scenarios with objectives and rubrics |
+| Responses | JSON | Professional transcripts and extracted concepts |
 | Rubrics | JSON (or TOML) | Evaluation criteria and scoring rules |
 
 ---
@@ -53,4 +53,4 @@ Each dataset includes a metadata file describing source, format, and intended us
 - Include a `README.md` or `metadata.json` describing the dataset
 - Document the source and any licensing
 - Use realistic but anonymized data
-- Avoid including any real candidate information
+- Avoid including any real professional information

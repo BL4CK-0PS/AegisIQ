@@ -25,7 +25,7 @@
 
 ## Purpose
 
-This document defines how AegisIQ is deployed across development, staging, and production environments.
+This document defines how PWNDORA SkillScan X is deployed across development, staging, and production environments.
 
 It covers:
 
@@ -42,16 +42,10 @@ It covers:
 
 Deployments should be:
 
-```
-Repeatable
-    ↓
-Automated
-    ↓
-Recoverable
-    ↓
-Observable
-    ↓
-Secure
+```mermaid
+flowchart TD
+    R[Repeatable] --> A[Automated] --> REC[Recoverable]
+    REC --> O[Observable] --> S[Secure]
 ```
 
 Every deployment should produce identical results from identical source code.
@@ -89,28 +83,20 @@ Each environment has its own configuration and secrets.
 
 # 5. Deployment Architecture
 
-```
-Internet
-    ↓
-Nginx
-├──────── React Frontend
-└──────── FastAPI Backend
-    ↓
-PostgreSQL
+```mermaid
+flowchart TD
+    IN[Internet] --> N[Nginx]
+    N --> RE[React Frontend]
+    N --> FA[FastAPI Backend]
+    FA --> PG[PostgreSQL]
 ```
 
 Future architecture:
 
-```
-Load Balancer
-    ↓
-Frontend
-    ↓
-Backend Cluster
-    ↓
-AI Workers
-    ↓
-Database Cluster
+```mermaid
+flowchart TD
+    LB[Load Balancer] --> FE[Frontend] --> BC[Backend Cluster]
+    BC --> AW[AI Workers] --> DC[Database Cluster]
 ```
 
 ---
@@ -120,22 +106,17 @@ Database Cluster
 Docker Compose:
 
 ```
-frontend
-backend
-postgres
-nginx
+- frontend
+- backend
+- postgres
+- nginx
 ```
 
 Deployment order:
 
-```
-PostgreSQL
-    ↓
-Backend
-    ↓
-Frontend
-    ↓
-Nginx
+```mermaid
+flowchart TD
+    PG[PostgreSQL] --> BE[Backend] --> FE[Frontend] --> N[Nginx]
 ```
 
 Shutdown order is reversed.
@@ -163,6 +144,12 @@ LOG_LEVEL
 ENVIRONMENT
 ```
 
+Database URL format:
+
+```
+postgresql://user:password@host:5432/skillscanx
+```
+
 Rules:
 
 - Never hardcode secrets.
@@ -175,24 +162,20 @@ Rules:
 
 Deployment sequence:
 
-```
-Start PostgreSQL
-    ↓
-Run Alembic Migrations
-    ↓
-Seed Reference Data
-    ↓
-Verify Schema
-    ↓
-Start Backend
+```mermaid
+flowchart TD
+    SP[Start PostgreSQL] --> RA[Run Alembic Migrations] --> SR[Seed Reference Data]
+    SR --> VS[Verify Schema] --> SB[Start Backend]
 ```
 
 Reference data includes:
 
-- Competencies
-- Mission types
+- Capabilities
+- Challenge types
 - Rubric definitions
 - Default roles
+
+The default database name is `skillscanx`.
 
 ---
 
@@ -209,36 +192,21 @@ Nginx responsibilities:
 
 Routing:
 
-```
-/
-    ↓
-React
-
-/api
-    ↓
-FastAPI
+```mermaid
+flowchart TD
+    R[/] --> RE[React]
+    API[/api] --> FA[FastAPI]
 ```
 
 ---
 
 # 10. Deployment Workflow
 
-```
-Merge to Main
-    ↓
-GitHub Actions
-    ↓
-Run Tests
-    ↓
-Build Docker Images
-    ↓
-Push Images
-    ↓
-Deploy
-    ↓
-Health Check
-    ↓
-Deployment Complete
+```mermaid
+flowchart TD
+    MM[Merge to Main] --> GA[GitHub Actions] --> RT[Run Tests]
+    RT --> BD[Build Docker Images] --> PI[Push Images]
+    PI --> DEP[Deploy] --> HC[Health Check] --> DC[Deployment Complete]
 ```
 
 No manual file copying to servers.
@@ -275,18 +243,10 @@ Checks:
 
 # 12. Rollback Procedure
 
-```
-Deploy
-    ↓
-Health Check
-    ↓
-Failure Detected
-    ↓
-Restore Previous Image
-    ↓
-Restart Services
-    ↓
-Verify Health
+```mermaid
+flowchart TD
+    DEP[Deploy] --> HC[Health Check] --> FD[Failure Detected]
+    FD --> RPI[Restore Previous Image] --> RS[Restart Services] --> VH[Verify Health]
 ```
 
 Rollback target:
@@ -303,28 +263,17 @@ Failure scenarios:
 
 ### Server Failure
 
-```
-Provision Server
-    ↓
-Restore Backup
-    ↓
-Deploy Containers
-    ↓
-Restore Database
-    ↓
-Validate
+```mermaid
+flowchart TD
+    PS[Provision Server] --> RB[Restore Backup] --> DC[Deploy Containers]
+    DC --> RDB[Restore Database] --> V[Validate]
 ```
 
 ### Database Corruption
 
-```
-Stop Writes
-    ↓
-Restore Backup
-    ↓
-Replay Migrations
-    ↓
-Verify Integrity
+```mermaid
+flowchart TD
+    SW[Stop Writes] --> RB[Restore Backup] --> RM[Replay Migrations] --> VI[Verify Integrity]
 ```
 
 Recovery objectives:
@@ -353,8 +302,8 @@ After deployment:
 
 - Verify health endpoint
 - Verify login
-- Verify JD upload
-- Verify assessment creation
+- Verify Role Definition upload
+- Verify capability assessment creation
 - Verify report generation
 
 ---
@@ -374,8 +323,15 @@ Future improvements:
 
 Introduce these only when operational requirements justify the added complexity.
 
+## Related Documents
+
+- [DevOps Architecture](32-devops-architecture.md)
+- [Testing Strategy](31-testing-strategy.md)
+- [Monitoring & Observability](34-monitoring-observability.md)
+- [Security Architecture Deep Dive](35-security-architecture-deep-dive.md)
+
 ---
 
 # 16. Conclusion
 
-The deployment architecture prioritizes reliability, repeatability, and simplicity. A Docker-based deployment on Ubuntu with GitHub Actions automation provides a practical production path while remaining manageable for a four-person team.
+The deployment architecture prioritizes reliability, repeatability, and simplicity. A Docker-based deployment on Ubuntu with GitHub Actions automation provides a practical production path while remaining manageable for the PWNDORA SkillScan X Team.
