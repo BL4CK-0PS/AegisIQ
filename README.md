@@ -1145,6 +1145,348 @@ gantt
 
 ---
 
+## Core AI/ML Backend
+
+The `src/core/` package contains all AI and knowledge-engineering logic, organized in 5 layers:
+
+```mermaid
+flowchart TD
+    subgraph L1["1. AI Plumbing"]
+        PL["PromptLoader<br/>(YAML templates)"]
+        AC["AIClient<br/>(orchestrator + metrics)"]
+        subgraph PROV["Providers"]
+            OP["OllamaProvider"]
+            MP["MistralProvider"]
+        end
+        PL -->|rendered prompt| AC
+        AC --> OP
+        AC --> MP
+    end
+    subgraph L2["2. Knowledge Structures"]
+        TAX["taxonomy.py<br/>(Pydantic domain models)"]
+        RUB["rubrics.py<br/>(weighted scoring rubrics)"]
+        SD["seed_data.py<br/>(4 domains, 16 skills, 16 MITRE techniques)"]
+    end
+    subgraph L3["3. Question Engine"]
+        QG["QuestionGenerator<br/>(skill assessments)"]
+        SG["ScenarioGenerator<br/>(incident + threat hunting scenarios)"]
+    end
+    subgraph L4["4. Evaluation Engine"]
+        AE["AnswerEvaluator<br/>(criterion scoring)"]
+        CE1["CapabilityEngine<br/>(consolidation + Cyber Twin)"]
+    end
+    subgraph L5["5. AI Mentor"]
+        AME["AIMentorEngine<br/>(learning roadmaps + labs)"]
+        FE["FeedbackEngine<br/>(answer repair guides)"]
+    end
+
+    L1 --> L3
+    L2 --> L3
+    L3 --> L4
+    L4 --> L5
+```
+
+### Directory Layout
+
+```
+src/core/
+├── ai/                          # 1. AI Plumbing
+│   ├── __init__.py
+│   ├── provider.py              # BaseAIProvider, OllamaProvider, MistralProvider
+│   ├── client.py                # AIClient (wraps provider with timing/logging)
+│   └── prompt_loader.py         # PromptLoader (YAML → rendered string)
+├── knowledge/                   # 2. Knowledge Structures
+│   ├── __init__.py
+│   ├── taxonomy.py              # 14 Pydantic models (CyberDomain, Skill, MitreTechnique…)
+│   ├── rubrics.py               # ScoringRubric + 3 pre-built rubrics + registry
+│   └── seed_data.py             # 4 domains, 16 skills, 5 technologies, 16 real MITRE techniques
+├── engine/                      # 3. Question Engine
+│   ├── __init__.py
+│   ├── question_generator.py    # QuestionGenerator → SkillAssessmentQuestion
+│   └── scenarios.py             # ScenarioGenerator + TEMPLATE_POOL (T1190/T1486/T1566/T1059)
+├── evaluation/                  # 4. Evaluation Engine
+│   ├── __init__.py
+│   ├── evaluator.py             # AnswerEvaluator → EvaluationResult + CriterionScore
+│   └── dna_engine.py            # CapabilityEngine → ConsolidatedProfile, CyberTwinModel
+├── mentor/                      # 5. AI Mentor
+│   ├── __init__.py
+│   ├── mentor_engine.py         # AIMentorEngine → LearningRoadmap + LabRecommendation
+│   └── feedback.py              # FeedbackEngine → AnswerRepairGuide
+└── prompts/                     # YAML prompt templates
+    ├── skill_assessment.yaml
+    ├── incident_scenario.yaml
+    ├── evaluation_engine.yaml
+    ├── mentor_guidance.yaml
+    └── answer_repair.yaml
+```
+
+### Layer 1 — AI Plumbing (`src/core/ai/`)
+
+**`BaseAIProvider`** (abstract) — single method `async generate(prompt, schema?) → str`
+
+| Provider | Endpoint | Auth | Retry |
+|---|---|---|---|
+| **`OllamaProvider`** | `{base_url}/api/generate` | None | Exponential backoff (default 3 tries, 2s base) |
+| **`MistralProvider`** | `{base_url}/v1/chat/completions` | `api_key` header | Same retry strategy |
+
+**`AIClient`** — wraps any provider with timing instrumentation, logs duration & response length. Constructor: `AIClient(provider: BaseAIProvider, timeout=120, log_prompts=False)`. Single method `async generate(prompt, schema?, timeout?) → str`.
+
+**`PromptLoader`** — reads YAML templates from a directory. Key methods:
+- `load(name)` → `dict` with `system`, `user`, `required_variables`
+- `render(name, variables)` → `str` (injects into system+user via `str.format`)
+- `load_system_prompt(name)` → `str`
+- `list_templates()` → `list[str]`
+
+**YAML template structure:**
+```yaml
+system: |
+  You are an expert {role}. {instructions}
+required_variables:
+  - role
+user: |
+  Build a scenario for {technique}.
+```
+
+Every engine class below receives `AIClient` + `PromptLoader` via constructor injection.
+
+### Layer 2 — Knowledge Structures (`src/core/knowledge/`)
+
+**ProficiencyLevel** enum: `beginner`, `intermediate`, `advanced`, `expert`.
+
+**Key domain models** (all `pydantic.BaseModel`, `frozen=True`):
+
+| Model | Fields | Purpose |
+|---|---|---|
+| `CyberDomain` | `id`, `name`, `description`, `capabilities: list[Capability]`, `technologies`, `mitre_mappings` | Top-level grouping (Web, Network, Cloud, IR) |
+| `Capability` | `id`, `name`, `description`, `skills: list[Skill]`, `mitre_mappings`, `technologies` | A unit of professional competency |
+| `Skill` | `id`, `name`, `description`, `alternative_labels`, `knowledge_areas: list[KnowledgeArea]`, `proficiency_level` | Measurable skill with learning objectives |
+| `MitreTechnique` | `id`, `name`, `description`, `tactic: MitreTactic`, `sub_techniques: list[MitreTechnique]` | Recursive MITRE ATT&CK technique |
+| `MitreMapping` | `technique`, `skill_ids`, `detection_methods`, `mitigation_references` | Bridges skills to MITRE |
+| `SkillDnaProfile` | `id`, `title`, `capabilities`, `knowledge_areas`, `responsibilities`, `difficulty`, `estimated_duration_minutes`, `recommended_rubric` | Aggregated blueprint for assessment |
+| `KnowledgeArea` | `id`, `name`, `description`, `learning_objectives: list[LearningObjective]` | Topic area with Bloom's-taxonomy objectives |
+| `Technology` | `id`, `name`, `category`, `description`, `skill_ids`, `depends_on_technology_ids` | Tools & services (Burp Suite, Wireshark, etc.) |
+
+**Rubrics:**
+
+| Rubric | Level | Criteria | Passing |
+|---|---|---|---|
+| `RUBRIC_BEGINNER` | beginner | foundational_knowledge, tool_familiarity, guided_analysis, communication, situational_awareness | 50% |
+| `RUBRIC_INTERMEDIATE` | intermediate | technical_analysis, incident_response, threat_intelligence, decision_making, communication | 55% |
+| `RUBRIC_ADVANCED` | advanced | threat_hunting, security_architecture, strategic_reasoning, mentoring_and_leadership, advanced_technical_depth | 60% |
+
+Each criterion has a `weight` (0-1), `max_score` (default 5), and `passing_threshold`. Rubric levels define score ranges with fulfilled-criteria lists. Access via `RUBRIC_REGISTRY[level]` or `get_rubric_for_difficulty(level)`.
+
+**Seed data** (`seed_data.py`):
+- 4 **CyberDomains**: Web Application Security, Network Security, Cloud Security, Incident Response & Forensics
+- 16 **Skills** (e.g., Web Vulnerability Scanning, SQL Injection, Packet Analysis, Threat Hunting)
+- 4 **Capabilities** grouping skills + MITRE technique references
+- 16 **MITRE ATT&CK techniques** across 11 tactics (T1190, T1486, T1566, T1059, T1110, etc.)
+- 5 **Technologies** (Burp Suite, Wireshark, Snort, AWS CloudTrail, Microsoft Sentinel)
+- Aggregated exports: `ALL_DOMAINS`, `SEED_SKILLS`, `SEED_MITRE_TECHNIQUES`, `SEED_TECHNOLOGIES`
+
+### Layer 3 — Question Engine (`src/core/engine/`)
+
+**Input → Output flow:**
+
+```
+Domain + Skill + ProficiencyLevel  ──→  QuestionGenerator  ──→  GeneratedQuestionSet
+MitreTechnique + ProficiencyLevel   ──→  QuestionGenerator  ──→  SkillAssessmentQuestion
+MitreTechnique + difficulty         ──→  ScenarioGenerator   ──→  IncidentScenario
+list[MitreTechnique] + difficulty   ──→  ScenarioGenerator   ──→  ThreatHuntingScenario
+```
+
+**GeneratedQuestionSet:**
+| Field | Type |
+|---|---|
+| `id` | str (uuid12) |
+| `domain`, `skill` | str |
+| `difficulty` | ProficiencyLevel |
+| `questions` | `list[SkillAssessmentQuestion]` |
+| `total_time_estimate_minutes` | int |
+| `metadata` | `dict[str, Any]` |
+
+**SkillAssessmentQuestion:**
+| Field | Type |
+|---|---|
+| `id` | str (uuid12) |
+| `type` | QuestionType enum (knowledge/scenario/practical/behavioral) |
+| `question_text` | str |
+| `domain`, `skill` | str |
+| `difficulty` | ProficiencyLevel |
+| `expected_reasoning_points` | `list[str]` |
+| `rubric_hints` | `list[str]` |
+| `time_estimate_minutes` | int |
+
+**IncidentScenario:**
+| Field | Type |
+|---|---|
+| `id` | str (uuid12) |
+| `title`, `summary` | str |
+| `mitre_technique_id`, `mitre_technique_name` | str |
+| `tactic_name` | str |
+| `difficulty` | ProficiencyLevel |
+| `incident_details` | IncidentDetails (initial_access_vector, indicators, affected_systems, timeline_estimate) |
+| `candidate_tasks` | `list[str]` |
+| `evaluation_criteria` | `list[str]` |
+
+**ThreatHuntingScenario:**
+| Field | Type |
+|---|---|
+| `id` | str (uuid12) |
+| `title`, `hypothesis` | str |
+| `mitre_technique_ids` | `list[str]` |
+| `data_sources` | `list[str]` |
+| `hunting_steps` | `list[str]` |
+| `expected_findings` | `list[str]` |
+| `difficulty` | ProficiencyLevel |
+
+**`TEMPLATE_POOL`** — 4 pre-built scenario templates (T1190 Web Exploitation, T1486 Ransomware, T1566 Spear-Phishing, T1059 LOLBins/PowerShell) with fallback generator for any other technique.
+
+### Layer 4 — Evaluation Engine (`src/core/evaluation/`)
+
+**Input → Output flow:**
+
+```
+question + answer + rubric  ──→  AnswerEvaluator  ──→  EvaluationResult
+list[EvaluationResult]       ──→  CapabilityEngine ──→  ConsolidatedProfile
+ConsolidatedProfile          ──→  CapabilityEngine ──→  SkillDnaProfile (for JD/assessment)
+ConsolidatedProfile          ──→  CapabilityEngine ──→  CyberTwinModel
+```
+
+**EvaluationResult:**
+| Field | Type |
+|---|---|
+| `overall_score` | float (0-100) |
+| `criteria_scores` | `list[CriterionScore]` (name, score, max_score, justification, passed) |
+| `confidence` | float (0.0-1.0) |
+| `overall_justification` | str |
+| `missing_concepts` | `list[str]` |
+| `demonstrated_skills` | `list[str]` |
+| `mitre_technique_ids` | `list[str]` |
+| `proficiency_level` | ProficiencyLevel |
+| `passed` | bool |
+
+**ConsolidatedProfile:**
+| Field | Type |
+|---|---|
+| `overall_average_score` | float |
+| `skill_summaries` | `list[SkillSummary]` (name, avg_score, count, confidence, level) |
+| `demonstrated_skills` | `list[str]` |
+| `missing_concepts` | `list[str]` |
+| `detected_mitre_techniques` | `list[str]` |
+| `overall_confidence` | float |
+| `weaknesses` | `list[WeaknessEntry]` (name, score, gap, focus) |
+| `evaluation_count` | int |
+
+**CyberTwinModel:**
+| Field | Type |
+|---|---|
+| `id` | str (uuid12) |
+| `candidate_label` | str |
+| `verified_skills` | `list[VerifiedSkillEntry]` (name, level, confidence, evidence_count, last_demonstrated, mitre_ids) |
+| `capability_profile` | `dict[str, Any]` |
+| `experience_graph` | `dict[str, Any]` (nodes + edges: co-occurring techniques, skill→technique) |
+| `overall_score`, `overall_confidence` | float |
+| `weakness_areas` | `list[WeaknessEntry]` |
+| `last_updated` | ISO timestamp string |
+
+### Layer 5 — AI Mentor (`src/core/mentor/`)
+
+**Input → Output flow:**
+
+```
+ConsolidatedProfile + weeks  ──→  AIMentorEngine  ──→  LearningRoadmap
+ConsolidatedProfile           ──→  AIMentorEngine  ──→  list[LabRecommendation]
+question + answer + EvaluationResult  ──→  FeedbackEngine  ──→  AnswerRepairGuide
+```
+
+**LearningRoadmap:**
+| Field | Type |
+|---|---|
+| `timeline_weeks` | int |
+| `steps` | `list[LearningStep]` (week, topic, description, resource_type, resource_hint, time_estimate_hours, priority, milestone_check) |
+| `milestones` | `list[LearningMilestone]` (week, description, validation_criteria) |
+| `labs` | `list[LabRecommendation]` (title, platform, difficulty, mitre_technique_ids, skills_practiced, duration) |
+| `focus_areas` | `list[str]` |
+| `generated_at` | ISO timestamp |
+
+**LabRecommendation platforms** determined automatically from weakness keywords:
+- SQLi/XSS → PortSwigger (90 min)
+- Phishing → TryHackMe (60 min)
+- Ransomware/Malware → HackTheBox / ANY.RUN (120 min)
+- Packet/Network → Blue Team Labs Online (75 min)
+- PowerShell/LOLBases → DetectionLab / Caldera (90 min)
+- Forensics → DFIR Madness / MemLabs (120 min)
+- Default → PWNDORA Labs (60 min)
+
+**AnswerRepairGuide:**
+| Field | Type |
+|---|---|
+| `what_was_missing` | `list[str]` |
+| `model_answer` | str |
+| `model_answer_breakdown` | `list[str]` |
+| `key_principles` | `list[PrincipleEntry]` (principle + explanation) |
+| `practice_exercise` | str |
+
+### Quick Start
+
+```python
+import asyncio
+from src.core.ai import OllamaProvider, AIClient, PromptLoader
+from src.core.knowledge.seed_data import ALL_DOMAINS, SEED_SKILLS
+from src.core.engine import QuestionGenerator
+
+async def main():
+    # 1. AI plumbing
+    provider = OllamaProvider(base_url="http://localhost:11434", model="llama3")
+    client = AIClient(provider=provider, log_prompts=True)
+    loader = PromptLoader(prompts_dir="prompts")
+
+    # 2. Pick a domain + skill from seed data
+    domain = ALL_DOMAINS[0]                        # Web Application Security
+    skill = SEED_SKILLS["Web Vulnerability Scanning"]
+    from src.core.knowledge import ProficiencyLevel
+
+    # 3. Generate questions
+    gen = QuestionGenerator(ai_client=client, prompt_loader=loader)
+    qset = await gen.generate_skill_assessment(
+        domain=domain,
+        skill=skill,
+        difficulty=ProficiencyLevel.INTERMEDIATE,
+        question_count=3,
+    )
+    print(f"Generated {len(qset.questions)} questions ({qset.total_time_estimate_minutes} min)")
+
+    # 4. Evaluate a candidate answer
+    from src.core.evaluation import AnswerEvaluator
+    from src.core.knowledge.rubrics import RUBRIC_INTERMEDIATE
+
+    evaluator = AnswerEvaluator(ai_client=client, prompt_loader=loader)
+    result = await evaluator.evaluate(
+        question_text=qset.questions[0].question_text,
+        candidate_answer="I would check the web server logs for unusual patterns...",
+        rubric=RUBRIC_INTERMEDIATE,
+        domain=domain.name,
+        skill=skill.name,
+    )
+    print(f"Score: {result.overall_score:.1f}/100 — {'PASS' if result.passed else 'NEEDS WORK'}")
+
+    # 5. Generate learning roadmap from evaluation
+    from src.core.evaluation import CapabilityEngine
+    from src.core.mentor import AIMentorEngine
+
+    profile = CapabilityEngine.aggregate_evaluations([result])
+    mentor = AIMentorEngine(ai_client=client, prompt_loader=loader)
+    roadmap = await mentor.generate_roadmap(profile=profile, timeline_weeks=6)
+    print(f"Roadmap: {len(roadmap.steps)} steps over {roadmap.timeline_weeks} weeks")
+
+asyncio.run(main())
+```
+
+All engine classes use **Dependency Injection** — swap `OllamaProvider` for `MistralProvider` without changing any other code.
+
+---
+
 ## Security
 
 | Control | Implementation |
