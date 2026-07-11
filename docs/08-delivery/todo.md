@@ -95,23 +95,23 @@ Every task should satisfy:
 
 ### UI Foundation
 
-* [ ] Next.js setup
-* [ ] Tailwind
-* [ ] shadcn/ui
-* [ ] Routing
-* [ ] Theme
-* [ ] Layout
-* [ ] Sidebar
-* [ ] Navbar
+* [x] Vite + React 19 setup (used Vite per architecture doc, not Next.js)
+* [x] Tailwind CSS v4 with custom theme tokens
+* [x] Custom component library (Button, Card, Input, Badge, Modal, Progress, Skeleton, Avatar, Alert)
+* [x] React Router with lazy-loaded routes
+* [x] Theme (primary, cyber, danger, warning, surface palettes + Inter font)
+* [x] Layout (DashboardLayout, AuthLayout)
+* [x] Sidebar (Sidebar.tsx with nav items, branding, user avatar)
+* [x] Navbar (Navbar.tsx with search, notifications, logout)
 
 ---
 
 ### Authentication
 
-* [ ] Login page
-* [ ] Register page
-* [ ] Forgot password
-* [ ] Session persistence
+* [x] Login page (LoginPage.tsx with Zod validation)
+* [x] Register page (RegisterPage.tsx with password confirmation)
+* [x] Forgot password (ForgotPasswordPage.tsx with email form)
+* [x] Session persistence (auth-store.ts with localStorage + api-client.ts with token refresh)
 
 ---
 
@@ -119,12 +119,12 @@ Every task should satisfy:
 
 ### Assessment UI
 
-* [ ] Assessment dashboard
-* [ ] Question screen
-* [ ] Progress tracker
-* [ ] Timer
-* [ ] Voice controls
-* [ ] Answer editor
+* [x] Assessment dashboard (AssessmentDashboardPage.tsx with history + mission types)
+* [x] Question screen (AssessmentPage.tsx with scenario, questions, voice, text)
+* [x] Progress tracker (ProgressTracker.tsx with question counter + Progress bar)
+* [x] Timer (Timer.tsx using useTimer hook with start/pause/toggle)
+* [x] Voice controls (VoiceRecorder.tsx using Web Speech API)
+* [x] Answer editor (AnswerEditor.tsx with textarea + Ctrl+Enter submit)
 
 ---
 
@@ -132,11 +132,11 @@ Every task should satisfy:
 
 ### Dashboard
 
-* [ ] Skill DNA
-* [ ] Cyber Twin
-* [ ] Career Compass
-* [ ] Charts
-* [ ] Reports
+* [x] Skill DNA (SkillDNAProfilePage.tsx + CapabilityList.tsx + SkillGraph.tsx)
+* [x] Cyber Twin (CyberTwinPage.tsx + SkillDNAOverview.tsx + AssessmentHistory.tsx + GrowthTrajectory.tsx)
+* [x] Career Compass (CareerCompass.tsx with weak skills + progress bars)
+* [x] Charts (CapabilityHeatmap.tsx, SkillDNAGraph.tsx, ProgressChart.tsx, ScoreBreakdown.tsx)
+* [x] Reports (ReportPage.tsx + ReportSummary.tsx + CapabilityMatrix.tsx + EvidencePanel.tsx + MentorFeedback.tsx + Recommendations.tsx)
 
 ---
 
@@ -144,10 +144,10 @@ Every task should satisfy:
 
 ### Learning
 
-* [ ] Learning dashboard
-* [ ] Recommended labs
-* [ ] Progress
-* [ ] Mentor chat
+* [x] Learning dashboard (LearningDashboard.tsx with weak skills + roadmap)
+* [x] Recommended labs (RecommendedLabs.tsx with lab cards + difficulty badges)
+* [x] Progress (LearningProgress.tsx with phased roadmap timeline)
+* [x] Mentor chat (MentorChat.tsx with chat interface + mock messages)
 
 ---
 
@@ -155,12 +155,27 @@ Every task should satisfy:
 
 ### Polish
 
-* [ ] Animations
-* [ ] Responsive design
-* [ ] Accessibility
-* [ ] Error pages
-* [ ] Empty states
-* [ ] Loading skeletons
+* [ ] Animations (Tailwind transitions applied, no dedicated animation library yet)
+* [x] Responsive design (useMediaQuery hook + Tailwind responsive grid classes throughout)
+* [ ] Accessibility (no dedicated a11y utilities yet, basic ARIA attributes only)
+* [x] Error pages (NotFoundPage.tsx 404, UnauthorizedPage.tsx 403)
+* [x] Empty states (EmptyState.tsx component in feedback/)
+* [x] Loading skeletons (Skeleton.tsx, CardSkeleton, TableSkeleton in ui/)
+
+---
+
+## Additional Deliverables
+
+* [x] Landing page (LandingPage.tsx with hero, features, CTA)
+* [x] Auth guard (AuthGuard.tsx for protected routes)
+* [x] API client with token refresh interceptor (api-client.ts)
+* [x] Zustand auth store (auth-store.ts)
+* [x] Custom hooks (useAuth, useAssessment, useTimer, useVoiceRecorder, useMediaQuery)
+* [x] Services layer (auth, assessment, skill-dna, report, learning, role-definition)
+* [x] TypeScript types (user, assessment, skill-dna, report, career-compass)
+* [x] Job description upload (JobDescriptionUpload.tsx drag-and-drop + ParseResult.tsx)
+* [x] Forms (LoginForm.tsx, RegisterForm.tsx with react-hook-form + Zod)
+* [x] Feedback components (LoadingSpinner, EmptyState, ErrorBoundary, Toast)
 
 ---
 
