@@ -1,3 +1,13 @@
+from src.core.evaluation.career_compass import (
+    CareerCompassEngine,
+    CareerCompassEngineError,
+    CareerRoleDefinition,
+    DomainGapResult,
+    RoleDomainRequirement,
+    RoleGapAnalysis,
+    SkillGapDetail,
+    ROLE_REGISTRY,
+)
 from src.core.evaluation.evaluator import (
     AnswerEvaluator,
     AnswerEvaluatorError,
@@ -15,6 +25,14 @@ from src.core.evaluation.dna_engine import (
 )
 
 __all__ = [
+    "CareerCompassEngine",
+    "CareerCompassEngineError",
+    "CareerRoleDefinition",
+    "DomainGapResult",
+    "RoleDomainRequirement",
+    "RoleGapAnalysis",
+    "SkillGapDetail",
+    "ROLE_REGISTRY",
     "AnswerEvaluator",
     "AnswerEvaluatorError",
     "CriterionScore",
