@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { assessmentService } from "@/services/assessment.service";
 import type { Challenge, Response, Evaluation } from "@/types";

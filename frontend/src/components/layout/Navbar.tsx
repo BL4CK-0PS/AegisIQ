@@ -1,11 +1,7 @@
-import { Bell, Search, LogOut } from "lucide-react";
-import { useAuth } from "@/hooks";
-import { Button } from "@/components/ui/Button";
+import { Bell, Search } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 
 export function Navbar() {
-  const { logout } = useAuth();
-
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center border-b border-surface-800 bg-surface-950/80 px-6 backdrop-blur-sm">
       <div className="flex flex-1 items-center gap-4">
@@ -23,14 +19,6 @@ export function Navbar() {
           <Bell size={18} />
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary-500" />
         </button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={logout}
-          leftIcon={<LogOut size={16} />}
-        >
-          Logout
-        </Button>
       </div>
     </header>
   );

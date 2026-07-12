@@ -1,8 +1,7 @@
-import { Card, Badge } from '@/components/ui';
-import SkillDNAOverview from './components/SkillDNAOverview';
-import AssessmentHistory from './components/AssessmentHistory';
-import CareerCompass from './components/CareerCompass';
-import GrowthTrajectory from './components/GrowthTrajectory';
+import SkillDNAOverview from '../components/SkillDNAOverview';
+import AssessmentHistory from '../components/AssessmentHistory';
+import CareerCompass from '../components/CareerCompass';
+import GrowthTrajectory from '../components/GrowthTrajectory';
 import { Fingerprint } from 'lucide-react';
 
 export default function CyberTwinPage() {

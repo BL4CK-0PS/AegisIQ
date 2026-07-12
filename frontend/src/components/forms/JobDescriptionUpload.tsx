@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Upload, FileText, X, Loader2 } from "lucide-react";
+import { Upload, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 

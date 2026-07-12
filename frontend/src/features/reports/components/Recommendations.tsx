@@ -1,5 +1,5 @@
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import { Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +28,7 @@ const priorityOrder: Record<string, number> = {
 
 export default function Recommendations({ recommendations }: RecommendationsProps) {
   const sorted = [...recommendations].sort(
-    (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]
+    (a, b) => (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1)
   );
 
   return (

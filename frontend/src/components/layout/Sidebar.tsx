@@ -4,7 +4,6 @@ import {
   FileText,
   Dna,
   ClipboardCheck,
-  BarChart3,
   GraduationCap,
   Fingerprint,
   Settings,
@@ -12,11 +11,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
-import { useAuthStore } from "@/store/auth-store";
 
 const navItems = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/job-description", label: "Role Definition", icon: FileText },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/skill-dna-profile", label: "Skill DNA", icon: Dna },
   { to: "/assessment", label: "Assessments", icon: ClipboardCheck },
   { to: "/learning", label: "Learning", icon: GraduationCap },
@@ -28,8 +26,6 @@ const bottomItems = [
 ];
 
 export function Sidebar() {
-  const user = useAuthStore((s) => s.user);
-
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-surface-800 bg-surface-950">
       <div className="flex h-16 items-center gap-2 border-b border-surface-800 px-6">
@@ -80,10 +76,10 @@ export function Sidebar() {
         ))}
 
         <div className="mt-3 flex items-center gap-3 rounded-lg border-t border-surface-800 pt-3">
-          <Avatar name={user?.name || "User"} size="sm" />
+          <Avatar name="User" size="sm" />
           <div className="flex-1 truncate">
-            <p className="truncate text-sm font-medium text-surface-200">{user?.name}</p>
-            <p className="truncate text-xs text-surface-500">{user?.email}</p>
+            <p className="truncate text-sm font-medium text-surface-200">User</p>
+            <p className="truncate text-xs text-surface-500">user@pwndora.io</p>
           </div>
         </div>
       </div>

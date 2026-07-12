@@ -1,14 +1,6 @@
-import { useNavigate } from "react-router-dom";
-import { ClipboardCheck, Play, Clock, Target, Zap } from "lucide-react";
+import { ClipboardCheck, Target, Zap } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-
-const mockAssessments = [
-  { id: "1", title: "SOC Analyst Assessment", type: "soc", status: "completed", score: 82, duration: "25 min" },
-  { id: "2", title: "DFIR Challenge", type: "dfir", status: "completed", score: 74, duration: "30 min" },
-  { id: "3", title: "Threat Hunting", type: "threat_hunting", status: "in_progress", score: null, duration: "15 min" },
-];
+import { EmptyState } from "@/components/feedback/EmptyState";
 
 const missionTypes = [
   { type: "soc", label: "SOC Operations", icon: Target, color: "text-primary-400", bg: "bg-primary-900/30" },
@@ -16,14 +8,7 @@ const missionTypes = [
   { type: "threat_hunting", label: "Threat Hunting", icon: ClipboardCheck, color: "text-warning-400", bg: "bg-warning-900/30" },
 ];
 
-const statusColors: Record<string, "success" | "primary" | "warning"> = {
-  completed: "success",
-  in_progress: "primary",
-  pending: "warning",
-};
-
 export default function AssessmentDashboardPage() {
-  const navigate = useNavigate();
 
   return (
     <div className="space-y-8">
@@ -56,35 +41,11 @@ export default function AssessmentDashboardPage() {
           <CardDescription>Your recent assessment sessions</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {mockAssessments.map((a) => (
-              <div
-                key={a.id}
-                className="flex items-center gap-4 rounded-lg border border-surface-700/50 p-4 transition-colors hover:bg-surface-800/50"
-              >
-                <div className="flex-1">
-                  <div className="mb-1 flex items-center gap-2">
-                    <span className="text-sm font-medium text-surface-200">{a.title}</span>
-                    <Badge variant={statusColors[a.status]}>{a.status.replace("_", " ")}</Badge>
-                  </div>
-                  <div className="flex items-center gap-4 text-xs text-surface-500">
-                    <span className="flex items-center gap-1">
-                      <Clock size={12} /> {a.duration}
-                    </span>
-                    {a.score !== null && <span>Score: {a.score}%</span>}
-                  </div>
-                </div>
-                <Button
-                  variant={a.status === "in_progress" ? "primary" : "ghost"}
-                  size="sm"
-                  onClick={() => navigate(`/assessment/${a.id}`)}
-                  leftIcon={a.status === "in_progress" ? <Play size={14} /> : undefined}
-                >
-                  {a.status === "in_progress" ? "Resume" : "View"}
-                </Button>
-              </div>
-            ))}
-          </div>
+          <EmptyState
+            icon={<ClipboardCheck className="h-8 w-8" />}
+            title="No assessments yet"
+            description="Start your first assessment mission above"
+          />
         </CardContent>
       </Card>
     </div>

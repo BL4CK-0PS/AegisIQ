@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { User, Bell, Shield, Monitor, Save } from "lucide-react";
-import { useAuthStore } from "@/store/auth-store";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
 
 export default function SettingsPage() {
-  const user = useAuthStore((s) => s.user);
   const [saved, setSaved] = useState(false);
 
   const handleSave = () => {
@@ -34,8 +32,8 @@ export default function SettingsPage() {
           <CardDescription>Your personal information</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Input label="Full Name" defaultValue={user?.name || ""} />
-          <Input label="Email" type="email" defaultValue={user?.email || ""} disabled />
+          <Input label="Full Name" defaultValue="User" />
+          <Input label="Email" type="email" defaultValue="user@pwndora.io" disabled />
         </CardContent>
       </Card>
 

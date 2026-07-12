@@ -1,41 +1,33 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, CheckCircle, Loader2, FileText, ArrowRight } from "lucide-react";
+import { Upload, CheckCircle, FileText, ArrowRight } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { JobDescriptionUpload } from "@/components/forms/JobDescriptionUpload";
 import { ParseResult } from "../components/ParseResult";
+import { roleDefinitionService } from "@/services/role-definition.service";
 
 export default function JobDescriptionPage() {
   const navigate = useNavigate();
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [_uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [parseResult, setParseResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [roleDefinitionId, setRoleDefinitionId] = useState<string | null>(null);
 
   const handleUpload = async (file: File) => {
     setUploadedFile(file);
     setIsUploading(true);
     setError(null);
     try {
-      // Simulate upload and parse
-      await new Promise((r) => setTimeout(r, 2000));
-      setParseResult({
-        role: "Senior SOC Analyst",
-        skills: ["SIEM", "Threat Detection", "Incident Response", "Log Analysis"],
-        capabilities: [
-          { name: "Log Analysis", weight: 0.9 },
-          { name: "Threat Detection", weight: 0.85 },
-          { name: "Incident Response", weight: 0.8 },
-          { name: "SIEM Management", weight: 0.75 },
-        ],
-        experience: "5+ years",
-        certifications: ["CISSP", "CEH"],
-      });
+      const result = await roleDefinitionService.upload(file);
+      setRoleDefinitionId(result.role_definition_id);
+      const parsed = await roleDefinitionService.parse(result.role_definition_id);
+      setParseResult(parsed);
     } catch {
-      setError("Failed to process job description. Please try again.");
+      setError("API not configured yet. Please try again later.");
     } finally {
       setIsUploading(false);
     }
@@ -44,7 +36,9 @@ export default function JobDescriptionPage() {
   const handleGenerateSkillDNA = async () => {
     setIsProcessing(true);
     try {
-      await new Promise((r) => setTimeout(r, 3000));
+      if (roleDefinitionId) {
+        await roleDefinitionService.get(roleDefinitionId);
+      }
       navigate("/skill-dna-profile");
     } catch {
       setError("Failed to generate Skill DNA Profile.");

@@ -1,7 +1,5 @@
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/Card';
 import { Brain, Lightbulb, Target } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface CapabilityScore {
   name: string;
@@ -26,7 +24,6 @@ interface MentorFeedbackProps {
 
 export default function MentorFeedback({ report }: MentorFeedbackProps) {
   const topStrengths = report.strengths.slice(0, 2);
-  const topWeaknesses = report.weaknesses.slice(0, 2);
 
   const improvementTips = report.weaknesses.map((weakness) => {
     if (weakness.toLowerCase().includes('network') || weakness.toLowerCase().includes('segmentation')) {

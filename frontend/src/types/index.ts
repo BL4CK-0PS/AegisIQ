@@ -6,6 +6,7 @@ export type {
   ChallengeType,
   Response,
   ResponseType,
+  Evaluation,
 } from "./assessment";
 export type {
   SkillDNAProfile,

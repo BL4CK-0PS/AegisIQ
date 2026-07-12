@@ -37,10 +37,7 @@ export default function LandingPage() {
           <span className="text-xs font-medium text-primary-400">SkillScan X</span>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="ghost" onClick={() => navigate("/login")}>
-            Sign in
-          </Button>
-          <Button onClick={() => navigate("/register")}>Get Started</Button>
+          <Button onClick={() => navigate("/dashboard")}>Go to Dashboard</Button>
         </div>
       </nav>
 
@@ -58,11 +55,8 @@ export default function LandingPage() {
           practical challenges, AI-powered reasoning evaluation, and explainable capability scoring.
         </p>
         <div className="flex items-center gap-4">
-          <Button size="lg" onClick={() => navigate("/register")} rightIcon={<ArrowRight size={18} />}>
-            Start Assessment
-          </Button>
-          <Button size="lg" variant="outline" onClick={() => navigate("/login")}>
-            Sign in
+          <Button size="lg" onClick={() => navigate("/dashboard")} rightIcon={<ArrowRight size={18} />}>
+            Go to Dashboard
           </Button>
         </div>
       </section>
@@ -94,8 +88,8 @@ export default function LandingPage() {
         <p className="mb-8 text-surface-400">
           Join professionals who are transforming how cybersecurity capability is evaluated.
         </p>
-        <Button size="lg" onClick={() => navigate("/register")} rightIcon={<ArrowRight size={18} />}>
-          Get Started Free
+        <Button size="lg" onClick={() => navigate("/dashboard")} rightIcon={<ArrowRight size={18} />}>
+          Get Started
         </Button>
       </section>
 

@@ -1,5 +1,3 @@
-import { Card } from "@/components/ui/Card";
-
 interface Question {
   id: string;
   text: string;
