@@ -68,3 +68,23 @@ def generate_question_logic(topic: str, difficulty: str) -> dict:
         "difficulty": difficulty,
         "question": fallback_q
     }
+# --- ADAPTERS FOR BACKEND ROUTE EXPECTATIONS ---
+
+def generate_question(topic: str, difficulty: str) -> dict:
+    """
+    Adapter function mapping backend routes to our tiered generation logic.
+    """
+    return generate_question_logic(topic, difficulty)
+
+def evaluate_answer(question: str, answer: str) -> dict:
+    """
+    Adapter function for answer evaluation.
+    (Currently returning a stub; update with your prompt logic when ready!)
+    """
+    logger.info("Evaluating answer...")
+    # Add your evaluation prompt logic here as needed
+    return {
+        "score": 8,
+        "feedback": "Good attempt! Your logic is mostly correct, but look closely at edge cases.",
+        "error": None
+    }
