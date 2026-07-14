@@ -1,82 +1,70 @@
 import os
 import json
-import random
-from typing import Dict, Any
-import google.generativeai as genai
-from google.api_core.exceptions import GoogleAPICallError
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+import logging
+from google import generativeai as genai
+import ollama
 
-# 🎛️ DEMO TOGGLE: Set to True to bypass Google API quota blocks completely!
+# Setup local logger inside the AI module to avoid cross-folder import loops
+logger = logging.getLogger("AegisIQ_AI")
+logging.basicConfig(level=logging.INFO)
+
+# Retrieve environment configuration
 DEMO_MODE = os.getenv("DEMO_MODE", "True").lower() == "true"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
-# Securely pull API Key from environment variables (Sprint 1: Secrets)
-API_KEY = os.getenv("GEMINI_API_KEY", "")
-if not DEMO_MODE and not API_KEY:
-    raise ValueError("CRITICAL: GEMINI_API_KEY environment variable is missing!")
+# Configure Gemini if key is available
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
-if not DEMO_MODE:
-    genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel("gemini-2.0-flash")
+# Local Mock Data for Bulletproof Demos (Absolute Last Resort fallback)
+MOCK_QUESTIONS = {
+    "arrays": "Given an integer array nums, return true if any value appears at least twice in the array, and return false if every element is distinct.",
+    "strings": "Given a string s, find the first non-repeating character in it and return its index. If it does not exist, return -1."
+}
 
-LOCAL_QUESTION_POOL = [
-    {"topic": "arrays", "difficulty": "medium", "question": "Given an integer array nums, find the contiguous subarray which has the largest sum and return its sum."},
-    {"topic": "arrays", "difficulty": "medium", "question": "Write a function to rotate an array of n elements to the right by k steps."},
-    {"topic": "arrays", "difficulty": "medium", "question": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target."},
-    {"topic": "arrays", "difficulty": "easy", "question": "Write a function to find the maximum and minimum elements in an unsorted array."},
-    {"topic": "arrays", "difficulty": "hard", "question": "Given an unsorted integer array, find the smallest missing positive integer."}
-]
-
-# Sprint 1: Retry Logic - Automatically retry up to 3 times with exponential backoff if the API experiences transient issues
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=2, max=6),
-    retry=retry_if_exception_type(GoogleAPICallError),
-    reraise=False
-)
-def _call_gemini_with_retry(prompt: str) -> Any:
-    # Sprint 1: Timeout Handling - Impose a hard client-side timeout boundary constraint (e.g., 8.0 seconds)
-    response = model.generate_content(
-        prompt, 
-        generation_config={"response_mime_type": "application/json"},
-        request_options={"timeout": 8.0} 
+def generate_question_logic(topic: str, difficulty: str) -> dict:
+    """
+    Generates a coding question using a multi-tiered fallback pipeline:
+    Tier 1: Cloud Gemini API (Production)
+    Tier 2: Local Mistral via Ollama (Local/Offline Failover)
+    Tier 3: Local Demo Mock Fallback (Bulletproof Hackathon Safety Net)
+    """
+    prompt = (
+        f"Generate a {difficulty} level coding question focused on the topic of {topic}. "
+        f"Provide the response strictly in JSON format matching this structure: "
+        f'{{"topic": "{topic}", "difficulty": "{difficulty}", "question": "your question details here"}}'
     )
-    return json.loads(response.text)
 
-def generate_question(topic: str, difficulty: str) -> Dict[str, Any]:
-    if DEMO_MODE:
-        matches = [q for q in LOCAL_QUESTION_POOL if q["topic"] == topic.lower()]
-        return random.choice(matches) if matches else random.choice(LOCAL_QUESTION_POOL)
+    # --- TIER 1: CLOUD GEMINI API ---
+    if not DEMO_MODE and GEMINI_API_KEY:
+        try:
+            logger.info("Attempting Cloud Generation via Gemini...")
+            model = genai.GenerativeModel("gemini-pro")
+            response = model.generate_content(prompt)
+            
+            # Sanitize markdown code blocks if the model wrapped JSON in ```json ... ```
+            cleaned_text = response.text.strip().replace("```json", "").replace("```", "").strip()
+            return json.loads(cleaned_text)
+        except Exception as e:
+            logger.warning(f"Tier 1 (Gemini) failed: {e}. Falling back to Tier 2 (Ollama Mistral)...")
 
-    prompt = f"""
-    Generate a highly specific technical programming interview question.
-    Topic: {topic}
-    Difficulty Level: {difficulty}
-    You MUST return your response as a JSON object with exactly these three keys:
-    {{"question": "text", "difficulty": "{difficulty}", "topic": "{topic}"}}
-    """
+    # --- TIER 2: LOCAL MISTRAL VIA OLLAMA ---
     try:
-        return _call_gemini_with_retry(prompt)
+        logger.info("Attempting Local Generation via Ollama (Mistral)...")
+        response = ollama.chat(
+            model='mistral',
+            messages=[{'role': 'user', 'content': prompt}]
+        )
+        cleaned_response = response['message']['content'].strip().replace("```json", "").replace("```", "").strip()
+        return json.loads(cleaned_response)
     except Exception as e:
-        # Fallback Pipeline - If retries fail completely, gracefully fall back to local store to prevent application crash
-        print(f"Resiliency Fallback Triggered. Engine Error: {e}")
-        return random.choice(LOCAL_QUESTION_POOL)
+        logger.warning(f"Tier 2 (Ollama) failed: {e}. Falling back to Tier 3 (Mock Data)...")
 
-def evaluate_answer(question: str, user_answer: str) -> Dict[str, Any]:
-    if DEMO_MODE:
-        return {
-            "score": random.randint(7, 9),
-            "feedback": "Strong logical approach to the problem. Consider optimizing time complexity from O(N^2) to O(N)."
-        }
-
-    prompt = f"""
-    Evaluate this user's programming answer based on the question provided.
-    Question: {question}
-    User Answer: {user_answer}
-    You MUST return your response as a JSON object with exactly these keys:
-    {{"score": 8, "feedback": "text"}}
-    """
-    try:
-        return _call_gemini_with_retry(prompt)
-    except Exception as e:
-        print(f"Resiliency Fallback Triggered. Evaluation Error: {e}")
-        return {"score": 8, "feedback": "Good execution flow. Base cases were handled correctly."}
+    # --- TIER 3: BULLETPROOF DEMO MOCK DATA ---
+    logger.info("Serving cached mock data.")
+    fallback_q = MOCK_QUESTIONS.get(topic.lower(), f"Write a functional programming solution solving a {difficulty} {topic} challenge.")
+    return {
+        "topic": topic,
+        "difficulty": difficulty,
+        "question": fallback_q
+    }
