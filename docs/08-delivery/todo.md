@@ -256,21 +256,21 @@ Every task should satisfy:
 
 ### Infrastructure
 
-* [ ] Docker
-* [ ] Docker Compose
-* [ ] GitHub Actions
-* [ ] Environment management
-* [ ] Secrets
+* [x] Docker
+* [x] Docker Compose
+* [x] GitHub Actions
+* [x] Environment management
+* [x] Secrets
 
 ---
 
 ### AI
 
-* [ ] Mistral integration
-* [ ] Ollama integration
+* [x] Mistral integration
+* [x] Ollama integration
 * [x] AI wrapper
-* [ ] Retry logic
-* [ ] Timeout handling
+* [x] Retry logic
+* [x] Timeout handling
 
 ---
 
@@ -287,9 +287,9 @@ Every task should satisfy:
 
 ### Integration
 
-* [ ] Backend integration
+* [x] Backend integration
 * [ ] Frontend integration
-* [ ] AI integration
+* [x] AI integration
 
 ---
 
