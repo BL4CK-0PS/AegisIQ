@@ -268,7 +268,7 @@ Every task should satisfy:
 
 * [ ] Mistral integration
 * [ ] Ollama integration
-* [ ] AI wrapper
+* [x] AI wrapper
 * [ ] Retry logic
 * [ ] Timeout handling
 
