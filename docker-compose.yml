@@ -1,0 +1,88 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../infrastructure/docker/Dockerfile.frontend
+    container_name: aegisiq_frontend
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - aegisiq_network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../infrastructure/docker/Dockerfile.backend
+    container_name: aegisiq_backend
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - aegisiq_network
+    restart: unless-stopped
+    volumes:
+      - backend_logs:/app/logs
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: aegisiq_postgres
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-aegisiq}
+      POSTGRES_USER: ${POSTGRES_USER:-aegisiq}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aegisiq_dev_2026}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aegisiq} -d ${POSTGRES_DB:-aegisiq}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - aegisiq_network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: aegisiq_nginx
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - aegisiq_network
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+    driver: local
+  backend_logs:
+    driver: local
+
+networks:
+  aegisiq_network:
+    driver: bridge
