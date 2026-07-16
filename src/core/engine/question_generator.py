@@ -4,7 +4,7 @@ import json
 import logging
 import uuid
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -187,13 +187,15 @@ class QuestionGenerator:
         difficulty_fallback: ProficiencyLevel,
     ) -> SkillAssessmentQuestion:
         """Parse a single question response from the LLM."""
-        parsed: dict[str, Any] = self._safe_json_parse(raw)
+        parsed: Any = self._safe_json_parse(raw)
 
         if isinstance(parsed, list):
             if parsed:
                 parsed = parsed[0]
             else:
                 parsed = {}
+
+        assert isinstance(parsed, dict), f"Expected dict, got {type(parsed).__name__}"
 
         if "question_text" not in parsed:
             question_text = parsed.get("scenario", parsed.get("summary", raw[:200]))

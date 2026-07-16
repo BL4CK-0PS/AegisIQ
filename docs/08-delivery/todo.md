@@ -185,20 +185,20 @@ Every task should satisfy:
 
 ### Knowledge Base
 
-* [ ] Cyber domains
-* [ ] Skills taxonomy
-* [ ] Competency mapping
-* [ ] MITRE mapping
-* [ ] Question taxonomy
+* [x] Cyber domains
+* [x] Skills taxonomy
+* [x] Competency mapping
+* [x] MITRE mapping
+* [x] Question taxonomy
 
 ---
 
 ### Rubrics
 
-* [ ] Beginner rubric
-* [ ] Intermediate rubric
-* [ ] Advanced rubric
-* [ ] Scoring criteria
+* [x] Beginner rubric
+* [x] Intermediate rubric
+* [x] Advanced rubric
+* [x] Scoring criteria
 
 ---
 
@@ -206,10 +206,10 @@ Every task should satisfy:
 
 ### Question Engine
 
-* [ ] Question templates
-* [ ] Practical challenges
-* [ ] Incident scenarios
-* [ ] Adaptive branching
+* [x] Question templates
+* [x] Practical challenges
+* [x] Incident scenarios
+* [x] Adaptive branching
 
 ---
 
@@ -217,12 +217,12 @@ Every task should satisfy:
 
 ### Evaluation
 
-* [ ] Prompt library
-* [ ] Evaluation prompt
-* [ ] Skill extraction
-* [ ] Concept extraction
-* [ ] Communication analysis
-* [ ] Decision analysis
+* [x] Prompt library
+* [x] Evaluation prompt
+* [x] Skill extraction
+* [x] Concept extraction
+* [x] Communication analysis
+* [x] Decision analysis
 
 ---
 
@@ -230,11 +230,11 @@ Every task should satisfy:
 
 ### Capability Engine
 
-* [ ] Skill DNA logic
-* [ ] Cyber Twin logic
-* [ ] Confidence score
-* [ ] Career Compass
-* [ ] Weakness detection
+* [x] Skill DNA logic
+* [x] Cyber Twin logic
+* [x] Confidence score
+* [x] Career Compass
+* [x] Weakness detection
 
 ---
 
@@ -242,11 +242,11 @@ Every task should satisfy:
 
 ### Learning
 
-* [ ] AI Mentor prompts
-* [ ] Learning roadmap
-* [ ] Recommended labs
-* [ ] Answer repair
-* [ ] Feedback engine
+* [x] AI Mentor prompts
+* [x] Learning roadmap
+* [x] Recommended labs
+* [x] Answer repair
+* [x] Feedback engine
 
 ---
 
