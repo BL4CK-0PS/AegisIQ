@@ -60,6 +60,7 @@ app.add_middleware(
 )
 
 # --- Monitoring ---
+_monitoring = MonitoringMiddleware(app)
 app.add_middleware(MonitoringMiddleware)
 
 # --- API v1 Routes ---
@@ -101,4 +102,5 @@ async def metrics():
     return {
         "service": settings.app_name,
         "version": settings.app_version,
+        **_monitoring.metrics,
     }
