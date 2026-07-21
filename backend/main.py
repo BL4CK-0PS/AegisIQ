@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.config import get_settings
 from backend.middleware import MonitoringMiddleware
 from backend.routes.ai_routes import router as ai_router
+from backend.routes.voice_routes import router as voice_router
 
 # Configure structured logging
 logging.basicConfig(
@@ -64,6 +65,7 @@ app.add_middleware(MonitoringMiddleware)
 
 # --- Routes ---
 app.include_router(ai_router, prefix="/ai")
+app.include_router(voice_router, prefix="/voice")
 
 
 # --- Health & Status Endpoints ---
