@@ -1,196 +1,208 @@
 """
-AegisIQ AI Routes — Production-Ready
+AegisIQ AI Routes — Production Ready
 
-Routes now use the new src/core/ai/ provider layer with full retry,
-timeout, and fallback support via the provider factory.
+Wires src/core/ai, engine, evaluation, mentor modules into FastAPI endpoints.
 """
 
+import json
 import logging
-from typing import Dict, Any
+from typing import Any
 
 from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel, Field
 
-from backend.services.provider_factory import create_ai_client
+from backend.orchestrator import (
+    generate_skill_assessment,
+    build_incident_scenario,
+    evaluate_response,
+    generate_roadmap,
+    generate_repair_guide,
+    build_profile,
+    build_cyber_twin,
+    analyze_career_gaps,
+    find_best_roles,
+    parse_jd,
+    start_session,
+    record_answer,
+    compute_next_difficulty,
+    complete_session,
+    get_session_summary,
+)
+from backend.schemas import (
+    GenerateAssessmentRequest,
+    GenerateAssessmentResponse,
+    EvaluateResponseRequest,
+    EvaluateResponseResponse,
+    ParseJDRequest,
+    ParseJDResponse,
+    IncidentScenarioRequest,
+    IncidentScenarioResponse,
+    RepairGuideRequest,
+    RepairGuideResponse,
+    StartSessionRequest,
+    RecordAnswerRequest,
+    SessionResponse,
+)
+from backend.config import get_settings
+
+from src.core.evaluation.evaluator import EvaluationResult
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
-
-# Lazily initialized AI client (created on first request)
-_ai_client = None
-_prompt_loader = None
+settings = get_settings()
 
 
-def _get_ai():
-    """Get or create the AI client and prompt loader (lazy init)."""
-    global _ai_client, _prompt_loader
-    if _ai_client is None:
-        _ai_client, _prompt_loader = create_ai_client()
-    return _ai_client, _prompt_loader
-
-
-# --- Request/Response Schemas ---
-
-class QuestionRequest(BaseModel):
-    topic: str = Field(..., example="web_security", description="The cybersecurity topic for the question.")
-    difficulty: str = Field(..., example="intermediate", description="Difficulty level: beginner, intermediate, advanced.")
-    domain: str = Field(default="Web Application Security", description="Cybersecurity domain.")
-    question_count: int = Field(default=3, ge=1, le=10, description="Number of questions to generate.")
-
-
-class EvaluationRequest(BaseModel):
-    question: str = Field(..., description="The original question text.")
-    user_answer: str = Field(..., description="The professional's answer/transcript.")
-    domain: str = Field(default="General", description="Cybersecurity domain.")
-    skill: str = Field(default="General", description="Specific skill being assessed.")
-
-
-class GenerationResponse(BaseModel):
-    status: str
-    topic: str
-    difficulty: str
-    questions: list[Dict[str, Any]]
-    provider: str
-
-
-class EvaluationResponse(BaseModel):
-    status: str
-    score: float
-    confidence: float
-    passed: bool
-    feedback: str
-    provider: str
-
-
-# --- Routes ---
-
-@router.post("/generate", status_code=status.HTTP_200_OK)
-async def generate(payload: QuestionRequest) -> Dict[str, Any]:
-    """
-    Generate cybersecurity assessment questions using the AI pipeline.
-    
-    Uses the new provider layer with retry, timeout, and fallback support.
-    """
-    client, loader = _get_ai()
-
+@router.post("/parse-jd", response_model=ParseJDResponse, status_code=status.HTTP_200_OK)
+async def parse_jd_endpoint(payload: ParseJDRequest) -> dict[str, Any]:
     try:
-        # Build prompt from template
-        prompt = loader.render(
-            "skill_assessment",
-            {
-                "domain": payload.domain,
-                "skill": payload.topic,
-                "difficulty": payload.difficulty,
-                "question_count": str(payload.question_count),
-            },
-        )
-    except Exception:
-        # Fallback to direct prompt if template not found
-        prompt = (
-            f"Generate {payload.question_count} cybersecurity assessment questions "
-            f"for the topic '{payload.topic}' at {payload.difficulty} difficulty level "
-            f"in the domain of {payload.domain}. "
-            f"Return a JSON array of objects with keys: question_text, type, expected_reasoning_points."
-        )
-
-    try:
-        response = await client.generate(prompt=prompt)
-        
-        import json
-        try:
-            # Try to parse as JSON
-            cleaned = response.strip().replace("```json", "").replace("```", "")
-            data = json.loads(cleaned)
-        except json.JSONDecodeError:
-            data = {"raw_response": response}
-
+        profile = await parse_jd(jd_text=payload.jd_text, title=payload.title)
         return {
             "status": "success",
-            "topic": payload.topic,
-            "difficulty": payload.difficulty,
-            "questions": data if isinstance(data, list) else [data],
-            "provider": type(client.provider).__name__,
+            "title": profile.title,
+            "difficulty": profile.difficulty.value,
+            "capabilities": [c.model_dump() for c in profile.capabilities],
+            "knowledge_areas": [k.model_dump() for k in profile.knowledge_areas],
+            "responsibilities": profile.responsibilities,
+            "assessment_objectives": profile.assessment_objectives,
+            "estimated_duration_minutes": profile.estimated_duration_minutes,
+            "recommended_rubric": profile.recommended_rubric,
         }
-
-    except Exception as e:
-        logger.error("Question generation failed: %s", e)
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"AI generation service unavailable: {str(e)}",
-        )
+    except Exception as exc:
+        logger.error("JD parsing failed: %s", exc)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
 
 
-@router.post("/evaluate", status_code=status.HTTP_200_OK)
-async def evaluate(payload: EvaluationRequest) -> Dict[str, Any]:
-    """
-    Evaluate a professional's response using the AI evaluation engine.
-    
-    Uses the new provider layer with full observability.
-    """
-    client, loader = _get_ai()
-
+@router.post("/generate-assessment", response_model=GenerateAssessmentResponse, status_code=status.HTTP_200_OK)
+async def generate_assessment(payload: GenerateAssessmentRequest) -> dict[str, Any]:
     try:
-        prompt = loader.render(
-            "evaluation_engine",
-            {
-                "question": payload.question,
-                "answer": payload.user_answer,
-                "domain": payload.domain,
-                "skill": payload.skill,
-            },
+        qset = await generate_skill_assessment(
+            domain_name=payload.domain,
+            skill_name=payload.skill,
+            difficulty=payload.difficulty,
+            question_count=payload.question_count,
         )
-    except Exception:
-        prompt = (
-            f"Evaluate the following cybersecurity response:\n\n"
-            f"Question: {payload.question}\n"
-            f"Answer: {payload.user_answer}\n\n"
-            f"Provide a JSON response with: score (0-100), confidence (0.0-1.0), "
-            f"passed (bool), feedback (string), demonstrated_skills (list)."
-        )
-
-    try:
-        response = await client.generate(prompt=prompt)
-
-        import json
-        try:
-            cleaned = response.strip().replace("```json", "").replace("```", "")
-            data = json.loads(cleaned)
-        except json.JSONDecodeError:
-            data = {
-                "score": 50,
-                "confidence": 0.5,
-                "passed": False,
-                "feedback": response[:500],
-            }
-
         return {
             "status": "success",
-            "score": data.get("score", 50),
-            "confidence": data.get("confidence", 0.5),
-            "passed": data.get("passed", False),
-            "feedback": data.get("feedback", "Evaluation complete."),
-            "provider": type(client.provider).__name__,
+            "domain": qset.domain,
+            "skill": qset.skill,
+            "difficulty": qset.difficulty.value,
+            "questions": [q.model_dump() for q in qset.questions],
+            "total_time_estimate_minutes": qset.total_time_estimate_minutes,
         }
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except Exception as exc:
+        logger.error("Assessment generation failed: %s", exc)
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc))
 
-    except Exception as e:
-        logger.error("Evaluation failed: %s", e)
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"AI evaluation service unavailable: {str(e)}",
+
+@router.post("/incident-scenario", response_model=IncidentScenarioResponse)
+async def incident_scenario(payload: IncidentScenarioRequest) -> dict[str, Any]:
+    try:
+        scenario = build_incident_scenario(payload.technique_id, payload.difficulty)
+        return {"status": "success", "scenario": scenario.model_dump()}
+    except Exception as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+
+
+@router.post("/evaluate", response_model=EvaluateResponseResponse, status_code=status.HTTP_200_OK)
+async def evaluate(payload: EvaluateResponseRequest) -> dict[str, Any]:
+    try:
+        result: EvaluationResult = await evaluate_response(
+            question_text=payload.question_text,
+            candidate_answer=payload.candidate_answer,
+            domain=payload.domain,
+            skill=payload.skill,
+            difficulty=payload.difficulty,
         )
+        return {
+            "status": "success",
+            "overall_score": result.overall_score,
+            "confidence": result.confidence,
+            "proficiency_level": result.proficiency_level.value,
+            "passed": result.passed,
+            "criteria_scores": [c.model_dump() for c in result.criteria_scores],
+            "missing_concepts": result.missing_concepts,
+            "demonstrated_skills": result.demonstrated_skills,
+            "mitre_technique_ids": result.mitre_technique_ids,
+            "overall_justification": result.overall_justification,
+        }
+    except Exception as exc:
+        logger.error("Evaluation failed: %s", exc)
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc))
+
+
+@router.post("/repair-guide", response_model=RepairGuideResponse)
+async def repair_guide(payload: RepairGuideRequest) -> dict[str, Any]:
+    try:
+        dummy_eval = EvaluationResult(
+            question_text=payload.question_text,
+            domain=payload.domain,
+            skill=payload.skill,
+        )
+        guide = await generate_repair_guide(
+            question_text=payload.question_text,
+            candidate_answer=payload.candidate_answer,
+            evaluation_result=dummy_eval,
+            domain=payload.domain,
+            skill=payload.skill,
+            mitre_technique_id=payload.mitre_technique_id,
+        )
+        return {
+            "status": "success",
+            "guide_id": guide.id,
+            "what_was_missing": guide.what_was_missing,
+            "model_answer": guide.model_answer,
+            "model_answer_breakdown": guide.model_answer_breakdown,
+            "key_principles": [p.model_dump() for p in guide.key_principles],
+            "practice_exercise": guide.practice_exercise,
+        }
+    except Exception as exc:
+        logger.error("Repair guide failed: %s", exc)
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc))
+
+
+@router.post("/session/start", response_model=SessionResponse)
+async def session_start(payload: StartSessionRequest) -> dict[str, Any]:
+    session = start_session(domain=payload.domain, difficulty=payload.initial_difficulty)
+    return {"status": "success", "session": session.model_dump()}
+
+
+@router.post("/session/record", response_model=SessionResponse)
+async def session_record(payload: RecordAnswerRequest) -> dict[str, Any]:
+    session_ref = start_session(payload.domain)
+    updated = record_answer(
+        session=session_ref,
+        question_id=payload.question_id,
+        question_text=payload.question_text,
+        domain=payload.domain,
+        skill=payload.skill,
+        difficulty=payload.difficulty,
+        score=payload.score,
+        confidence=payload.confidence,
+        passed=payload.passed,
+        is_follow_up=payload.is_follow_up,
+    )
+    return {"status": "success", "session": updated.model_dump()}
+
+
+@router.post("/session/complete")
+async def session_complete(payload: StartSessionRequest) -> dict[str, Any]:
+    session = start_session(payload.domain)
+    completed = complete_session(session)
+    return {"status": "success", "session": completed.model_dump()}
 
 
 @router.get("/providers")
-async def list_providers():
-    """List available AI providers and their status."""
+async def list_providers() -> dict[str, Any]:
     import os
     providers = {
         "gemini": bool(os.getenv("GEMINI_API_KEY")),
         "mistral": bool(os.getenv("MISTRAL_API_KEY")),
-        "ollama": True,  # Always available if running locally
-        "mock": True,    # Always available as fallback
+        "ollama": True,
+        "mock": True,
     }
     return {
         "available": providers,
         "active": os.getenv("LLM_PROVIDER", "ollama"),
+        "configured": [k for k, v in providers.items() if v],
     }

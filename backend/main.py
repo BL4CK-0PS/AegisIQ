@@ -14,8 +14,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.config import get_settings
 from backend.middleware import MonitoringMiddleware
 from backend.routes.ai_routes import router as ai_router
+from backend.routes.evaluation_routes import router as evaluation_router
 
-# Configure structured logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
@@ -25,18 +25,14 @@ logging.basicConfig(
 logger = logging.getLogger("aegisiq")
 
 settings = get_settings()
-monitoring = MonitoringMiddleware(app=None)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifespan: startup and shutdown events."""
     logger.info("Starting %s v%s", settings.app_name, settings.app_version)
     logger.info("AI Provider: %s", settings.llm_provider)
     logger.info("Demo Mode: %s", settings.demo_mode)
-
     yield
-
     logger.info("Shutting down %s", settings.app_name)
 
 
@@ -59,18 +55,19 @@ app.add_middleware(
 )
 
 # --- Monitoring ---
-monitoring = MonitoringMiddleware(app)
 app.add_middleware(MonitoringMiddleware)
 
-# --- Routes ---
-app.include_router(ai_router, prefix="/ai")
+# --- API v1 Routes ---
+API_V1_PREFIX = "/api/v1"
+
+app.include_router(ai_router, prefix=f"{API_V1_PREFIX}/ai", tags=["AI Engine"])
+app.include_router(evaluation_router, prefix=f"{API_V1_PREFIX}", tags=["Evaluation"])
 
 
-# --- Health & Status Endpoints ---
+# --- Health & Status ---
 
-@app.get("/health")
+@app.get("/health", tags=["System"])
 async def health_check():
-    """Health check endpoint for Docker and load balancers."""
     return {
         "status": "healthy",
         "service": settings.app_name,
@@ -78,9 +75,8 @@ async def health_check():
     }
 
 
-@app.get("/")
+@app.get("/", tags=["System"])
 async def root():
-    """Root endpoint with basic service info."""
     return {
         "service": settings.app_name,
         "version": settings.app_version,
@@ -89,11 +85,13 @@ async def root():
     }
 
 
-@app.get("/metrics")
+@app.get("/metrics", tags=["System"])
 async def metrics():
-    """Basic metrics endpoint."""
+    from backend.middleware import MonitoringMiddleware
+    mw = None
+    for m in app.middleware_stack.__class__.__mro__:
+        pass
     return {
         "service": settings.app_name,
         "version": settings.app_version,
-        **monitoring.metrics,
     }

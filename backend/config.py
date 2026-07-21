@@ -49,6 +49,15 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     enable_audit_logging: bool = True
 
+    # Docker-compose env vars (tolerated, not used by backend directly)
+    postgres_port: Optional[str] = None
+    backend_port: Optional[str] = None
+    frontend_port: Optional[str] = None
+    vite_api_base_url: Optional[str] = None
+    vite_app_name: Optional[str] = None
+    nginx_http_port: Optional[str] = None
+    nginx_https_port: Optional[str] = None
+
     model_config = {
         "env_file": ".env",
         "env_file_encoding": "utf-8",
