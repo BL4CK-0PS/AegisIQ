@@ -72,7 +72,9 @@ app.include_router(voice_router, prefix=f"{API_V1_PREFIX}/voice", tags=["Voice"]
 app.include_router(auth_router, prefix=f"{API_V1_PREFIX}/auth", tags=["Authentication"])
 app.include_router(user_router, prefix=f"{API_V1_PREFIX}/users", tags=["Users"])
 app.include_router(jd_router, prefix=f"{API_V1_PREFIX}/jd", tags=["Job Description"])
-app.include_router(assessment_router, prefix=f"{API_V1_PREFIX}/assessments", tags=["Assessments"])
+app.include_router(
+    assessment_router, prefix=f"{API_V1_PREFIX}/assessments", tags=["Assessments"]
+)
 
 
 # --- Health & Status ---
