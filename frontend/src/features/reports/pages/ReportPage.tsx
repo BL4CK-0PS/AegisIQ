@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/feedback/EmptyState';
 
 export default function ReportPage() {
-  const { reportId } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   return (
@@ -23,7 +23,7 @@ export default function ReportPage() {
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Assessment Report</h1>
               <p className="text-sm text-muted-foreground">
-                Report ID: {reportId || 'N/A'}
+                Report ID: {id || 'N/A'}
               </p>
             </div>
           </div>
