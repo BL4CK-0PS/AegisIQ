@@ -229,13 +229,17 @@ jobs:
             type=ref,event=branch
             type=sha,prefix=
 
+      - name: Set image name
+        id: image
+        run: echo "name=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
       - name: Build and push backend image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./infrastructure/docker/Dockerfile.backend
           push: true
-          tags: ghcr.io/${{ github.repository }}/backend:${{ steps.meta.outputs.version }}
+          tags: ${{ steps.image.outputs.name }}/backend:${{ steps.meta.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -245,6 +249,6 @@ jobs:
           context: ./frontend
           file: ./infrastructure/docker/Dockerfile.frontend
           push: true
-          tags: ghcr.io/${{ github.repository }}/frontend:${{ steps.meta.outputs.version }}
+          tags: ${{ steps.image.outputs.name }}/frontend:${{ steps.meta.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
