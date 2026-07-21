@@ -16,6 +16,10 @@ from backend.middleware import MonitoringMiddleware
 from backend.routes.ai_routes import router as ai_router
 from backend.routes.evaluation_routes import router as evaluation_router
 from backend.routes.voice_routes import router as voice_router
+from backend.routes.auth_routes import router as auth_router
+from backend.routes.user_routes import router as user_router
+from backend.routes.jd_routes import router as jd_router
+from backend.routes.assessment_routes import router as assessment_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -64,6 +68,10 @@ API_V1_PREFIX = "/api/v1"
 app.include_router(ai_router, prefix=f"{API_V1_PREFIX}/ai", tags=["AI Engine"])
 app.include_router(evaluation_router, prefix=f"{API_V1_PREFIX}", tags=["Evaluation"])
 app.include_router(voice_router, prefix=f"{API_V1_PREFIX}/voice", tags=["Voice"])
+app.include_router(auth_router, prefix=f"{API_V1_PREFIX}/auth", tags=["Authentication"])
+app.include_router(user_router, prefix=f"{API_V1_PREFIX}/users", tags=["Users"])
+app.include_router(jd_router, prefix=f"{API_V1_PREFIX}/jd", tags=["Job Description"])
+app.include_router(assessment_router, prefix=f"{API_V1_PREFIX}/assessments", tags=["Assessments"])
 
 
 # --- Health & Status ---
