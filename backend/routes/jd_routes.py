@@ -9,17 +9,14 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.auth import get_current_user
 from backend.database import get_session
 from backend.models import UserModel
-from backend.orchestrator import _find_domain, _find_skill
 
 from src.core.knowledge.taxonomy import SkillDnaProfile, ProficiencyLevel
 from src.core.knowledge.seed_data import ALL_DOMAINS, SEED_SKILLS, SEED_MITRE_TECHNIQUES
-from src.core.engine.scenarios import ScenarioGenerator, IncidentScenario
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -78,12 +75,18 @@ async def parse_jd(
             or any(label.lower() in text_lower for label in s.alternative_labels)
         ]
 
-        responsibilities = [line.strip() for line in payload.jd_text.split("\n") if line.strip()]
+        responsibilities = [
+            line.strip() for line in payload.jd_text.split("\n") if line.strip()
+        ]
 
         difficulty = ProficiencyLevel.INTERMEDIATE
         if "senior" in text_lower or "advanced" in text_lower or "lead" in text_lower:
             difficulty = ProficiencyLevel.ADVANCED
-        if "expert" in text_lower or "architect" in text_lower or "principal" in text_lower:
+        if (
+            "expert" in text_lower
+            or "architect" in text_lower
+            or "principal" in text_lower
+        ):
             difficulty = ProficiencyLevel.EXPERT
         if "junior" in text_lower or "entry" in text_lower or "tier 1" in text_lower:
             difficulty = ProficiencyLevel.BEGINNER
@@ -159,13 +162,15 @@ async def list_techniques() -> list[dict[str, Any]]:
     for t in SEED_MITRE_TECHNIQUES.values():
         if t.id not in seen:
             seen.add(t.id)
-            result.append({
-                "id": t.id,
-                "name": t.name,
-                "description": t.description,
-                "tactic_name": t.tactic.name if t.tactic else "General",
-                "sub_techniques": [st.id for st in t.sub_techniques],
-            })
+            result.append(
+                {
+                    "id": t.id,
+                    "name": t.name,
+                    "description": t.description,
+                    "tactic_name": t.tactic.name if t.tactic else "General",
+                    "sub_techniques": [st.id for st in t.sub_techniques],
+                }
+            )
     return result
 
 

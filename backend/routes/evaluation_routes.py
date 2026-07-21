@@ -26,7 +26,10 @@ from backend.schemas import (
     RoadmapResponse,
     CyberTwinResponse,
 )
-from src.core.evaluation.dna_engine import ConsolidatedProfile, CyberTwinModel as CTModel
+from src.core.evaluation.dna_engine import (
+    ConsolidatedProfile,
+    CyberTwinModel as CTModel,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -35,6 +38,7 @@ router = APIRouter()
 @router.post("/profile/build", response_model=BuildProfileResponse)
 async def build_profile_endpoint(payload: BuildProfileRequest) -> dict[str, Any]:
     from src.core.evaluation.evaluator import EvaluationResult
+
     evals: list[EvaluationResult] = []
     try:
         profile: ConsolidatedProfile = build_profile(evals)
@@ -52,7 +56,9 @@ async def build_profile_endpoint(payload: BuildProfileRequest) -> dict[str, Any]
         }
     except Exception as exc:
         logger.error("Profile build failed: %s", exc)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
+        )
 
 
 @router.post("/cyber-twin/build", response_model=CyberTwinResponse)
@@ -74,13 +80,16 @@ async def build_cyber_twin_endpoint() -> dict[str, Any]:
         }
     except Exception as exc:
         logger.error("Cyber Twin build failed: %s", exc)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
+        )
 
 
 @router.post("/career-compass/analyze", response_model=CareerCompassResponse)
 async def career_compass_analyze(payload: CareerCompassRequest) -> dict[str, Any]:
     try:
         from src.core.knowledge.taxonomy import SkillDnaProfile
+
         dummy = SkillDnaProfile(title="Candidate")
         analysis = analyze_career_gaps(dummy, payload.target_role)
         return {
@@ -99,6 +108,7 @@ async def career_compass_analyze(payload: CareerCompassRequest) -> dict[str, Any
 @router.get("/career-compass/roles", response_model=BestFitRolesResponse)
 async def career_compass_roles() -> dict[str, Any]:
     from src.core.knowledge.taxonomy import SkillDnaProfile
+
     dummy = SkillDnaProfile(title="Candidate")
     roles = find_best_roles(dummy, top_n=7)
     return {"status": "success", "roles": roles}
@@ -122,10 +132,12 @@ async def generate_roadmap_endpoint(payload: RoadmapRequest) -> dict[str, Any]:
             "timeline_weeks": roadmap.timeline_weeks,
             "steps": [s.model_dump() for s in roadmap.steps],
             "milestones": [m.model_dump() for m in roadmap.milestones],
-            "labs": [l.model_dump() for l in roadmap.labs],
+            "labs": [lab.model_dump() for lab in roadmap.labs],
             "focus_areas": roadmap.focus_areas,
             "generated_at": roadmap.generated_at,
         }
     except Exception as exc:
         logger.error("Roadmap generation failed: %s", exc)
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc))
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)
+        )

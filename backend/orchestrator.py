@@ -9,17 +9,29 @@ import logging
 from typing import Any, Optional, Union
 
 from backend.config import get_settings
-from backend.services.provider_factory import create_ai_client, create_provider
+from backend.services.provider_factory import create_ai_client
 
 from src.core.ai.client import AIClient
 from src.core.ai.prompt_loader import PromptLoader
 from src.core.engine.question_generator import QuestionGenerator, GeneratedQuestionSet
-from src.core.engine.scenarios import ScenarioGenerator, IncidentScenario, ThreatHuntingScenario
-from src.core.engine.branching import AdaptiveSessionManager, AdaptiveSession, DifficultyAdjustment
+from src.core.engine.scenarios import (
+    ScenarioGenerator,
+    IncidentScenario,
+    ThreatHuntingScenario,
+)
+from src.core.engine.branching import (
+    AdaptiveSessionManager,
+    AdaptiveSession,
+    DifficultyAdjustment,
+)
 from src.core.evaluation.evaluator import AnswerEvaluator, EvaluationResult
-from src.core.evaluation.dna_engine import CapabilityEngine, ConsolidatedProfile, CyberTwinModel as CTModel
+from src.core.evaluation.dna_engine import (
+    CapabilityEngine,
+    ConsolidatedProfile,
+    CyberTwinModel as CTModel,
+)
 from src.core.evaluation.career_compass import CareerCompassEngine, RoleGapAnalysis
-from src.core.knowledge.seed_data import ALL_DOMAINS, SEED_SKILLS, SEED_MITRE_TECHNIQUES
+from src.core.knowledge.seed_data import ALL_DOMAINS, SEED_SKILLS
 from src.core.knowledge.taxonomy import (
     CyberDomain,
     MitreTechnique,
@@ -28,7 +40,7 @@ from src.core.knowledge.taxonomy import (
     SkillDnaProfile,
 )
 from src.core.knowledge.rubrics import get_rubric_for_difficulty, ScoringRubric
-from src.core.mentor.mentor_engine import AIMentorEngine, LearningRoadmap, LabRecommendation
+from src.core.mentor.mentor_engine import AIMentorEngine, LearningRoadmap
 from src.core.mentor.feedback import FeedbackEngine, AnswerRepairGuide
 
 logger = logging.getLogger(__name__)
@@ -72,13 +84,16 @@ def _find_domain(name: str) -> CyberDomain:
 def _find_skill(name: str) -> Skill:
     skill = SEED_SKILLS.get(name)
     if skill is None:
-        raise ValueError(f"Unknown skill '{name}'. Available: {list(SEED_SKILLS.keys())}")
+        raise ValueError(
+            f"Unknown skill '{name}'. Available: {list(SEED_SKILLS.keys())}"
+        )
     return skill
 
 
 # ---------------------------------------------------------------------------
 # JD Intelligence
 # ---------------------------------------------------------------------------
+
 
 async def parse_jd(
     jd_text: str,
@@ -95,9 +110,11 @@ async def parse_jd(
         difficulty=ProficiencyLevel.INTERMEDIATE,
     )
 
+
 # ---------------------------------------------------------------------------
 # Question / Scenario Generation
 # ---------------------------------------------------------------------------
+
 
 async def generate_skill_assessment(
     domain_name: str,
@@ -124,16 +141,20 @@ async def generate_skill_assessment(
 def build_incident_scenario(technique_id: str, difficulty: str) -> IncidentScenario:
     technique: MitreTechnique = ScenarioGenerator.lookup_technique(technique_id)
     diff = _resolve_difficulty(difficulty)
-    return ScenarioGenerator.create_incident_scenario(technique=technique, difficulty=diff)
+    return ScenarioGenerator.create_incident_scenario(
+        technique=technique, difficulty=diff
+    )
 
 
 def build_threat_hunting_scenario(technique_ids: list[str]) -> ThreatHuntingScenario:
     techniques = [ScenarioGenerator.lookup_technique(tid) for tid in technique_ids]
     return ScenarioGenerator.create_threat_hunting_scenario(techniques=techniques)
 
+
 # ---------------------------------------------------------------------------
 # Evaluation
 # ---------------------------------------------------------------------------
+
 
 async def evaluate_response(
     question_text: str,
@@ -157,9 +178,11 @@ async def evaluate_response(
         skill=skill,
     )
 
+
 # ---------------------------------------------------------------------------
 # Profile / Cyber Twin
 # ---------------------------------------------------------------------------
+
 
 def build_profile(evaluations: list[EvaluationResult]) -> ConsolidatedProfile:
     return CapabilityEngine.aggregate_evaluations(evaluations)
@@ -171,9 +194,11 @@ def build_cyber_twin(
 ) -> CTModel:
     return CapabilityEngine.build_cyber_twin(profile=profile, candidate_label=label)
 
+
 # ---------------------------------------------------------------------------
 # Career Compass
 # ---------------------------------------------------------------------------
+
 
 def analyze_career_gaps(
     profile: Union[SkillDnaProfile, CTModel],
@@ -188,9 +213,11 @@ def find_best_roles(
 ) -> list[dict[str, Any]]:
     return CareerCompassEngine.find_best_fit_roles(profile, top_n=top_n)
 
+
 # ---------------------------------------------------------------------------
 # Mentor (Roadmap + Feedback)
 # ---------------------------------------------------------------------------
+
 
 async def generate_roadmap(
     profile: ConsolidatedProfile,
@@ -228,6 +255,7 @@ async def generate_repair_guide(
         skill=skill,
         mitre_technique_id=mitre_technique_id,
     )
+
 
 # ---------------------------------------------------------------------------
 # Adaptive Session
@@ -279,7 +307,9 @@ def compute_next_difficulty(
     session: AdaptiveSession,
     current_skill: str = "",
 ) -> DifficultyAdjustment:
-    return _get_session_manager().compute_next_difficulty(session, current_skill=current_skill)
+    return _get_session_manager().compute_next_difficulty(
+        session, current_skill=current_skill
+    )
 
 
 def complete_session(session: AdaptiveSession) -> AdaptiveSession:

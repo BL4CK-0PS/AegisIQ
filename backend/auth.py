@@ -122,4 +122,5 @@ def require_role(*roles: str):
                 detail=f"Requires one of: {', '.join(roles)}",
             )
         return current_user
+
     return role_checker

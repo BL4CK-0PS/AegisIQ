@@ -14,24 +14,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.auth import get_current_user
 from backend.database import get_session
-from backend.models import UserModel, AssessmentModel, QuestionRecordModel, EvaluationResultModel
+from backend.models import (
+    UserModel,
+    AssessmentModel,
+    QuestionRecordModel,
+    EvaluationResultModel,
+)
 from backend.orchestrator import (
-    _get_session_manager,
     start_session,
-    record_answer,
-    complete_session,
     get_session_summary,
-    generate_skill_assessment,
     evaluate_response,
-    build_profile,
-    build_cyber_twin,
-    analyze_career_gaps,
-    _resolve_difficulty,
-    _find_domain,
-    _find_skill,
 )
 from src.core.engine.branching import AdaptiveSession
-from src.core.evaluation.evaluator import CriterionScore
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -114,15 +108,21 @@ async def get_assessment(
     )
     assessment = result.scalar_one_or_none()
     if assessment is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
+        )
 
     return {
         "id": assessment.id,
         "domain": assessment.domain,
         "status": assessment.status,
         "current_difficulty": assessment.current_difficulty,
-        "started_at": assessment.started_at.isoformat() if assessment.started_at else None,
-        "completed_at": assessment.completed_at.isoformat() if assessment.completed_at else None,
+        "started_at": assessment.started_at.isoformat()
+        if assessment.started_at
+        else None,
+        "completed_at": assessment.completed_at.isoformat()
+        if assessment.completed_at
+        else None,
         "question_count": len(assessment.questions) if assessment.questions else 0,
     }
 
@@ -138,7 +138,9 @@ async def record_answer_endpoint(
     )
     assessment = result.scalar_one_or_none()
     if assessment is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
+        )
 
     record = QuestionRecordModel(
         assessment_id=assessment.id,
@@ -152,7 +154,9 @@ async def record_answer_endpoint(
     await db.commit()
     await db.refresh(record)
 
-    logger.debug("Answer recorded for assessment %s, question %s", assessment.id, record.id)
+    logger.debug(
+        "Answer recorded for assessment %s, question %s", assessment.id, record.id
+    )
 
     return {
         "status": "success",
@@ -172,7 +176,9 @@ async def evaluate_assessment(
     )
     assessment = result.scalar_one_or_none()
     if assessment is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
+        )
 
     questions: list[QuestionRecordModel] = assessment.questions or []
     if not questions:
@@ -249,10 +255,13 @@ async def complete_assessment_endpoint(
     )
     assessment = result.scalar_one_or_none()
     if assessment is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
+        )
 
     assessment.status = "completed"
     from datetime import datetime, timezone
+
     assessment.completed_at = datetime.now(timezone.utc)
 
     session_ref = AdaptiveSession(
@@ -274,13 +283,16 @@ async def get_assessment_results(
     current_user: UserModel = Depends(get_current_user),
 ) -> dict[str, Any]:
     evals_result = await db.execute(
-        select(EvaluationResultModel).join(
+        select(EvaluationResultModel)
+        .join(
             QuestionRecordModel,
             EvaluationResultModel.question_id == QuestionRecordModel.id,
-        ).join(
+        )
+        .join(
             AssessmentModel,
             QuestionRecordModel.assessment_id == AssessmentModel.id,
-        ).where(AssessmentModel.id == assessment_id)
+        )
+        .where(AssessmentModel.id == assessment_id)
     )
     evals = evals_result.scalars().all()
 

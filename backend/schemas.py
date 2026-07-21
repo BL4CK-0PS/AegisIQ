@@ -6,12 +6,13 @@ Request and response models for all API endpoints.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
 
 # --- Health ---
+
 
 class HealthResponse(BaseModel):
     status: str
@@ -20,6 +21,7 @@ class HealthResponse(BaseModel):
 
 
 # --- JD Intelligence ---
+
 
 class ParseJDRequest(BaseModel):
     jd_text: str = Field(..., min_length=20, description="Raw job description text")
@@ -40,10 +42,13 @@ class ParseJDResponse(BaseModel):
 
 # --- Assessment ---
 
+
 class GenerateAssessmentRequest(BaseModel):
     domain: str = Field(default="Web Application Security")
     skill: str = Field(default="Web Vulnerability Scanning")
-    difficulty: str = Field(default="intermediate", pattern=r"^(beginner|intermediate|advanced|expert)$")
+    difficulty: str = Field(
+        default="intermediate", pattern=r"^(beginner|intermediate|advanced|expert)$"
+    )
     question_count: int = Field(default=5, ge=1, le=10)
 
 
@@ -68,6 +73,7 @@ class IncidentScenarioResponse(BaseModel):
 
 # --- Evaluation ---
 
+
 class EvaluateResponseRequest(BaseModel):
     question_text: str
     candidate_answer: str = Field(..., min_length=1)
@@ -91,6 +97,7 @@ class EvaluateResponseResponse(BaseModel):
 
 # --- Consolidated Profile ---
 
+
 class BuildProfileRequest(BaseModel):
     evaluation_ids: list[str] = Field(default_factory=list)
 
@@ -110,6 +117,7 @@ class BuildProfileResponse(BaseModel):
 
 # --- Cyber Twin ---
 
+
 class CyberTwinResponse(BaseModel):
     status: str
     twin_id: str
@@ -124,6 +132,7 @@ class CyberTwinResponse(BaseModel):
 
 
 # --- Career Compass ---
+
 
 class CareerCompassRequest(BaseModel):
     candidate_label: str = Field(default="Anonymous")
@@ -146,6 +155,7 @@ class BestFitRolesResponse(BaseModel):
 
 # --- Learning Roadmap ---
 
+
 class RoadmapRequest(BaseModel):
     candidate_label: str = Field(default="Anonymous")
     timeline_weeks: int = Field(default=8, ge=4, le=24)
@@ -167,6 +177,7 @@ class RoadmapResponse(BaseModel):
 
 # --- Answer Repair ---
 
+
 class RepairGuideRequest(BaseModel):
     question_text: str
     candidate_answer: str
@@ -186,6 +197,7 @@ class RepairGuideResponse(BaseModel):
 
 
 # --- Session (Adaptive) ---
+
 
 class StartSessionRequest(BaseModel):
     domain: str
@@ -211,6 +223,7 @@ class SessionResponse(BaseModel):
 
 
 # --- Providers ---
+
 
 class ProvidersResponse(BaseModel):
     available: dict[str, bool]

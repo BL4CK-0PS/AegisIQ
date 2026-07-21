@@ -8,7 +8,7 @@ import logging
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,7 +31,10 @@ class RegisterRequest(BaseModel):
     email: str = Field(..., examples=["analyst@pwndora.io"])
     password: str = Field(..., min_length=8, max_length=128)
     display_name: str = Field(..., min_length=1, max_length=255)
-    role: str = Field(default="professional", pattern=r"^(admin|capability_analyst|professional|reviewer)$")
+    role: str = Field(
+        default="professional",
+        pattern=r"^(admin|capability_analyst|professional|reviewer)$",
+    )
 
 
 class LoginRequest(BaseModel):
@@ -52,8 +55,12 @@ class RefreshRequest(BaseModel):
     refresh_token: str
 
 
-@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-async def register(payload: RegisterRequest, db: AsyncSession = Depends(get_session)) -> dict[str, Any]:
+@router.post(
+    "/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED
+)
+async def register(
+    payload: RegisterRequest, db: AsyncSession = Depends(get_session)
+) -> dict[str, Any]:
     result = await db.execute(select(UserModel).where(UserModel.email == payload.email))
     existing = result.scalar_one_or_none()
     if existing:
@@ -87,7 +94,9 @@ async def register(payload: RegisterRequest, db: AsyncSession = Depends(get_sess
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(payload: LoginRequest, db: AsyncSession = Depends(get_session)) -> dict[str, Any]:
+async def login(
+    payload: LoginRequest, db: AsyncSession = Depends(get_session)
+) -> dict[str, Any]:
     result = await db.execute(select(UserModel).where(UserModel.email == payload.email))
     user = result.scalar_one_or_none()
     if user is None or not verify_password(payload.password, user.hashed_password):
@@ -111,7 +120,9 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_session)) 
 
 
 @router.post("/refresh", response_model=TokenResponse)
-async def refresh(payload: RefreshRequest, db: AsyncSession = Depends(get_session)) -> dict[str, Any]:
+async def refresh(
+    payload: RefreshRequest, db: AsyncSession = Depends(get_session)
+) -> dict[str, Any]:
     try:
         token_data = decode_token(payload.refresh_token)
     except Exception:
@@ -161,5 +172,7 @@ async def get_me(current_user: UserModel = Depends(get_current_user)) -> dict[st
         "email": current_user.email,
         "display_name": current_user.display_name,
         "role": current_user.role,
-        "created_at": current_user.created_at.isoformat() if current_user.created_at else None,
+        "created_at": current_user.created_at.isoformat()
+        if current_user.created_at
+        else None,
     }

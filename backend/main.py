@@ -68,6 +68,7 @@ app.include_router(voice_router, prefix=f"{API_V1_PREFIX}/voice", tags=["Voice"]
 
 # --- Health & Status ---
 
+
 @app.get("/health", tags=["System"])
 async def health_check():
     return {
@@ -89,10 +90,6 @@ async def root():
 
 @app.get("/metrics", tags=["System"])
 async def metrics():
-    from backend.middleware import MonitoringMiddleware
-    mw = None
-    for m in app.middleware_stack.__class__.__mro__:
-        pass
     return {
         "service": settings.app_name,
         "version": settings.app_version,

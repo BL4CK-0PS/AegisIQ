@@ -4,7 +4,6 @@ AegisIQ AI Routes — Production Ready
 Wires src/core/ai, engine, evaluation, mentor modules into FastAPI endpoints.
 """
 
-import json
 import logging
 from typing import Any
 
@@ -14,18 +13,11 @@ from backend.orchestrator import (
     generate_skill_assessment,
     build_incident_scenario,
     evaluate_response,
-    generate_roadmap,
     generate_repair_guide,
-    build_profile,
-    build_cyber_twin,
-    analyze_career_gaps,
-    find_best_roles,
     parse_jd,
     start_session,
     record_answer,
-    compute_next_difficulty,
     complete_session,
-    get_session_summary,
 )
 from backend.schemas import (
     GenerateAssessmentRequest,
@@ -51,7 +43,9 @@ router = APIRouter()
 settings = get_settings()
 
 
-@router.post("/parse-jd", response_model=ParseJDResponse, status_code=status.HTTP_200_OK)
+@router.post(
+    "/parse-jd", response_model=ParseJDResponse, status_code=status.HTTP_200_OK
+)
 async def parse_jd_endpoint(payload: ParseJDRequest) -> dict[str, Any]:
     try:
         profile = await parse_jd(jd_text=payload.jd_text, title=payload.title)
@@ -68,10 +62,16 @@ async def parse_jd_endpoint(payload: ParseJDRequest) -> dict[str, Any]:
         }
     except Exception as exc:
         logger.error("JD parsing failed: %s", exc)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
+        )
 
 
-@router.post("/generate-assessment", response_model=GenerateAssessmentResponse, status_code=status.HTTP_200_OK)
+@router.post(
+    "/generate-assessment",
+    response_model=GenerateAssessmentResponse,
+    status_code=status.HTTP_200_OK,
+)
 async def generate_assessment(payload: GenerateAssessmentRequest) -> dict[str, Any]:
     try:
         qset = await generate_skill_assessment(
@@ -92,7 +92,9 @@ async def generate_assessment(payload: GenerateAssessmentRequest) -> dict[str, A
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
     except Exception as exc:
         logger.error("Assessment generation failed: %s", exc)
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc))
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)
+        )
 
 
 @router.post("/incident-scenario", response_model=IncidentScenarioResponse)
@@ -104,7 +106,9 @@ async def incident_scenario(payload: IncidentScenarioRequest) -> dict[str, Any]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
 
-@router.post("/evaluate", response_model=EvaluateResponseResponse, status_code=status.HTTP_200_OK)
+@router.post(
+    "/evaluate", response_model=EvaluateResponseResponse, status_code=status.HTTP_200_OK
+)
 async def evaluate(payload: EvaluateResponseRequest) -> dict[str, Any]:
     try:
         result: EvaluationResult = await evaluate_response(
@@ -128,7 +132,9 @@ async def evaluate(payload: EvaluateResponseRequest) -> dict[str, Any]:
         }
     except Exception as exc:
         logger.error("Evaluation failed: %s", exc)
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc))
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)
+        )
 
 
 @router.post("/repair-guide", response_model=RepairGuideResponse)
@@ -158,12 +164,16 @@ async def repair_guide(payload: RepairGuideRequest) -> dict[str, Any]:
         }
     except Exception as exc:
         logger.error("Repair guide failed: %s", exc)
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc))
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)
+        )
 
 
 @router.post("/session/start", response_model=SessionResponse)
 async def session_start(payload: StartSessionRequest) -> dict[str, Any]:
-    session = start_session(domain=payload.domain, difficulty=payload.initial_difficulty)
+    session = start_session(
+        domain=payload.domain, difficulty=payload.initial_difficulty
+    )
     return {"status": "success", "session": session.model_dump()}
 
 

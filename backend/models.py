@@ -7,11 +7,20 @@ Maps all domain entities to PostgreSQL tables.
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, String, Float, Boolean, DateTime, Text, JSON, Integer, ForeignKey, Enum as SAEnum
+from sqlalchemy import (
+    Column,
+    String,
+    Float,
+    Boolean,
+    DateTime,
+    Text,
+    JSON,
+    Integer,
+    ForeignKey,
+)
 from sqlalchemy.orm import relationship
 
 from backend.database import Base
-from src.core.knowledge.taxonomy import ProficiencyLevel
 
 
 def _utcnow() -> datetime:
@@ -33,7 +42,9 @@ class UserModel(Base):
     created_at = Column(DateTime(timezone=True), default=_utcnow)
     updated_at = Column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
 
-    assessments = relationship("AssessmentModel", back_populates="candidate", lazy="selectin")
+    assessments = relationship(
+        "AssessmentModel", back_populates="candidate", lazy="selectin"
+    )
 
 
 class AssessmentModel(Base):
@@ -49,7 +60,12 @@ class AssessmentModel(Base):
     summary = Column(JSON, default=dict)
 
     candidate = relationship("UserModel", back_populates="assessments", lazy="selectin")
-    questions = relationship("QuestionRecordModel", back_populates="assessment", lazy="selectin", cascade="all, delete-orphan")
+    questions = relationship(
+        "QuestionRecordModel",
+        back_populates="assessment",
+        lazy="selectin",
+        cascade="all, delete-orphan",
+    )
 
 
 class QuestionRecordModel(Base):
@@ -68,7 +84,9 @@ class QuestionRecordModel(Base):
     candidate_answer = Column(Text, default="")
     created_at = Column(DateTime(timezone=True), default=_utcnow)
 
-    assessment = relationship("AssessmentModel", back_populates="questions", lazy="selectin")
+    assessment = relationship(
+        "AssessmentModel", back_populates="questions", lazy="selectin"
+    )
 
 
 class EvaluationResultModel(Base):
