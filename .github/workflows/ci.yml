@@ -9,6 +9,7 @@ on:
 env:
   PYTHON_VERSION: "3.12"
   NODE_VERSION: "22"
+  PNPM_VERSION: "11.15.1"
 
 jobs:
   # ============================================
@@ -47,7 +48,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: frontend
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Run ESLint
         working-directory: frontend
@@ -123,7 +124,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: frontend
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Run TypeScript check
         working-directory: frontend
