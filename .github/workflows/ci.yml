@@ -8,7 +8,7 @@ on:
 
 env:
   PYTHON_VERSION: "3.12"
-  NODE_VERSION: "20"
+  NODE_VERSION: "22"
 
 jobs:
   # ============================================
@@ -27,7 +27,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Python linting tools
-        run: pip install ruff mypy
+        run: pip install ruff
 
       - name: Run Ruff linter
         run: ruff check backend/ src/
@@ -96,13 +96,7 @@ jobs:
           JWT_SECRET: test-secret-key
           DEMO_MODE: "true"
           PYTHONPATH: .
-        run: pytest backend/tests/ --cov=backend --cov-report=xml -v
-
-      - name: Upload coverage report
-        uses: codecov/codecov-action@v4
-        if: always()
-        with:
-          files: backend/coverage.xml
+        run: pytest backend/tests/ -v
 
   # ============================================
   # Frontend Tests
@@ -150,7 +144,7 @@ jobs:
 
       - name: Create .env file
         run: |
-          cat > .env << EOF
+          cat > .env << 'EOF'
           POSTGRES_DB=aegisiq_test
           POSTGRES_USER=aegisiq_test
           POSTGRES_PASSWORD=test_password
