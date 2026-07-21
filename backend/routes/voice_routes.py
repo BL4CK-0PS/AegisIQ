@@ -7,7 +7,7 @@ Handles voice-to-text transcription via Web Speech API proxy.
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, UploadFile, File, status
+from fastapi import APIRouter, UploadFile, File
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
@@ -16,12 +16,16 @@ router = APIRouter()
 
 class TranscriptionRequest(BaseModel):
     """Request for server-side transcription (when Web Speech API is unavailable)."""
+
     audio_base64: str = Field(..., description="Base64-encoded audio data")
-    language: str = Field(default="en-US", description="Language code for transcription")
+    language: str = Field(
+        default="en-US", description="Language code for transcription"
+    )
 
 
 class TranscriptionResponse(BaseModel):
     """Response containing transcribed text."""
+
     text: str
     language: str
     confidence: float
@@ -44,8 +48,8 @@ async def transcribe_audio(
 
     return TranscriptionResponse(
         text="[Voice transcription requires a speech-to-text API key. "
-             "Configure STT_PROVIDER in .env to enable server-side transcription. "
-             "The frontend Web Speech API works without this endpoint.]",
+        "Configure STT_PROVIDER in .env to enable server-side transcription. "
+        "The frontend Web Speech API works without this endpoint.]",
         language=language,
         confidence=0.0,
         provider="placeholder",

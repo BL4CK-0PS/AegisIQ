@@ -10,8 +10,7 @@ from pydantic import BaseModel, Field
 
 from src.core.ai.client import AIClient, AIClientError
 from src.core.ai.prompt_loader import PromptLoader, PromptLoadError
-from src.core.evaluation.dna_engine import ConsolidatedProfile, WeaknessEntry
-from src.core.evaluation.evaluator import EvaluationResult
+from src.core.evaluation.dna_engine import ConsolidatedProfile
 from src.core.knowledge.seed_data import SEED_MITRE_TECHNIQUES
 from src.core.knowledge.taxonomy import MitreTechnique, ProficiencyLevel
 
@@ -58,7 +57,9 @@ class LearningRoadmap(BaseModel):
     milestones: list[LearningMilestone] = Field(default_factory=list)
     labs: list[LabRecommendation] = Field(default_factory=list)
     focus_areas: list[str] = Field(default_factory=list)
-    generated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    generated_at: str = Field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 class AIMentorError(Exception):
@@ -82,17 +83,31 @@ class AIMentorEngine:
         timeline_weeks: int = 8,
         candidate_label: str = "Anonymous",
     ) -> LearningRoadmap:
-        weak_areas_text: str = "; ".join(
-            f"{w.skill_name} (score={w.average_score})" for w in profile.weaknesses
-        ) if profile.weaknesses else "None identified"
+        weak_areas_text: str = (
+            "; ".join(
+                f"{w.skill_name} (score={w.average_score})" for w in profile.weaknesses
+            )
+            if profile.weaknesses
+            else "None identified"
+        )
 
-        missing_text: str = "; ".join(profile.missing_concepts) if profile.missing_concepts else "None identified"
-        skills_text: str = "; ".join(profile.demonstrated_skills) if profile.demonstrated_skills else "None recorded"
+        missing_text: str = (
+            "; ".join(profile.missing_concepts)
+            if profile.missing_concepts
+            else "None identified"
+        )
+        skills_text: str = (
+            "; ".join(profile.demonstrated_skills)
+            if profile.demonstrated_skills
+            else "None recorded"
+        )
 
         variables: dict[str, Any] = {
             "overall_score": str(round(profile.overall_average_score, 1)),
             "confidence": str(round(profile.overall_confidence, 2)),
-            "proficiency_level": CapabilityEngine._score_to_level(profile.overall_average_score).value,
+            "proficiency_level": CapabilityEngine._score_to_level(
+                profile.overall_average_score
+            ).value,
             "demonstrated_skills": skills_text,
             "missing_concepts": missing_text,
             "weakness_areas": weak_areas_text,
@@ -105,9 +120,13 @@ class AIMentorEngine:
         steps: list[LearningStep] = self._parse_steps(parsed)
         milestones: list[LearningMilestone] = self._parse_milestones(parsed)
         labs: list[LabRecommendation] = self._generate_labs_from_template(profile)
-        focus_areas: list[str] = [w.skill_name for w in profile.weaknesses] + profile.missing_concepts
+        focus_areas: list[str] = [
+            w.skill_name for w in profile.weaknesses
+        ] + profile.missing_concepts
 
-        level: ProficiencyLevel = CapabilityEngine._score_to_level(profile.overall_average_score)
+        level: ProficiencyLevel = CapabilityEngine._score_to_level(
+            profile.overall_average_score
+        )
 
         return LearningRoadmap(
             candidate_label=candidate_label,
@@ -143,9 +162,7 @@ class AIMentorEngine:
                 schema=_MENTOR_SCHEMA,
             )
         except AIClientError as exc:
-            raise AIMentorError(
-                f"AI mentor generation failed: {exc}"
-            ) from exc
+            raise AIMentorError(f"AI mentor generation failed: {exc}") from exc
         return raw
 
     @staticmethod
@@ -166,7 +183,9 @@ class AIMentorEngine:
         try:
             data: Any = json.loads(cleaned)
             if not isinstance(data, dict):
-                raise AIMentorError(f"Expected a JSON object, got {type(data).__name__}")
+                raise AIMentorError(
+                    f"Expected a JSON object, got {type(data).__name__}"
+                )
             return data
         except json.JSONDecodeError as exc:
             raise AIMentorError(f"Failed to parse mentor JSON: {exc}") from exc
@@ -229,14 +248,21 @@ class AIMentorEngine:
             skill_lower: str = weakness.skill_name.lower()
             lab: Optional[LabRecommendation] = None
 
-            if "injection" in skill_lower or "sqli" in skill_lower or "xss" in skill_lower:
+            if (
+                "injection" in skill_lower
+                or "sqli" in skill_lower
+                or "xss" in skill_lower
+            ):
                 lab = LabRecommendation(
                     title=f"Web Security: {weakness.skill_name} Lab",
                     platform="PortSwigger Web Security Academy",
                     difficulty=ProficiencyLevel.INTERMEDIATE,
                     mitre_technique_ids=["T1190"],
                     description=f"Practice {weakness.skill_name} through guided exercises on intentionally vulnerable web applications.",
-                    skills_practiced=[weakness.skill_name, "Web vulnerability assessment"],
+                    skills_practiced=[
+                        weakness.skill_name,
+                        "Web vulnerability assessment",
+                    ],
                     estimated_duration_minutes=90,
                     url="https://portswigger.net/web-security",
                 )
@@ -247,8 +273,12 @@ class AIMentorEngine:
                     platform="TryHackMe",
                     difficulty=ProficiencyLevel.BEGINNER,
                     mitre_technique_ids=["T1566"],
-                    description=f"Simulate a phishing investigation and learn to analyse email headers and malicious attachments.",
-                    skills_practiced=[weakness.skill_name, "Email analysis", "Phishing detection"],
+                    description="Simulate a phishing investigation and learn to analyse email headers and malicious attachments.",
+                    skills_practiced=[
+                        weakness.skill_name,
+                        "Email analysis",
+                        "Phishing detection",
+                    ],
                     estimated_duration_minutes=60,
                     url="https://tryhackme.com",
                 )
@@ -259,20 +289,32 @@ class AIMentorEngine:
                     platform="HackTheBox / ANY.RUN",
                     difficulty=ProficiencyLevel.ADVANCED,
                     mitre_technique_ids=["T1486"],
-                    description=f"Analyse a ransomware sample in a sandboxed environment and document the full infection chain.",
-                    skills_practiced=[weakness.skill_name, "Malware analysis", "Threat hunting"],
+                    description="Analyse a ransomware sample in a sandboxed environment and document the full infection chain.",
+                    skills_practiced=[
+                        weakness.skill_name,
+                        "Malware analysis",
+                        "Threat hunting",
+                    ],
                     estimated_duration_minutes=120,
                     url="https://www.hackthebox.com",
                 )
 
-            elif "packet" in skill_lower or "network" in skill_lower or "traffic" in skill_lower:
+            elif (
+                "packet" in skill_lower
+                or "network" in skill_lower
+                or "traffic" in skill_lower
+            ):
                 lab = LabRecommendation(
                     title=f"Network Forensics: {weakness.skill_name} Lab",
                     platform="Blue Team Labs Online",
                     difficulty=ProficiencyLevel.INTERMEDIATE,
                     mitre_technique_ids=["T1046"],
-                    description=f"Analyse packet capture files to identify scanning, exploitation, and C2 traffic.",
-                    skills_practiced=[weakness.skill_name, "Wireshark analysis", "Traffic analysis"],
+                    description="Analyse packet capture files to identify scanning, exploitation, and C2 traffic.",
+                    skills_practiced=[
+                        weakness.skill_name,
+                        "Wireshark analysis",
+                        "Traffic analysis",
+                    ],
                     estimated_duration_minutes=75,
                     url="https://blueteamlabs.online",
                 )
@@ -283,20 +325,32 @@ class AIMentorEngine:
                     platform="DetectionLab / Caldera",
                     difficulty=ProficiencyLevel.ADVANCED,
                     mitre_technique_ids=["T1059"],
-                    description=f"Simulate PowerShell abuse scenarios and practise detecting malicious script execution.",
-                    skills_practiced=[weakness.skill_name, "PowerShell analysis", "EDR detection"],
+                    description="Simulate PowerShell abuse scenarios and practise detecting malicious script execution.",
+                    skills_practiced=[
+                        weakness.skill_name,
+                        "PowerShell analysis",
+                        "EDR detection",
+                    ],
                     estimated_duration_minutes=90,
                     url="https://detectionlab.network",
                 )
 
-            elif "forensic" in skill_lower or "acquisition" in skill_lower or "memory" in skill_lower:
+            elif (
+                "forensic" in skill_lower
+                or "acquisition" in skill_lower
+                or "memory" in skill_lower
+            ):
                 lab = LabRecommendation(
                     title=f"Digital Forensics: {weakness.skill_name} Lab",
                     platform="DFIR Madness / MemLabs",
                     difficulty=ProficiencyLevel.ADVANCED,
                     mitre_technique_ids=["T1055"],
-                    description=f"Acquire and analyse forensic images including memory dumps and disk images.",
-                    skills_practiced=[weakness.skill_name, "Memory analysis", "Disk forensics"],
+                    description="Acquire and analyse forensic images including memory dumps and disk images.",
+                    skills_practiced=[
+                        weakness.skill_name,
+                        "Memory analysis",
+                        "Disk forensics",
+                    ],
                     estimated_duration_minutes=120,
                     url="https://dfirmadness.com",
                 )
@@ -360,7 +414,15 @@ _MENTOR_SCHEMA: dict[str, Any] = {
                     "description": {"type": "string"},
                     "resource_type": {
                         "type": "string",
-                        "enum": ["course", "lab", "ctf", "book", "article", "video", "exercise"],
+                        "enum": [
+                            "course",
+                            "lab",
+                            "ctf",
+                            "book",
+                            "article",
+                            "video",
+                            "exercise",
+                        ],
                     },
                     "resource_hint": {"type": "string"},
                     "time_estimate_hours": {"type": "number"},

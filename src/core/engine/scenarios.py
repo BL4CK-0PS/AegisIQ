@@ -72,7 +72,10 @@ TEMPLATE_POOL: dict[str, dict[str, Any]] = {
             "Web server process spawning cmd.exe / powershell.exe",
             "Base64-encoded commands in web access logs",
         ],
-        "affected_systems": ["Public-facing web server (DMZ)", "Internal Active Directory"],
+        "affected_systems": [
+            "Public-facing web server (DMZ)",
+            "Internal Active Directory",
+        ],
         "tasks": [
             "Describe your immediate triage steps upon receiving the alert",
             "Explain how you would contain the compromised web server without losing forensic evidence",
@@ -384,11 +387,13 @@ def _build_hunting_steps(
         )
 
     if difficulty in (ProficiencyLevel.ADVANCED, ProficiencyLevel.EXPERT):
-        steps.extend([
-            "Create a behavioural baseline for affected systems and identify deviations",
-            "Perform timeline reconstruction of the attack chain using multiple log sources",
-            "Develop YARA or Sigma rules for retrospective detection across the environment",
-        ])
+        steps.extend(
+            [
+                "Create a behavioural baseline for affected systems and identify deviations",
+                "Perform timeline reconstruction of the attack chain using multiple log sources",
+                "Develop YARA or Sigma rules for retrospective detection across the environment",
+            ]
+        )
 
     return steps
 

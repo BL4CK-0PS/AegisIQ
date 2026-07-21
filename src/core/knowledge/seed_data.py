@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any
 
 from src.core.knowledge.taxonomy import (
     Capability,
@@ -26,41 +25,59 @@ def _id() -> str:
 # ---------------------------------------------------------------------------
 
 T_INITIAL_ACCESS = MitreTactic(
-    id="TA0001", name="Initial Access", description="The adversary is trying to get into your network."
+    id="TA0001",
+    name="Initial Access",
+    description="The adversary is trying to get into your network.",
 )
 T_EXECUTION = MitreTactic(
-    id="TA0002", name="Execution", description="The adversary is trying to run malicious code."
+    id="TA0002",
+    name="Execution",
+    description="The adversary is trying to run malicious code.",
 )
 T_PERSISTENCE = MitreTactic(
-    id="TA0003", name="Persistence", description="The adversary is trying to maintain their foothold."
+    id="TA0003",
+    name="Persistence",
+    description="The adversary is trying to maintain their foothold.",
 )
 T_PRIV_ESC = MitreTactic(
-    id="TA0004", name="Privilege Escalation",
+    id="TA0004",
+    name="Privilege Escalation",
     description="The adversary is trying to gain higher-level permissions.",
 )
 T_DEFENSE_EVASION = MitreTactic(
-    id="TA0005", name="Defense Evasion",
+    id="TA0005",
+    name="Defense Evasion",
     description="The adversary is trying to avoid being detected.",
 )
 T_CREDENTIAL_ACCESS = MitreTactic(
-    id="TA0006", name="Credential Access",
+    id="TA0006",
+    name="Credential Access",
     description="The adversary is trying to steal account names and passwords.",
 )
 T_DISCOVERY = MitreTactic(
-    id="TA0007", name="Discovery", description="The adversary is trying to figure out your environment."
+    id="TA0007",
+    name="Discovery",
+    description="The adversary is trying to figure out your environment.",
 )
 T_LATERAL_MOVEMENT = MitreTactic(
-    id="TA0008", name="Lateral Movement",
+    id="TA0008",
+    name="Lateral Movement",
     description="The adversary is trying to move through your environment.",
 )
 T_COLLECTION = MitreTactic(
-    id="TA0009", name="Collection", description="The adversary is trying to gather data of interest."
+    id="TA0009",
+    name="Collection",
+    description="The adversary is trying to gather data of interest.",
 )
 T_EXFILTRATION = MitreTactic(
-    id="TA0010", name="Exfiltration", description="The adversary is trying to steal data."
+    id="TA0010",
+    name="Exfiltration",
+    description="The adversary is trying to steal data.",
 )
 T_IMPACT = MitreTactic(
-    id="TA0040", name="Impact", description="The adversary is trying to manipulate, interrupt, or destroy systems."
+    id="TA0040",
+    name="Impact",
+    description="The adversary is trying to manipulate, interrupt, or destroy systems.",
 )
 
 # ---------------------------------------------------------------------------
@@ -108,10 +125,18 @@ T1059_COMMAND_SCRIPT = MitreTechnique(
     description="Adversaries may abuse command interpreters to execute commands.",
     tactic=T_EXECUTION,
     sub_techniques=[
-        MitreTechnique(id="T1059.001", name="PowerShell", tactic=T_EXECUTION,
-                       description="Adversaries may abuse PowerShell for execution."),
-        MitreTechnique(id="T1059.004", name="Unix Shell", tactic=T_EXECUTION,
-                       description="Adversaries may abuse Unix shells for execution."),
+        MitreTechnique(
+            id="T1059.001",
+            name="PowerShell",
+            tactic=T_EXECUTION,
+            description="Adversaries may abuse PowerShell for execution.",
+        ),
+        MitreTechnique(
+            id="T1059.004",
+            name="Unix Shell",
+            tactic=T_EXECUTION,
+            description="Adversaries may abuse Unix shells for execution.",
+        ),
     ],
 )
 
@@ -156,10 +181,18 @@ T1562_IMPAIR_DEFENSES = MitreTechnique(
     description="Adversaries may disable or impair security tools.",
     tactic=T_DEFENSE_EVASION,
     sub_techniques=[
-        MitreTechnique(id="T1562.001", name="Disable or Modify Tools", tactic=T_DEFENSE_EVASION,
-                       description="Adversaries may disable security tools."),
-        MitreTechnique(id="T1562.004", name="Disable or Modify System Firewall", tactic=T_DEFENSE_EVASION,
-                       description="Adversaries may disable the system firewall."),
+        MitreTechnique(
+            id="T1562.001",
+            name="Disable or Modify Tools",
+            tactic=T_DEFENSE_EVASION,
+            description="Adversaries may disable security tools.",
+        ),
+        MitreTechnique(
+            id="T1562.004",
+            name="Disable or Modify System Firewall",
+            tactic=T_DEFENSE_EVASION,
+            description="Adversaries may disable the system firewall.",
+        ),
     ],
 )
 
@@ -197,10 +230,18 @@ T1021_REMOTE_SERVICES = MitreTechnique(
     description="Adversaries may use remote services to move laterally.",
     tactic=T_LATERAL_MOVEMENT,
     sub_techniques=[
-        MitreTechnique(id="T1021.001", name="Remote Desktop Protocol", tactic=T_LATERAL_MOVEMENT,
-                       description="Adversaries may use RDP to move laterally."),
-        MitreTechnique(id="T1021.004", name="SSH", tactic=T_LATERAL_MOVEMENT,
-                       description="Adversaries may use SSH to move laterally."),
+        MitreTechnique(
+            id="T1021.001",
+            name="Remote Desktop Protocol",
+            tactic=T_LATERAL_MOVEMENT,
+            description="Adversaries may use RDP to move laterally.",
+        ),
+        MitreTechnique(
+            id="T1021.004",
+            name="SSH",
+            tactic=T_LATERAL_MOVEMENT,
+            description="Adversaries may use SSH to move laterally.",
+        ),
     ],
 )
 
@@ -237,112 +278,128 @@ T1486_RANSOMWARE = MitreTechnique(
 # ---------------------------------------------------------------------------
 
 SKILL_WEB_VULN_SCAN = Skill(
-    id=_id(), name="Web Vulnerability Scanning",
+    id=_id(),
+    name="Web Vulnerability Scanning",
     description="Operate automated scanners and interpret results for web application vulnerabilities.",
     proficiency_level=ProficiencyLevel.INTERMEDIATE,
     alternative_labels=["web scanning", "vulnerability assessment"],
 )
 
 SKILL_SQL_INJECTION = Skill(
-    id=_id(), name="SQL Injection Analysis",
+    id=_id(),
+    name="SQL Injection Analysis",
     description="Identify, test, and exploit SQL injection vulnerabilities in web applications.",
     proficiency_level=ProficiencyLevel.INTERMEDIATE,
     alternative_labels=["sqli", "sql injection testing"],
 )
 
 SKILL_XSS_ANALYSIS = Skill(
-    id=_id(), name="Cross-Site Scripting Analysis",
+    id=_id(),
+    name="Cross-Site Scripting Analysis",
     description="Detect and analyse reflected, stored, and DOM-based XSS vulnerabilities.",
     proficiency_level=ProficiencyLevel.INTERMEDIATE,
     alternative_labels=["xss", "cross-site scripting"],
 )
 
 SKILL_AUTH_BYPASS = Skill(
-    id=_id(), name="Authentication Bypass Testing",
+    id=_id(),
+    name="Authentication Bypass Testing",
     description="Identify weaknesses in authentication mechanisms including session flaws and broken access controls.",
     proficiency_level=ProficiencyLevel.ADVANCED,
     alternative_labels=["auth bypass", "access control testing"],
 )
 
 SKILL_API_SECURITY = Skill(
-    id=_id(), name="API Security Testing",
+    id=_id(),
+    name="API Security Testing",
     description="Assess REST and GraphQL API endpoints for injection, broken auth, and rate-limiting issues.",
     proficiency_level=ProficiencyLevel.ADVANCED,
     alternative_labels=["api hacking", "api assessment"],
 )
 
 SKILL_PACKET_ANALYSIS = Skill(
-    id=_id(), name="Packet Analysis",
+    id=_id(),
+    name="Packet Analysis",
     description="Capture and analyse network traffic using tools like Wireshark and tcpdump.",
     proficiency_level=ProficiencyLevel.INTERMEDIATE,
     alternative_labels=["traffic analysis", "pcap analysis", "wireshark"],
 )
 
 SKILL_NETWORK_MONITORING = Skill(
-    id=_id(), name="Network Monitoring",
+    id=_id(),
+    name="Network Monitoring",
     description="Deploy and maintain network monitoring solutions to detect anomalous traffic patterns.",
     proficiency_level=ProficiencyLevel.INTERMEDIATE,
     alternative_labels=["netmon", "network detection"],
 )
 
 SKILL_FIREWALL_MGMT = Skill(
-    id=_id(), name="Firewall Management",
+    id=_id(),
+    name="Firewall Management",
     description="Configure and maintain network firewall rules to enforce security policies.",
     proficiency_level=ProficiencyLevel.INTERMEDIATE,
     alternative_labels=["firewall config", "acl management"],
 )
 
 SKILL_IDS_IPS = Skill(
-    id=_id(), name="Intrusion Detection and Prevention",
+    id=_id(),
+    name="Intrusion Detection and Prevention",
     description="Deploy, tune, and analyse alerts from IDS/IPS systems such as Snort or Suricata.",
     proficiency_level=ProficiencyLevel.ADVANCED,
     alternative_labels=["ids/ips", "snort", "suricata"],
 )
 
 SKILL_NETWORK_SEGMENTATION = Skill(
-    id=_id(), name="Network Segmentation",
+    id=_id(),
+    name="Network Segmentation",
     description="Design and implement network segmentation to isolate critical assets and limit lateral movement.",
     proficiency_level=ProficiencyLevel.ADVANCED,
     alternative_labels=["vlan design", "micro-segmentation"],
 )
 
 SKILL_IAM = Skill(
-    id=_id(), name="Identity and Access Management",
+    id=_id(),
+    name="Identity and Access Management",
     description="Manage user identities, roles, and access policies across cloud and on-prem environments.",
     proficiency_level=ProficiencyLevel.ADVANCED,
     alternative_labels=["iam", "access management"],
 )
 
 SKILL_CSPM = Skill(
-    id=_id(), name="Cloud Security Posture Management",
+    id=_id(),
+    name="Cloud Security Posture Management",
     description="Assess and remediate cloud security misconfigurations using CSPM tools.",
     proficiency_level=ProficiencyLevel.INTERMEDIATE,
     alternative_labels=["cspm", "cloud posture"],
 )
 
 SKILL_CLOUD_LOG_ANALYSIS = Skill(
-    id=_id(), name="Cloud Log Analysis",
+    id=_id(),
+    name="Cloud Log Analysis",
     description="Analyse CloudTrail, CloudWatch, and other cloud-native logs for security incidents.",
     proficiency_level=ProficiencyLevel.INTERMEDIATE,
     alternative_labels=["cloud logging", "cloud trail analysis"],
 )
 
 SKILL_INCIDENT_TRIAGE = Skill(
-    id=_id(), name="Incident Triage",
+    id=_id(),
+    name="Incident Triage",
     description="Prioritise and categorise security alerts based on severity, impact, and confidence.",
     proficiency_level=ProficiencyLevel.INTERMEDIATE,
     alternative_labels=["alert triage", "incident prioritisation"],
 )
 
 SKILL_FORENSIC_ACQUISITION = Skill(
-    id=_id(), name="Forensic Acquisition",
+    id=_id(),
+    name="Forensic Acquisition",
     description="Acquire disk, memory, and log artifacts forensically while maintaining chain of custody.",
     proficiency_level=ProficiencyLevel.ADVANCED,
     alternative_labels=["forensics", "disk acquisition", "memory capture"],
 )
 
 SKILL_THREAT_HUNTING = Skill(
-    id=_id(), name="Threat Hunting",
+    id=_id(),
+    name="Threat Hunting",
     description="Proactively search for advanced threats using hypothesis-driven methodologies.",
     proficiency_level=ProficiencyLevel.ADVANCED,
     alternative_labels=["hunt", "proactive detection"],
@@ -353,61 +410,89 @@ SKILL_THREAT_HUNTING = Skill(
 # ---------------------------------------------------------------------------
 
 KA_WEB_ATTACK_SURFACE = KnowledgeArea(
-    id=_id(), name="Web Attack Surface",
+    id=_id(),
+    name="Web Attack Surface",
     description="Understanding of common web application attack vectors including injection, XSS, and SSRF.",
     learning_objectives=[
         LearningObjective(
             description="Identify and classify OWASP Top 10 vulnerabilities in a web application.",
-            assessment_criteria=["Correctly identifies vulnerability class", "Describes exploitation impact"],
+            assessment_criteria=[
+                "Correctly identifies vulnerability class",
+                "Describes exploitation impact",
+            ],
         ),
         LearningObjective(
             description="Explain how input validation failures lead to injection attacks.",
-            assessment_criteria=["Describes injection mechanics", "Provides remediation examples"],
+            assessment_criteria=[
+                "Describes injection mechanics",
+                "Provides remediation examples",
+            ],
         ),
     ],
 )
 
 KA_NETWORK_PROTOCOLS = KnowledgeArea(
-    id=_id(), name="Network Protocols",
+    id=_id(),
+    name="Network Protocols",
     description="Deep knowledge of TCP/IP, DNS, HTTP, and other network protocols.",
     learning_objectives=[
         LearningObjective(
             description="Analyse packet captures to identify anomalous protocol behaviour.",
-            assessment_criteria=["Identifies abnormal traffic patterns", "Correlates with attack techniques"],
+            assessment_criteria=[
+                "Identifies abnormal traffic patterns",
+                "Correlates with attack techniques",
+            ],
         ),
         LearningObjective(
             description="Explain how DNS exfiltration techniques operate at the protocol level.",
-            assessment_criteria=["Describes DNS tunnelling", "Identifies indicators of exfiltration"],
+            assessment_criteria=[
+                "Describes DNS tunnelling",
+                "Identifies indicators of exfiltration",
+            ],
         ),
     ],
 )
 
 KA_CLOUD_ARCHITECTURE = KnowledgeArea(
-    id=_id(), name="Cloud Security Architecture",
+    id=_id(),
+    name="Cloud Security Architecture",
     description="Understanding of shared responsibility model, cloud network security, and IAM best practices.",
     learning_objectives=[
         LearningObjective(
             description="Design a secure multi-account AWS or Azure landing zone.",
-            assessment_criteria=["Applies least privilege", "Implements network segmentation"],
+            assessment_criteria=[
+                "Applies least privilege",
+                "Implements network segmentation",
+            ],
         ),
         LearningObjective(
             description="Identify and remediate common cloud misconfigurations.",
-            assessment_criteria=["Lists CIS benchmark failures", "Provides remediation steps"],
+            assessment_criteria=[
+                "Lists CIS benchmark failures",
+                "Provides remediation steps",
+            ],
         ),
     ],
 )
 
 KA_INCIDENT_RESPONSE_PROCESS = KnowledgeArea(
-    id=_id(), name="Incident Response Process",
+    id=_id(),
+    name="Incident Response Process",
     description="Knowledge of the NIST incident response lifecycle: preparation, detection, analysis, containment, eradication, recovery.",
     learning_objectives=[
         LearningObjective(
             description="Apply the NIST IR lifecycle to a simulated ransomware incident.",
-            assessment_criteria=["Follows lifecycle phases", "Documents decisions at each phase"],
+            assessment_criteria=[
+                "Follows lifecycle phases",
+                "Documents decisions at each phase",
+            ],
         ),
         LearningObjective(
             description="Prioritise containment actions based on impact and dwell time.",
-            assessment_criteria=["Selects appropriate containment strategy", "Justifies prioritisation"],
+            assessment_criteria=[
+                "Selects appropriate containment strategy",
+                "Justifies prioritisation",
+            ],
         ),
     ],
 )
@@ -417,35 +502,40 @@ KA_INCIDENT_RESPONSE_PROCESS = KnowledgeArea(
 # ---------------------------------------------------------------------------
 
 TECH_BURPSUITE = Technology(
-    id=_id(), name="Burp Suite",
+    id=_id(),
+    name="Burp Suite",
     category="tool",
     description="Web application security testing platform for intercepting and modifying HTTP traffic.",
     skill_ids=[SKILL_WEB_VULN_SCAN.id, SKILL_SQL_INJECTION.id, SKILL_XSS_ANALYSIS.id],
 )
 
 TECH_WIRESHARK = Technology(
-    id=_id(), name="Wireshark",
+    id=_id(),
+    name="Wireshark",
     category="tool",
     description="Network protocol analyser for packet capture and traffic inspection.",
     skill_ids=[SKILL_PACKET_ANALYSIS.id],
 )
 
 TECH_SNORT = Technology(
-    id=_id(), name="Snort",
+    id=_id(),
+    name="Snort",
     category="tool",
     description="Open-source network intrusion detection and prevention system.",
     skill_ids=[SKILL_IDS_IPS.id, SKILL_NETWORK_MONITORING.id],
 )
 
 TECH_AWS_CLOUDTRAIL = Technology(
-    id=_id(), name="AWS CloudTrail",
+    id=_id(),
+    name="AWS CloudTrail",
     category="service",
     description="AWS API activity logging service for governance and security auditing.",
     skill_ids=[SKILL_CLOUD_LOG_ANALYSIS.id, SKILL_CSPM.id],
 )
 
 TECH_AZURE_SENTINEL = Technology(
-    id=_id(), name="Microsoft Sentinel",
+    id=_id(),
+    name="Microsoft Sentinel",
     category="service",
     description="Cloud-native SIEM and SOAR platform for security analytics.",
     skill_ids=[SKILL_CLOUD_LOG_ANALYSIS.id, SKILL_INCIDENT_TRIAGE.id],
@@ -456,9 +546,16 @@ TECH_AZURE_SENTINEL = Technology(
 # ---------------------------------------------------------------------------
 
 CAP_WEB_APP_SEC = Capability(
-    id=_id(), name="Web Application Security Testing",
+    id=_id(),
+    name="Web Application Security Testing",
     description="Assess web applications for vulnerabilities using manual and automated techniques.",
-    skills=[SKILL_WEB_VULN_SCAN, SKILL_SQL_INJECTION, SKILL_XSS_ANALYSIS, SKILL_AUTH_BYPASS, SKILL_API_SECURITY],
+    skills=[
+        SKILL_WEB_VULN_SCAN,
+        SKILL_SQL_INJECTION,
+        SKILL_XSS_ANALYSIS,
+        SKILL_AUTH_BYPASS,
+        SKILL_API_SECURITY,
+    ],
     mitre_mappings=[
         MitreMapping(
             technique=T1190_EXPLOIT_PUBLIC,
@@ -478,9 +575,16 @@ CAP_WEB_APP_SEC = Capability(
 )
 
 CAP_NETWORK_SEC = Capability(
-    id=_id(), name="Network Security Monitoring and Defense",
+    id=_id(),
+    name="Network Security Monitoring and Defense",
     description="Monitor, detect, and respond to network-level threats using analysis tools and defensive controls.",
-    skills=[SKILL_PACKET_ANALYSIS, SKILL_NETWORK_MONITORING, SKILL_FIREWALL_MGMT, SKILL_IDS_IPS, SKILL_NETWORK_SEGMENTATION],
+    skills=[
+        SKILL_PACKET_ANALYSIS,
+        SKILL_NETWORK_MONITORING,
+        SKILL_FIREWALL_MGMT,
+        SKILL_IDS_IPS,
+        SKILL_NETWORK_SEGMENTATION,
+    ],
     mitre_mappings=[
         MitreMapping(
             technique=T1046_NETWORK_SERVICE_SCAN,
@@ -491,7 +595,10 @@ CAP_NETWORK_SEC = Capability(
         MitreMapping(
             technique=T1021_REMOTE_SERVICES,
             skill_ids=[SKILL_NETWORK_MONITORING.id, SKILL_FIREWALL_MGMT.id],
-            detection_methods=["RDP/SSH log monitoring", "Anomalous lateral movement detection"],
+            detection_methods=[
+                "RDP/SSH log monitoring",
+                "Anomalous lateral movement detection",
+            ],
             mitigation_references=["Network segmentation", "Just-In-Time access"],
         ),
     ],
@@ -500,7 +607,8 @@ CAP_NETWORK_SEC = Capability(
 )
 
 CAP_CLOUD_SEC = Capability(
-    id=_id(), name="Cloud Security",
+    id=_id(),
+    name="Cloud Security",
     description="Secure cloud infrastructure across AWS, Azure, and GCP using IAM, monitoring, and posture management.",
     skills=[SKILL_IAM, SKILL_CSPM, SKILL_CLOUD_LOG_ANALYSIS],
     mitre_mappings=[
@@ -516,7 +624,8 @@ CAP_CLOUD_SEC = Capability(
 )
 
 CAP_INCIDENT_RESPONSE = Capability(
-    id=_id(), name="Incident Response and Forensics",
+    id=_id(),
+    name="Incident Response and Forensics",
     description="Detect, triage, contain, investigate, and remediate security incidents.",
     skills=[SKILL_INCIDENT_TRIAGE, SKILL_FORENSIC_ACQUISITION, SKILL_THREAT_HUNTING],
     mitre_mappings=[
@@ -600,9 +709,7 @@ SEED_MITRE_TECHNIQUES: dict[str, MitreTechnique] = {
 }
 
 SEED_TECHNOLOGIES: dict[str, Technology] = {
-    t.name: t
-    for domain in ALL_DOMAINS
-    for t in domain.technologies
+    t.name: t for domain in ALL_DOMAINS for t in domain.technologies
 }
 
 

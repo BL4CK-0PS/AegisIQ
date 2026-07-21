@@ -4,7 +4,7 @@ import logging
 import uuid
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -201,7 +201,11 @@ class AdaptiveSessionManager:
             remediation = current.needs_remediation
 
         new_avg = round(total_score / count, 2) if count else 0.0
-        new_passed = current.questions_passed + (1 if passed else 0) if current else (1 if passed else 0)
+        new_passed = (
+            current.questions_passed + (1 if passed else 0)
+            if current
+            else (1 if passed else 0)
+        )
 
         skill_statuses[skill] = SkillMasteryStatus(
             skill_name=skill,
@@ -230,7 +234,9 @@ class AdaptiveSessionManager:
             )
 
         recent = self._recent_records(records)
-        avg_recent: float = sum(r.score for r in recent) / len(recent) if recent else 0.0
+        avg_recent: float = (
+            sum(r.score for r in recent) / len(recent) if recent else 0.0
+        )
 
         inject_follow_up: bool = False
         follow_up_skill: str = ""
@@ -324,14 +330,10 @@ class AdaptiveSessionManager:
                 difficulties.append(r.difficulty)
 
         mastered = [
-            s.skill_name
-            for s in session.skill_statuses.values()
-            if s.is_mastered
+            s.skill_name for s in session.skill_statuses.values() if s.is_mastered
         ]
         remediation = [
-            s.skill_name
-            for s in session.skill_statuses.values()
-            if s.needs_remediation
+            s.skill_name for s in session.skill_statuses.values() if s.needs_remediation
         ]
 
         return {

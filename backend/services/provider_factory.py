@@ -37,32 +37,33 @@ class GeminiProvider(BaseAIProvider):
     def _get_client(self):
         if self._genai is None:
             import google.generativeai as genai
+
             genai.configure(api_key=self._api_key)
             self._genai = genai.GenerativeModel(self._model)
         return self._genai
 
     async def generate(self, prompt: str, schema: Optional[dict] = None) -> str:
         import asyncio
-        import httpx as _httpx
 
         last_exception = None
         for attempt in range(1, self._max_retries + 1):
             try:
                 model = self._get_client()
-                response = await asyncio.to_thread(
-                    model.generate_content, prompt
-                )
+                response = await asyncio.to_thread(model.generate_content, prompt)
                 return response.text
             except Exception as exc:
                 last_exception = exc
                 logger.warning(
                     "Gemini attempt %d/%d failed: %s",
-                    attempt, self._max_retries, exc,
+                    attempt,
+                    self._max_retries,
+                    exc,
                 )
                 if attempt < self._max_retries:
                     await asyncio.sleep(self._retry_delay * attempt)
 
         from src.core.ai.provider import AIProviderError
+
         raise AIProviderError(
             f"Gemini provider failed after {self._max_retries} attempts"
         ) from last_exception
@@ -73,12 +74,15 @@ class MockProvider(BaseAIProvider):
 
     async def generate(self, prompt: str, schema: Optional[dict] = None) -> str:
         import json
+
         logger.info("Using MockProvider fallback")
-        return json.dumps({
-            "status": "mock",
-            "message": "Running in demo mode. No LLM provider available.",
-            "prompt_length": len(prompt),
-        })
+        return json.dumps(
+            {
+                "status": "mock",
+                "message": "Running in demo mode. No LLM provider available.",
+                "prompt_length": len(prompt),
+            }
+        )
 
 
 def create_provider(
@@ -89,7 +93,7 @@ def create_provider(
 ) -> BaseAIProvider:
     """
     Factory function to create the appropriate AI provider based on configuration.
-    
+
     Priority chain:
     1. Explicit provider_name parameter
     2. LLM_PROVIDER environment variable
@@ -150,7 +154,7 @@ def create_ai_client(
 ) -> tuple[AIClient, PromptLoader]:
     """
     Create a fully configured AIClient and PromptLoader.
-    
+
     Returns:
         Tuple of (AIClient, PromptLoader) ready for use.
     """

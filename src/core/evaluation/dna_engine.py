@@ -12,7 +12,6 @@ from src.core.knowledge.seed_data import SEED_MITRE_TECHNIQUES, SEED_SKILLS
 from src.core.knowledge.taxonomy import (
     Capability,
     KnowledgeArea,
-    LearningObjective,
     MitreMapping,
     MitreTechnique,
     ProficiencyLevel,
@@ -69,7 +68,9 @@ class CyberTwinModel(BaseModel):
     overall_score: float = 0.0
     overall_confidence: float = 0.0
     weakness_areas: list[WeaknessEntry] = Field(default_factory=list)
-    last_updated: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    last_updated: str = Field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 class CapabilityEngineError(Exception):
@@ -116,7 +117,9 @@ class CapabilityEngine:
 
         eval_count: int = len(evaluations)
         overall_average: float = round(score_sum / eval_count, 2) if eval_count else 0.0
-        overall_conf: float = round(confidence_sum / eval_count, 2) if eval_count else 0.0
+        overall_conf: float = (
+            round(confidence_sum / eval_count, 2) if eval_count else 0.0
+        )
 
         skill_summaries: list[SkillSummary] = []
         for s_name in sorted(all_skills):
@@ -163,7 +166,9 @@ class CapabilityEngine:
         for s_name in profile.demonstrated_skills:
             matched_skill: Optional[Skill] = SEED_SKILLS.get(s_name)
             if matched_skill is None:
-                matched_skill = Skill(name=s_name, description="Identified during evaluation")
+                matched_skill = Skill(
+                    name=s_name, description="Identified during evaluation"
+                )
 
             for cap in SEED_SKILLS.values():
                 if cap.id == matched_skill.id and cap.knowledge_areas:
@@ -175,14 +180,15 @@ class CapabilityEngine:
             mitre_ids.add(mitre_id)
             technique: Optional[MitreTechnique] = SEED_MITRE_TECHNIQUES.get(mitre_id)
             if technique is not None:
-                tactic_name: str = technique.tactic.name if technique.tactic else "General"
                 mitre_mapping: MitreMapping = MitreMapping(
                     technique=technique,
                     detection_methods=[],
                     mitigation_references=[],
                 )
                 if not any(
-                    m.technique.id == technique.id for c in capabilities for m in c.mitre_mappings
+                    m.technique.id == technique.id
+                    for c in capabilities
+                    for m in c.mitre_mappings
                 ):
                     capabilities.append(
                         Capability(
@@ -195,7 +201,9 @@ class CapabilityEngine:
                         )
                     )
 
-        difficulty: ProficiencyLevel = CapabilityEngine._score_to_level(profile.overall_average_score)
+        difficulty: ProficiencyLevel = CapabilityEngine._score_to_level(
+            profile.overall_average_score
+        )
 
         return SkillDnaProfile(
             title=title,
@@ -215,10 +223,10 @@ class CapabilityEngine:
     ) -> CyberTwinModel:
         verified_skills: list[VerifiedSkillEntry] = []
         for summary in profile.skill_summaries:
-            level: ProficiencyLevel = CapabilityEngine._score_to_level(summary.average_score)
-            relevant_mitre: list[str] = [
-                t for t in profile.detected_mitre_techniques
-            ]
+            level: ProficiencyLevel = CapabilityEngine._score_to_level(
+                summary.average_score
+            )
+            relevant_mitre: list[str] = [t for t in profile.detected_mitre_techniques]
             verified_skills.append(
                 VerifiedSkillEntry(
                     skill_name=summary.skill_name,
@@ -241,7 +249,12 @@ class CapabilityEngine:
 
         experience_graph: dict[str, Any] = {
             "nodes": [
-                {"id": s.skill_name, "type": "skill", "score": s.average_score, "confidence": s.confidence}
+                {
+                    "id": s.skill_name,
+                    "type": "skill",
+                    "score": s.average_score,
+                    "confidence": s.confidence,
+                }
                 for s in profile.skill_summaries
             ],
             "edges": CapabilityEngine._build_experience_edges(profile),
@@ -323,11 +336,13 @@ class CapabilityEngine:
         mitre_list: list[str] = profile.detected_mitre_techniques
 
         for i in range(len(mitre_list) - 1):
-            edges.append({
-                "source": mitre_list[i],
-                "target": mitre_list[i + 1],
-                "relationship": "co_occurring_technique",
-            })
+            edges.append(
+                {
+                    "source": mitre_list[i],
+                    "target": mitre_list[i + 1],
+                    "relationship": "co_occurring_technique",
+                }
+            )
 
         for s_name in profile.demonstrated_skills:
             for mitre_id in mitre_list:
@@ -337,11 +352,13 @@ class CapabilityEngine:
                 ):
                     continue
                 if len(edges) < len(profile.demonstrated_skills) * 2:
-                    edges.append({
-                        "source": s_name,
-                        "target": mitre_id,
-                        "relationship": "skill_addresses_technique",
-                    })
+                    edges.append(
+                        {
+                            "source": s_name,
+                            "target": mitre_id,
+                            "relationship": "skill_addresses_technique",
+                        }
+                    )
 
         return edges
 

@@ -24,8 +24,9 @@ class BaseAIProvider(abc.ABC):
     """Abstract interface that all LLM providers must implement."""
 
     @abc.abstractmethod
-    async def generate(self, prompt: str, schema: Optional[dict[str, Any]] = None) -> str:
-        ...
+    async def generate(
+        self, prompt: str, schema: Optional[dict[str, Any]] = None
+    ) -> str: ...
 
 
 class OllamaProvider(BaseAIProvider):
@@ -45,7 +46,9 @@ class OllamaProvider(BaseAIProvider):
         self._max_retries = max_retries
         self._retry_delay = retry_delay
 
-    async def generate(self, prompt: str, schema: Optional[dict[str, Any]] = None) -> str:
+    async def generate(
+        self, prompt: str, schema: Optional[dict[str, Any]] = None
+    ) -> str:
         last_exception: Optional[Exception] = None
 
         payload: dict[str, object] = {
@@ -67,7 +70,7 @@ class OllamaProvider(BaseAIProvider):
                     data: dict[str, Any] = response.json()
                     return str(data.get("response", ""))
 
-            except httpx.TimeoutException as exc:
+            except httpx.TimeoutException:
                 last_exception = AIProviderTimeoutError(
                     f"Ollama request timed out after {self._timeout}s "
                     f"(attempt {attempt}/{self._max_retries})"
@@ -115,7 +118,9 @@ class MistralProvider(BaseAIProvider):
         self._max_retries = max_retries
         self._retry_delay = retry_delay
 
-    async def generate(self, prompt: str, schema: Optional[dict[str, Any]] = None) -> str:
+    async def generate(
+        self, prompt: str, schema: Optional[dict[str, Any]] = None
+    ) -> str:
         last_exception: Optional[Exception] = None
 
         messages: list[dict[str, str]] = [
@@ -144,7 +149,7 @@ class MistralProvider(BaseAIProvider):
                     data: dict[str, Any] = response.json()
                     return str(data["choices"][0]["message"]["content"])
 
-            except httpx.TimeoutException as exc:
+            except httpx.TimeoutException:
                 last_exception = AIProviderTimeoutError(
                     f"Mistral request timed out after {self._timeout}s "
                     f"(attempt {attempt}/{self._max_retries})"

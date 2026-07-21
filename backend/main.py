@@ -70,6 +70,7 @@ app.include_router(voice_router, prefix="/voice")
 
 # --- Health & Status Endpoints ---
 
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint for Docker and load balancers."""

@@ -31,11 +31,24 @@ def _get_ai():
 
 # --- Request/Response Schemas ---
 
+
 class QuestionRequest(BaseModel):
-    topic: str = Field(..., example="web_security", description="The cybersecurity topic for the question.")
-    difficulty: str = Field(..., example="intermediate", description="Difficulty level: beginner, intermediate, advanced.")
-    domain: str = Field(default="Web Application Security", description="Cybersecurity domain.")
-    question_count: int = Field(default=3, ge=1, le=10, description="Number of questions to generate.")
+    topic: str = Field(
+        ...,
+        example="web_security",
+        description="The cybersecurity topic for the question.",
+    )
+    difficulty: str = Field(
+        ...,
+        example="intermediate",
+        description="Difficulty level: beginner, intermediate, advanced.",
+    )
+    domain: str = Field(
+        default="Web Application Security", description="Cybersecurity domain."
+    )
+    question_count: int = Field(
+        default=3, ge=1, le=10, description="Number of questions to generate."
+    )
 
 
 class EvaluationRequest(BaseModel):
@@ -64,11 +77,12 @@ class EvaluationResponse(BaseModel):
 
 # --- Routes ---
 
+
 @router.post("/generate", status_code=status.HTTP_200_OK)
 async def generate(payload: QuestionRequest) -> Dict[str, Any]:
     """
     Generate cybersecurity assessment questions using the AI pipeline.
-    
+
     Uses the new provider layer with retry, timeout, and fallback support.
     """
     client, loader = _get_ai()
@@ -95,8 +109,9 @@ async def generate(payload: QuestionRequest) -> Dict[str, Any]:
 
     try:
         response = await client.generate(prompt=prompt)
-        
+
         import json
+
         try:
             # Try to parse as JSON
             cleaned = response.strip().replace("```json", "").replace("```", "")
@@ -124,7 +139,7 @@ async def generate(payload: QuestionRequest) -> Dict[str, Any]:
 async def evaluate(payload: EvaluationRequest) -> Dict[str, Any]:
     """
     Evaluate a professional's response using the AI evaluation engine.
-    
+
     Uses the new provider layer with full observability.
     """
     client, loader = _get_ai()
@@ -152,6 +167,7 @@ async def evaluate(payload: EvaluationRequest) -> Dict[str, Any]:
         response = await client.generate(prompt=prompt)
 
         import json
+
         try:
             cleaned = response.strip().replace("```json", "").replace("```", "")
             data = json.loads(cleaned)
@@ -184,11 +200,12 @@ async def evaluate(payload: EvaluationRequest) -> Dict[str, Any]:
 async def list_providers():
     """List available AI providers and their status."""
     import os
+
     providers = {
         "gemini": bool(os.getenv("GEMINI_API_KEY")),
         "mistral": bool(os.getenv("MISTRAL_API_KEY")),
         "ollama": True,  # Always available if running locally
-        "mock": True,    # Always available as fallback
+        "mock": True,  # Always available as fallback
     }
     return {
         "available": providers,

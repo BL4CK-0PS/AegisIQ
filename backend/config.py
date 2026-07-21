@@ -4,7 +4,6 @@ AegisIQ Backend Configuration
 Centralized configuration loaded from environment variables.
 """
 
-import os
 from functools import lru_cache
 from typing import Optional
 
@@ -43,7 +42,11 @@ class Settings(BaseSettings):
     llm_max_retries: int = 3
 
     # CORS
-    cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000", "http://localhost"]
+    cors_origins: list[str] = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://localhost",
+    ]
 
     # Monitoring
     log_level: str = "INFO"
