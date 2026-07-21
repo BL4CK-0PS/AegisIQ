@@ -22,9 +22,7 @@ class PromptLoader:
     def __init__(self, prompts_dir: str | os.PathLike[str]) -> None:
         self._prompts_dir = Path(prompts_dir).resolve()
         if not self._prompts_dir.is_dir():
-            raise PromptLoadError(
-                f"Prompts directory not found: {self._prompts_dir}"
-            )
+            raise PromptLoadError(f"Prompts directory not found: {self._prompts_dir}")
 
     def load(self, template_name: str) -> dict[str, Any]:
         """Locate and parse a YAML template by name (accepts .yml, .yaml, or bare name)."""

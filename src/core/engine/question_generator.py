@@ -87,7 +87,9 @@ class QuestionGenerator:
             schema=_SKILL_ASSESSMENT_SCHEMA,
         )
 
-        questions: list[SkillAssessmentQuestion] = self._parse_question_set(raw_response)
+        questions: list[SkillAssessmentQuestion] = self._parse_question_set(
+            raw_response
+        )
         total_time = sum(q.time_estimate_minutes for q in questions)
 
         return GeneratedQuestionSet(

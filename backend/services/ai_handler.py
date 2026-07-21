@@ -5,6 +5,7 @@ from ai.ai_service import generate_question, evaluate_answer
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def get_question(data):
     try:
         topic = data.get("topic", "general")
@@ -17,8 +18,9 @@ def get_question(data):
             "question": "Fallback: Explain the difference between an Array and a Linked List.",
             "difficulty": "medium",
             "topic": "arrays",
-            "error": "Safe fallback triggered."
+            "error": "Safe fallback triggered.",
         }
+
 
 def check_answer(data):
     try:
@@ -30,5 +32,5 @@ def check_answer(data):
         return {
             "score": 0,
             "feedback": "System temporary slowdown. Your answer was recorded successfully.",
-            "error": "Safe fallback triggered."
+            "error": "Safe fallback triggered.",
         }

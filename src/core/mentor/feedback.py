@@ -61,13 +61,17 @@ class FeedbackEngine:
     ) -> AnswerRepairGuide:
         technique_name: str = ""
         if mitre_technique_id:
-            technique: Optional[MitreTechnique] = SEED_MITRE_TECHNIQUES.get(mitre_technique_id)
+            technique: Optional[MitreTechnique] = SEED_MITRE_TECHNIQUES.get(
+                mitre_technique_id
+            )
             if technique is not None:
                 technique_name = f"{technique.name} ({technique.id})"
 
-        missing_concepts_text: str = "; ".join(
-            evaluation_result.missing_concepts
-        ) if evaluation_result.missing_concepts else "None explicitly identified"
+        missing_concepts_text: str = (
+            "; ".join(evaluation_result.missing_concepts)
+            if evaluation_result.missing_concepts
+            else "None explicitly identified"
+        )
 
         variables: dict[str, Any] = {
             "question_text": question_text,
@@ -96,7 +100,9 @@ class FeedbackEngine:
         try:
             rendered: str = self._prompt_loader.render("answer_repair", variables)
         except PromptLoadError as exc:
-            raise FeedbackError(f"Failed to load answer repair template: {exc}") from exc
+            raise FeedbackError(
+                f"Failed to load answer repair template: {exc}"
+            ) from exc
         try:
             raw: str = await self._ai_client.generate(
                 prompt=rendered,
@@ -124,7 +130,9 @@ class FeedbackEngine:
         try:
             data: Any = json.loads(cleaned)
             if not isinstance(data, dict):
-                raise FeedbackError(f"Expected a JSON object, got {type(data).__name__}")
+                raise FeedbackError(
+                    f"Expected a JSON object, got {type(data).__name__}"
+                )
             return data
         except json.JSONDecodeError as exc:
             raise FeedbackError(f"Failed to parse repair JSON: {exc}") from exc
@@ -167,7 +175,8 @@ class FeedbackEngine:
                     principles.append(PrincipleEntry(principle=p, explanation=""))
 
         model_answer: str = parsed.get(
-            "model_answer", parsed.get("perfect_answer", parsed.get("ideal_response", ""))
+            "model_answer",
+            parsed.get("perfect_answer", parsed.get("ideal_response", "")),
         )
         practice: str = parsed.get("practice_exercise", parsed.get("exercise", ""))
 

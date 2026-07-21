@@ -6,8 +6,8 @@ from typing import Any, Optional, Union
 from pydantic import BaseModel, Field
 
 from src.core.evaluation.dna_engine import CyberTwinModel
-from src.core.knowledge.seed_data import ALL_DOMAINS, SEED_SKILLS
-from src.core.knowledge.taxonomy import ProficiencyLevel, Skill, SkillDnaProfile
+from src.core.knowledge.seed_data import ALL_DOMAINS
+from src.core.knowledge.taxonomy import ProficiencyLevel, SkillDnaProfile
 
 logger = logging.getLogger(__name__)
 
@@ -325,8 +325,8 @@ class CareerCompassEngine:
         domain_profs: dict[str, ProficiencyLevel] = (
             CareerCompassEngine._compute_domain_proficiencies(domain_scores)
         )
-        skill_map: dict[str, SkillGapDetail] = (
-            CareerCompassEngine._build_skill_gap_map(profile, target)
+        skill_map: dict[str, SkillGapDetail] = CareerCompassEngine._build_skill_gap_map(
+            profile, target
         )
 
         domain_results: list[DomainGapResult] = []
@@ -342,7 +342,8 @@ class CareerCompassEngine:
             status: str = CareerCompassEngine._domain_status(current_lev, required_lev)
 
             domain_gaps: list[SkillGapDetail] = [
-                v for k, v in skill_map.items()
+                v
+                for k, v in skill_map.items()
                 if k in _domain_skill_names(req.domain_name)
             ]
 
@@ -366,7 +367,9 @@ class CareerCompassEngine:
                 if g.gap_severity == "critical":
                     all_critical.append(g)
 
-        overall_pct: float = round(weighted_score / total_weight * 100, 1) if total_weight else 0.0
+        overall_pct: float = (
+            round(weighted_score / total_weight * 100, 1) if total_weight else 0.0
+        )
         steps: list[str] = CareerCompassEngine._build_progression_steps(
             all_critical, target
         )
@@ -387,14 +390,16 @@ class CareerCompassEngine:
         results: list[dict[str, Any]] = []
         for title in ROLE_REGISTRY:
             analysis = CareerCompassEngine.analyze_against_role(profile, title)
-            results.append({
-                "role": title,
-                "match_percentage": analysis.overall_match_percentage,
-                "critical_gap_count": len(analysis.critical_gaps),
-                "domains_met": sum(
-                    1 for d in analysis.domain_results if d.status == "met"
-                ),
-            })
+            results.append(
+                {
+                    "role": title,
+                    "match_percentage": analysis.overall_match_percentage,
+                    "critical_gap_count": len(analysis.critical_gaps),
+                    "domains_met": sum(
+                        1 for d in analysis.domain_results if d.status == "met"
+                    ),
+                }
+            )
         results.sort(key=lambda x: x["match_percentage"], reverse=True)
         return results[:top_n]
 
@@ -406,23 +411,23 @@ class CareerCompassEngine:
     def _extract_domain_scores(
         profile: Union[SkillDnaProfile, CyberTwinModel],
     ) -> dict[str, float]:
-        scores: dict[str, list[float]] = {
-            d.name: [] for d in ALL_DOMAINS
-        }
+        scores: dict[str, list[float]] = {d.name: [] for d in ALL_DOMAINS}
 
         if isinstance(profile, SkillDnaProfile):
             for cap in profile.capabilities:
                 matched_domains = [
-                    d for d in ALL_DOMAINS
+                    d
+                    for d in ALL_DOMAINS
                     if any(c.name == cap.name for c in d.capabilities)
                 ]
                 for d in matched_domains:
-                    skills_count: int = len(cap.skills) if cap.skills else 1
                     base_score: float = _proficiency_to_score(cap.proficiency_level)
                     scores[d.name].append(base_score)
 
                     for skill in cap.skills:
-                        skill_score: float = _proficiency_to_score(skill.proficiency_level)
+                        skill_score: float = _proficiency_to_score(
+                            skill.proficiency_level
+                        )
                         scores[d.name].append(skill_score)
 
         elif isinstance(profile, CyberTwinModel):
@@ -473,7 +478,9 @@ class CareerCompassEngine:
                 for skill in cap.skills:
                     current = candidate_skills.get(skill.name)
                     new_lvl = skill.proficiency_level
-                    if current is None or _proficiency_to_score(new_lvl) > _proficiency_to_score(current):
+                    if current is None or _proficiency_to_score(
+                        new_lvl
+                    ) > _proficiency_to_score(current):
                         candidate_skills[skill.name] = new_lvl
 
         elif isinstance(profile, CyberTwinModel):
@@ -481,9 +488,7 @@ class CareerCompassEngine:
                 candidate_skills[entry.skill_name] = entry.verified_level
 
         req_domain_names: set[str] = {r.domain_name for r in target.domain_requirements}
-        relevant_domains = [
-            d for d in ALL_DOMAINS if d.name in req_domain_names
-        ]
+        relevant_domains = [d for d in ALL_DOMAINS if d.name in req_domain_names]
         relevant_skills: set[str] = set()
         for d in relevant_domains:
             for cap in d.capabilities:
@@ -491,9 +496,7 @@ class CareerCompassEngine:
                     relevant_skills.add(s.name)
 
         for skill_name in sorted(relevant_skills):
-            current_prof = candidate_skills.get(
-                skill_name, ProficiencyLevel.BEGINNER
-            )
+            current_prof = candidate_skills.get(skill_name, ProficiencyLevel.BEGINNER)
             required_prof = _infer_required_proficiency(skill_name, target)
             severity, rec = _assess_gap(current_prof, required_prof, skill_name)
             skill_map[skill_name] = SkillGapDetail(

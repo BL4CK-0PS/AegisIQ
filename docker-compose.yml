@@ -7,7 +7,7 @@ services:
       dockerfile: ../infrastructure/docker/Dockerfile.frontend
     container_name: aegisiq_frontend
     ports:
-      - "${FRONTEND_PORT:-80}:80"
+      - "${FRONTEND_PORT:-3000}:80"
     depends_on:
       backend:
         condition: service_healthy
@@ -17,8 +17,8 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: ../infrastructure/docker/Dockerfile.backend
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
     container_name: aegisiq_backend
     ports:
       - "${BACKEND_PORT:-8000}:8000"

@@ -102,9 +102,7 @@ class AnswerEvaluator:
                 schema=_EVALUATION_SCHEMA,
             )
         except AIClientError as exc:
-            raise AnswerEvaluatorError(
-                f"AI evaluation failed: {exc}"
-            ) from exc
+            raise AnswerEvaluatorError(f"AI evaluation failed: {exc}") from exc
 
         return raw
 
@@ -161,7 +159,10 @@ class AnswerEvaluator:
         for rc in rubric.criteria:
             match: Optional[dict[str, Any]] = None
             for raw_c in raw_criteria:
-                if isinstance(raw_c, dict) and raw_c.get("criterion_name", "").lower() == rc.name.lower():
+                if (
+                    isinstance(raw_c, dict)
+                    and raw_c.get("criterion_name", "").lower() == rc.name.lower()
+                ):
                     match = raw_c
                     break
             if match is not None:
@@ -170,7 +171,11 @@ class AnswerEvaluator:
             else:
                 score = 0
                 just = "No explicit evaluation provided for this criterion."
-            passed: bool = (score / rc.max_score) >= rc.passing_threshold if rc.max_score > 0 else False
+            passed: bool = (
+                (score / rc.max_score) >= rc.passing_threshold
+                if rc.max_score > 0
+                else False
+            )
             criteria_scores.append(
                 CriterionScore(
                     criterion_name=rc.name,
@@ -181,17 +186,27 @@ class AnswerEvaluator:
                 )
             )
 
-        overall_score: float = max(0.0, min(100.0, float(parsed.get("overall_score", 0.0))))
+        overall_score: float = max(
+            0.0, min(100.0, float(parsed.get("overall_score", 0.0)))
+        )
         confidence: float = max(0.0, min(1.0, float(parsed.get("confidence", 0.0))))
 
         level_str: str = parsed.get("proficiency_level", difficulty)
         try:
             proficiency_level: ProficiencyLevel = ProficiencyLevel(level_str.lower())
         except ValueError:
-            proficiency_level = ProficiencyLevel(difficulty) if difficulty in ("beginner", "intermediate", "advanced", "expert") else ProficiencyLevel.BEGINNER
+            proficiency_level = (
+                ProficiencyLevel(difficulty)
+                if difficulty in ("beginner", "intermediate", "advanced", "expert")
+                else ProficiencyLevel.BEGINNER
+            )
 
         passing_percentage: float = rubric.passing_percentage
-        passed: bool = (overall_score / rubric.total_score_possible) >= passing_percentage if rubric.total_score_possible > 0 else False
+        passed: bool = (
+            (overall_score / rubric.total_score_possible) >= passing_percentage
+            if rubric.total_score_possible > 0
+            else False
+        )
 
         missing: list[str] = []
         raw_missing: Any = parsed.get("missing_concepts")

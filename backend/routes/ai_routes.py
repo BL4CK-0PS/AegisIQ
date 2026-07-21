@@ -195,6 +195,7 @@ async def session_complete(payload: StartSessionRequest) -> dict[str, Any]:
 @router.get("/providers")
 async def list_providers() -> dict[str, Any]:
     import os
+
     providers = {
         "gemini": bool(os.getenv("GEMINI_API_KEY")),
         "mistral": bool(os.getenv("MISTRAL_API_KEY")),
