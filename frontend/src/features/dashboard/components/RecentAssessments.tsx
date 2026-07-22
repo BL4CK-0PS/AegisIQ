@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ClipboardCheck } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { assessmentService } from "@/services/assessment.service";
 
@@ -18,7 +19,14 @@ export function RecentAssessments() {
   return (
     <Card variant="elevated">
       <CardHeader>
-        <CardTitle>Recent Assessments</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>Recent Assessments</CardTitle>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/assessment")}>
+              View All
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       {isLoading ? (
         <div className="px-6 pb-4 text-sm text-surface-500">Loading assessments...</div>

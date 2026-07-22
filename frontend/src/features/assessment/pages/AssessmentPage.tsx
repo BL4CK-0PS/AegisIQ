@@ -108,7 +108,7 @@ export default function AssessmentPage() {
   const assessmentId = assessment.id ?? id;
 
   const isCompleted = status === "completed";
-  const isActive = status === "active";
+  const isActive = status === "active" || status === "in_progress";
 
   const handleSubmitAnswer = () => {
     if (!answer.trim()) return;

@@ -3,27 +3,10 @@ export type {
   Assessment,
   AssessmentStatus,
   Challenge,
-  ChallengeType,
   Response,
-  ResponseType,
   Evaluation,
 } from "./assessment";
-export type {
-  SkillDNAProfile,
-  Capability,
-  KnowledgeArea,
-  Responsibility,
-} from "./skill-dna";
-export type {
-  Report,
-  CapabilityScore,
-  Evidence,
-  Recommendation,
-} from "./report";
-export type {
-  CareerCompass,
-  WeakSkill,
-  LearningRecommendation,
-  Lab,
-  RoadmapItem,
-} from "./career-compass";
+export type { SkillDNAProfile } from "./skill-dna";
+export type { Report } from "./report";
+export type { CareerCompass } from "./career-compass";
+export type { RoleDefinition } from "./role-definition";

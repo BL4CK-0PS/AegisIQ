@@ -68,7 +68,9 @@ async def _fetch_evaluations(
                 EvaluationResult(
                     question_text="",
                     domain=row.proficiency_level,
-                    skill=(row.demonstrated_skills[0] if row.demonstrated_skills else ""),
+                    skill=(
+                        row.demonstrated_skills[0] if row.demonstrated_skills else ""
+                    ),
                     overall_score=row.overall_score,
                     confidence=row.confidence,
                     proficiency_level=ProficiencyLevel(row.proficiency_level),

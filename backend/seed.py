@@ -228,7 +228,7 @@ async def main() -> None:
     await init_db()
 
     logger.info("Seeding admin user...")
-    admin = await seed_admin_user()
+    await seed_admin_user()
 
     logger.info("Seeding demo user...")
     demo = await seed_demo_user()

@@ -53,7 +53,9 @@ settings = get_settings()
 )
 async def parse_jd_endpoint(
     payload: ParseJDRequest,
-    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+    current_user: UserModel = Depends(
+        require_role("admin", "capability_analyst", "professional")
+    ),
 ) -> dict[str, Any]:
     try:
         profile = await parse_jd(jd_text=payload.jd_text, title=payload.title)
@@ -82,7 +84,9 @@ async def parse_jd_endpoint(
 )
 async def generate_assessment(
     payload: GenerateAssessmentRequest,
-    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+    current_user: UserModel = Depends(
+        require_role("admin", "capability_analyst", "professional")
+    ),
 ) -> dict[str, Any]:
     try:
         qset = await generate_skill_assessment(
@@ -111,7 +115,9 @@ async def generate_assessment(
 @router.post("/incident-scenario", response_model=IncidentScenarioResponse)
 async def incident_scenario(
     payload: IncidentScenarioRequest,
-    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+    current_user: UserModel = Depends(
+        require_role("admin", "capability_analyst", "professional")
+    ),
 ) -> dict[str, Any]:
     try:
         scenario = build_incident_scenario(payload.technique_id, payload.difficulty)
@@ -125,7 +131,9 @@ async def incident_scenario(
 )
 async def evaluate(
     payload: EvaluateResponseRequest,
-    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+    current_user: UserModel = Depends(
+        require_role("admin", "capability_analyst", "professional")
+    ),
 ) -> dict[str, Any]:
     try:
         result: EvaluationResult = await evaluate_response(
@@ -157,7 +165,9 @@ async def evaluate(
 @router.post("/repair-guide", response_model=RepairGuideResponse)
 async def repair_guide(
     payload: RepairGuideRequest,
-    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+    current_user: UserModel = Depends(
+        require_role("admin", "capability_analyst", "professional")
+    ),
 ) -> dict[str, Any]:
     try:
         dummy_eval = EvaluationResult(
@@ -192,7 +202,9 @@ async def repair_guide(
 @router.post("/session/start", response_model=SessionResponse)
 async def session_start(
     payload: StartSessionRequest,
-    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+    current_user: UserModel = Depends(
+        require_role("admin", "capability_analyst", "professional")
+    ),
 ) -> dict[str, Any]:
     session = start_session(
         domain=payload.domain, difficulty=payload.initial_difficulty
@@ -203,7 +215,9 @@ async def session_start(
 @router.post("/session/record", response_model=SessionResponse)
 async def session_record(
     payload: RecordAnswerRequest,
-    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+    current_user: UserModel = Depends(
+        require_role("admin", "capability_analyst", "professional")
+    ),
 ) -> dict[str, Any]:
     mgr = _get_session_manager()
     session = mgr.get_session(payload.session_id)
@@ -230,7 +244,9 @@ async def session_record(
 @router.post("/session/complete", response_model=SessionResponse)
 async def session_complete(
     payload: CompleteSessionRequest,
-    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+    current_user: UserModel = Depends(
+        require_role("admin", "capability_analyst", "professional")
+    ),
 ) -> dict[str, Any]:
     mgr = _get_session_manager()
     session = mgr.get_session(payload.session_id)

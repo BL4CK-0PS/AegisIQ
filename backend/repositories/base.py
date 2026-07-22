@@ -6,7 +6,7 @@ Generic async CRUD operations over SQLAlchemy ORM models.
 
 from typing import Any, Generic, Sequence, TypeVar
 
-from sqlalchemy import select, func, delete as sa_delete
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.database import Base

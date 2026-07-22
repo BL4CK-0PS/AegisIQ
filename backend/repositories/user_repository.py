@@ -24,7 +24,9 @@ class UserRepository(BaseRepository[UserModel]):
     async def email_exists(self, email: str) -> bool:
         return await self.get_by_email(email) is not None
 
-    async def get_by_role(self, role: str, limit: int = 20, offset: int = 0) -> list[UserModel]:
+    async def get_by_role(
+        self, role: str, limit: int = 20, offset: int = 0
+    ) -> list[UserModel]:
         result = await self.session.execute(
             select(UserModel)
             .where(UserModel.role == role)

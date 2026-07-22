@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardCheck, Target, Zap, Loader2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { assessmentService } from "@/services/assessment.service";
 
@@ -11,6 +12,22 @@ const missionTypes = [
   { type: "dfir", label: "DFIR", icon: Zap, color: "text-cyber-400", bg: "bg-cyber-900/30" },
   { type: "threat_hunting", label: "Threat Hunting", icon: ClipboardCheck, color: "text-warning-400", bg: "bg-warning-900/30" },
 ];
+
+function statusBadge(status: string) {
+  switch (status) {
+    case "completed":
+      return <Badge variant="success" size="sm">Completed</Badge>;
+    case "in_progress":
+    case "active":
+      return <Badge variant="primary" size="sm">In Progress</Badge>;
+    case "paused":
+      return <Badge variant="warning" size="sm">Paused</Badge>;
+    case "abandoned":
+      return <Badge variant="danger" size="sm">Abandoned</Badge>;
+    default:
+      return <Badge variant="secondary" size="sm">Pending</Badge>;
+  }
+}
 
 export default function AssessmentDashboardPage() {
   const navigate = useNavigate();
@@ -100,7 +117,11 @@ export default function AssessmentDashboardPage() {
               {assessments.map((a) => (
                 <button
                   key={a.id}
-                  onClick={() => navigate(`/report/${a.id}`)}
+                  onClick={() =>
+                    a.status === "completed"
+                      ? navigate(`/report/${a.id}`)
+                      : navigate(`/assessment/${a.id}`)
+                  }
                   className="flex w-full items-center justify-between rounded-lg border border-surface-700/50 p-4 text-left transition-colors hover:bg-surface-800/50"
                 >
                   <div>
@@ -111,17 +132,7 @@ export default function AssessmentDashboardPage() {
                       {a.started_at ? new Date(a.started_at).toLocaleDateString() : "Unknown date"}
                     </p>
                   </div>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                      a.status === "completed"
-                        ? "bg-success-900/30 text-success-400"
-                        : a.status === "active"
-                          ? "bg-primary-900/30 text-primary-400"
-                          : "bg-surface-700/30 text-surface-400"
-                    }`}
-                  >
-                    {a.status}
-                  </span>
+                  {statusBadge(a.status)}
                 </button>
               ))}
             </div>

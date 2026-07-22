@@ -6,9 +6,9 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   setUser: (user: User | null) => void;
+  setLoading: (loading: boolean) => void;
   login: (user: User, accessToken: string, refreshToken: string) => void;
   logout: () => void;
-  setLoading: (loading: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -17,6 +17,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoading: false,
 
   setUser: (user) => set({ user }),
+  setLoading: (isLoading) => set({ isLoading }),
 
   login: (user, accessToken, refreshToken) => {
     localStorage.setItem("access_token", accessToken);
@@ -29,6 +30,4 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.removeItem("refresh_token");
     set({ user: null, isAuthenticated: false });
   },
-
-  setLoading: (isLoading) => set({ isLoading }),
 }));
