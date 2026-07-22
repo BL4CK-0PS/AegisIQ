@@ -12,7 +12,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.config import get_settings
-from backend.middleware import MonitoringMiddleware
+from backend.middleware import MonitoringMiddleware, RateLimitMiddleware, get_metrics
 from backend.routes.ai_routes import router as ai_router
 from backend.routes.evaluation_routes import router as evaluation_router
 from backend.routes.voice_routes import router as voice_router
@@ -60,8 +60,10 @@ app.add_middleware(
 )
 
 # --- Monitoring ---
-_monitoring = MonitoringMiddleware(app)
 app.add_middleware(MonitoringMiddleware)
+
+# --- Rate Limiting ---
+app.add_middleware(RateLimitMiddleware)
 
 # --- API v1 Routes ---
 API_V1_PREFIX = "/api/v1"
@@ -72,7 +74,9 @@ app.include_router(voice_router, prefix=f"{API_V1_PREFIX}/voice", tags=["Voice"]
 app.include_router(auth_router, prefix=f"{API_V1_PREFIX}/auth", tags=["Authentication"])
 app.include_router(user_router, prefix=f"{API_V1_PREFIX}/users", tags=["Users"])
 app.include_router(jd_router, prefix=f"{API_V1_PREFIX}/jd", tags=["Job Description"])
-app.include_router(assessment_router, prefix=f"{API_V1_PREFIX}/assessments", tags=["Assessments"])
+app.include_router(
+    assessment_router, prefix=f"{API_V1_PREFIX}/assessments", tags=["Assessments"]
+)
 
 
 # --- Health & Status ---
@@ -102,5 +106,5 @@ async def metrics():
     return {
         "service": settings.app_name,
         "version": settings.app_version,
-        **_monitoring.metrics,
+        **get_metrics(),
     }

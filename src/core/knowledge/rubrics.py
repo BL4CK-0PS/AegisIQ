@@ -306,10 +306,105 @@ RUBRIC_ADVANCED: ScoringRubric = ScoringRubric(
 )
 
 
+RUBRIC_EXPERT: ScoringRubric = ScoringRubric(
+    name="Expert Rubric",
+    difficulty="expert",
+    description="Principal / staff-level cybersecurity capability assessment rubric. "
+    "Evaluates advanced threat hunting, strategic risk assessment, "
+    "architecture resilience, and incident command under ambiguity.",
+    criteria=[
+        RubricCriterion(
+            name="advanced_threat_hunting",
+            description="Proactively discovers novel, advanced persistent threats using "
+            "hypothesis-driven methodologies and cross-domain correlation.",
+            weight=0.25,
+            max_score=5,
+            passing_threshold=0.8,
+        ),
+        RubricCriterion(
+            name="strategic_risk_assessment",
+            description="Evaluates business-aligned risk posture, quantifies impact, "
+            "and translates technical findings into executive-level risk language.",
+            weight=0.20,
+            max_score=5,
+            passing_threshold=0.8,
+        ),
+        RubricCriterion(
+            name="architecture_resilience",
+            description="Designs, reviews, and hardens complex security architectures "
+            "with zero-trust, defence-in-depth, and chaos-engineering principles.",
+            weight=0.20,
+            max_score=5,
+            passing_threshold=0.8,
+        ),
+        RubricCriterion(
+            name="incident_command",
+            description="Leads large-scale incident response under ambiguity, coordinates "
+            "cross-functional teams, and makes time-critical containment decisions.",
+            weight=0.20,
+            max_score=5,
+            passing_threshold=0.8,
+        ),
+        RubricCriterion(
+            name="mentorship_and_influence",
+            description="Elevates organisational security maturity through mentoring, "
+            "knowledge transfer, and driving security culture change.",
+            weight=0.15,
+            max_score=5,
+            passing_threshold=0.8,
+        ),
+    ],
+    levels=[
+        RubricLevel(
+            label="Below Expert",
+            min_score=0,
+            max_score=40,
+            description="Operates at senior level but has not demonstrated staff-level breadth or strategic influence.",
+            criteria_fulfilled=[],
+        ),
+        RubricLevel(
+            label="Developing Expert",
+            min_score=41,
+            max_score=65,
+            description="Shows expert depth in specific domains but lacks cross-domain leadership and strategic vision.",
+            criteria_fulfilled=["advanced_threat_hunting", "architecture_resilience"],
+        ),
+        RubricLevel(
+            label="Competent Expert",
+            min_score=66,
+            max_score=85,
+            description="Leads incident response, drives architecture decisions, and mentors teams effectively.",
+            criteria_fulfilled=[
+                "advanced_threat_hunting",
+                "strategic_risk_assessment",
+                "architecture_resilience",
+                "incident_command",
+            ],
+        ),
+        RubricLevel(
+            label="Principal / Distinguished",
+            min_score=86,
+            max_score=100,
+            description="Operates at CISO or principal engineer level. Shapes organisational security strategy and industry direction.",
+            criteria_fulfilled=[
+                "advanced_threat_hunting",
+                "strategic_risk_assessment",
+                "architecture_resilience",
+                "incident_command",
+                "mentorship_and_influence",
+            ],
+        ),
+    ],
+    total_score_possible=100,
+    passing_percentage=0.65,
+)
+
+
 RUBRIC_REGISTRY: dict[DifficultyLevel, ScoringRubric] = {
     "beginner": RUBRIC_BEGINNER,
     "intermediate": RUBRIC_INTERMEDIATE,
     "advanced": RUBRIC_ADVANCED,
+    "expert": RUBRIC_EXPERT,
 }
 
 

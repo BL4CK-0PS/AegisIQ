@@ -30,6 +30,7 @@ class ParseJDRequest(BaseModel):
 
 class ParseJDResponse(BaseModel):
     status: str
+    profile_id: str = ""
     title: str
     difficulty: str
     capabilities: list[dict[str, Any]]
@@ -38,6 +39,7 @@ class ParseJDResponse(BaseModel):
     assessment_objectives: list[str]
     estimated_duration_minutes: int
     recommended_rubric: str
+    mitre_technique_ids: list[str] = Field(default_factory=list)
 
 
 # --- Assessment ---
@@ -217,9 +219,44 @@ class RecordAnswerRequest(BaseModel):
     is_follow_up: bool = False
 
 
+class CompleteSessionRequest(BaseModel):
+    session_id: str
+
+
 class SessionResponse(BaseModel):
     status: str
     session: dict[str, Any]
+
+
+# --- Assessment (DB-backed) ---
+
+
+class CreateAssessmentRequest(BaseModel):
+    domain: str = Field(default="Web Application Security")
+    skill: str = Field(default="Web Vulnerability Scanning")
+    difficulty: str = Field(default="beginner")
+    question_count: int = Field(default=5, ge=1, le=10)
+
+
+class RecordAssessmentAnswerRequest(BaseModel):
+    assessment_id: str
+    question_id: str
+    question_text: str
+    domain: str
+    skill: str
+    difficulty: str
+    candidate_answer: str = Field(default="")
+
+
+class CompleteAssessmentRequest(BaseModel):
+    assessment_id: str
+
+
+class PaginatedAssessmentsResponse(BaseModel):
+    assessments: list[dict[str, Any]]
+    total: int
+    limit: int
+    offset: int
 
 
 # --- Providers ---

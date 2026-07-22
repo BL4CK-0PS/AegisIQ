@@ -9,6 +9,7 @@ on:
 env:
   PYTHON_VERSION: "3.12"
   NODE_VERSION: "20"
+  PNPM_VERSION: "11.15.1"
 
 jobs:
   # ============================================
@@ -27,7 +28,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Python linting tools
-        run: pip install ruff mypy
+        run: pip install ruff
 
       - name: Run Ruff linter
         run: ruff check backend/ src/
@@ -96,13 +97,7 @@ jobs:
           JWT_SECRET: test-secret-key
           DEMO_MODE: "true"
           PYTHONPATH: .
-        run: pytest backend/tests/ --cov=backend --cov-report=xml -v
-
-      - name: Upload coverage report
-        uses: codecov/codecov-action@v4
-        if: always()
-        with:
-          files: backend/coverage.xml
+        run: pytest backend/tests/ -v
 
   # ============================================
   # Frontend Tests
@@ -150,7 +145,7 @@ jobs:
 
       - name: Create .env file
         run: |
-          cat > .env << EOF
+          cat > .env << 'EOF'
           POSTGRES_DB=aegisiq_test
           POSTGRES_USER=aegisiq_test
           POSTGRES_PASSWORD=test_password
@@ -229,13 +224,17 @@ jobs:
             type=ref,event=branch
             type=sha,prefix=
 
+      - name: Set image name
+        id: image
+        run: echo "name=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
       - name: Build and push backend image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./infrastructure/docker/Dockerfile.backend
           push: true
-          tags: ghcr.io/${{ github.repository }}/backend:${{ steps.meta.outputs.version }}
+          tags: ${{ steps.image.outputs.name }}/backend:${{ steps.meta.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -245,6 +244,6 @@ jobs:
           context: ./frontend
           file: ./infrastructure/docker/Dockerfile.frontend
           push: true
-          tags: ghcr.io/${{ github.repository }}/frontend:${{ steps.meta.outputs.version }}
+          tags: ${{ steps.image.outputs.name }}/frontend:${{ steps.meta.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

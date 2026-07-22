@@ -9,7 +9,7 @@ set -euo pipefail
 
 ENVIRONMENT="${1:-development}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+PROJECT_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
 BACKUP_DIR="$PROJECT_ROOT/infrastructure/backups"
 LOG_FILE="$PROJECT_ROOT/deploy.log"
 

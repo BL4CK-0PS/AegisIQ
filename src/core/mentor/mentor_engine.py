@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 from src.core.ai.client import AIClient, AIClientError
 from src.core.ai.prompt_loader import PromptLoader, PromptLoadError
-from src.core.evaluation.dna_engine import ConsolidatedProfile
+from src.core.evaluation.dna_engine import ConsolidatedProfile, CapabilityEngine
 from src.core.knowledge.seed_data import SEED_MITRE_TECHNIQUES
 from src.core.knowledge.taxonomy import MitreTechnique, ProficiencyLevel
 
@@ -387,18 +387,6 @@ class AIMentorEngine:
                 )
 
         return labs
-
-
-class CapabilityEngine:
-    @staticmethod
-    def _score_to_level(score: float) -> ProficiencyLevel:
-        if score >= 80:
-            return ProficiencyLevel.EXPERT
-        if score >= 65:
-            return ProficiencyLevel.ADVANCED
-        if score >= 45:
-            return ProficiencyLevel.INTERMEDIATE
-        return ProficiencyLevel.BEGINNER
 
 
 _MENTOR_SCHEMA: dict[str, Any] = {
