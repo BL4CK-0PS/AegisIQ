@@ -1,9 +1,41 @@
 import { useNavigate } from "react-router-dom";
 import { Shield, ArrowRight, Target, Brain, BarChart3, Fingerprint } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useState } from "react";
+import { Mic, MicOff, RefreshCw } from "lucide-react";
+import { useVoiceRecognition } from "../hooks/useVoiceRecognition";
+import { sendVoiceTranscript } from "../services/aiService";
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  // Sprint 2 Voice States & Hooks
+  const {
+    isListening,
+    transcript,
+    error,
+    startListening,
+    stopListening,
+    resetTranscript,
+  } = useVoiceRecognition();
+
+  const [aiResponse, setAiResponse] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [manualInput, setManualInput] = useState('');
+
+  const handleProcessVoiceInput = async () => {
+    const queryText = transcript || manualInput;
+    if (!queryText) return;
+
+    setIsLoading(true);
+    try {
+      const data = await sendVoiceTranscript(queryText, "medium");
+      setAiResponse(data);
+    } catch (err) {
+      console.error("Sprint 2 Roundtrip failed:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const features = [
     {
@@ -60,7 +92,92 @@ export default function LandingPage() {
           </Button>
         </div>
       </section>
+{/* SPRINT 2 VOICE INTEGRATION PLAYGROUND */}
+      <section className="mx-auto max-w-3xl px-8 py-12">
+        <div className="rounded-2xl border border-primary-500/20 bg-surface-900/50 p-8 shadow-2xl backdrop-blur-sm">
+          <div className="mb-6 text-center">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary-400">Sprint 2 Demo</span>
+            <h2 className="text-2xl font-bold mt-1 text-surface-100">Voice Capability Sandbox</h2>
+            <p className="text-sm text-surface-400 mt-1">Test your live Web Speech API audio capturing and AI fallback routes below.</p>
+          </div>
 
+          <div className="space-y-6">
+            <div className="flex flex-col items-center justify-center space-y-3">
+              <button
+                onClick={isListening ? stopListening : startListening}
+                className={`flex h-16 w-16 items-center justify-center rounded-full transition-all duration-300 ${
+                  isListening 
+                    ? "bg-red-500 hover:bg-red-600 animate-pulse shadow-lg shadow-red-500/30" 
+                    : "bg-primary-500 hover:bg-primary-600 shadow-lg shadow-primary-500/20"
+                }`}
+              >
+                {isListening ? <MicOff className="h-7 w-7 text-white" /> : <Mic className="h-7 w-7 text-white" />}
+              </button>
+              <span className="text-xs font-semibold uppercase tracking-wider text-surface-400">
+                {isListening ? "Listening active... Speak now" : "Click to start recording"}
+              </span>
+            </div>
+
+            <div className="rounded-xl border border-surface-800 bg-surface-950 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold tracking-wide uppercase text-primary-400">Real-Time Transcript</span>
+                {(transcript || error) && (
+                  <button onClick={resetTranscript} className="text-xs text-surface-500 hover:text-surface-300 flex items-center gap-1">
+                    <RefreshCw size={12} /> Clear
+                  </button>
+                )}
+              </div>
+              <p className="min-h-[48px] text-sm text-surface-200 italic leading-relaxed">
+                {transcript ? `"${transcript}"` : "Your voice transcript will appear here instantly as you speak..."}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold tracking-wide uppercase text-primary-400 block">
+                Manual Text Input Fallback
+              </label>
+              <input
+                type="text"
+                placeholder="Or type manually in case mic authorization is disabled..."
+                value={manualInput}
+                onChange={(e) => setManualInput(e.target.value)}
+                className="w-full rounded-lg border border-surface-800 bg-surface-950 p-3 text-sm text-surface-100 placeholder-surface-600 outline-none focus:border-primary-500 transition-colors"
+              />
+            </div>
+
+            <Button
+              className="w-full py-3"
+              disabled={isLoading || (!transcript && !manualInput)}
+              onClick={handleProcessVoiceInput}
+            >
+              {isLoading ? "Generating with Fallback AI Pipeline..." : "Process with Multi-Tier AI"}
+            </Button>
+
+            {error && (
+              <p className="text-center text-xs font-semibold text-red-400 bg-red-950/20 py-2 rounded-lg border border-red-500/10">
+                System Error: {error}
+              </p>
+            )}
+
+            {aiResponse && (
+              <div className="rounded-xl border border-green-500/20 bg-green-950/10 p-5 space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-green-400 animate-ping" />
+                  <span className="text-xs font-bold text-green-400 uppercase tracking-wide">
+                    Generation Successful ({aiResponse.source})
+                  </span>
+                </div>
+                <div className="text-sm font-semibold text-surface-100 mt-2">
+                  Generated Cybersecurity Scenario:
+                </div>
+                <pre className="text-xs overflow-auto max-h-48 text-surface-300 bg-surface-950 p-3 rounded-lg border border-surface-800 leading-relaxed font-mono">
+                  {JSON.stringify(aiResponse.data, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
       <section className="mx-auto max-w-6xl px-8 py-20">
         <h2 className="mb-12 text-center text-3xl font-bold text-surface-100">
           How It Works
