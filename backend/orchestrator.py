@@ -208,7 +208,9 @@ def _fallback_jd_parse(jd_text: str, title: str) -> SkillDnaProfile:
         title=title,
         capabilities=profile_domain.capabilities,
         knowledge_areas=knowledge_areas,
-        responsibilities=[line.strip() for line in jd_text.split("\n") if line.strip()][:20],
+        responsibilities=[line.strip() for line in jd_text.split("\n") if line.strip()][
+            :20
+        ],
         assessment_objectives=["Analyse job description for skill requirements"],
         difficulty=difficulty,
         recommended_rubric=difficulty.value,

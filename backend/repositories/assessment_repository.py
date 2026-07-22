@@ -31,6 +31,7 @@ class AssessmentRepository(BaseRepository[AssessmentModel]):
 
     async def get_by_candidate_count(self, candidate_id: str) -> int:
         from sqlalchemy import func
+
         result = await self.session.execute(
             select(func.count())
             .select_from(AssessmentModel)

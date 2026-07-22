@@ -7,8 +7,6 @@ Covers session lifecycle, metrics, pagination, rate limiting, and caching.
 import pytest
 from fastapi.testclient import TestClient
 
-from backend.main import app
-
 
 # ---------------------------------------------------------------------------
 # Helper: register and return tokens
@@ -99,7 +97,10 @@ class TestSessionLifecycle:
 
         start_resp = client.post(
             "/api/v1/ai/session/start",
-            json={"domain": "Web Application Security", "initial_difficulty": "beginner"},
+            json={
+                "domain": "Web Application Security",
+                "initial_difficulty": "beginner",
+            },
             headers=headers,
         )
         session_id = start_resp.json()["session"]["id"]
@@ -184,7 +185,7 @@ class TestMetrics:
 
 class TestPagination:
     def test_users_pagination_has_correct_structure(self, client: TestClient):
-        token = _register_user(client, "pagination_admin@example.com")
+        _register_user(client, "pagination_admin@example.com")
 
         admin_resp = client.post(
             "/api/v1/auth/register",
@@ -265,13 +266,14 @@ class TestRateLimiting:
         for i in range(12):
             resp = client.post(
                 "/api/v1/auth/login",
-                json={"email": f"ratelimit_{i}@example.com", "password": "wrong_password"},
+                json={
+                    "email": f"ratelimit_{i}@example.com",
+                    "password": "wrong_password",
+                },
             )
             responses.append(resp.status_code)
 
-        assert 429 in responses, (
-            f"Expected 429 in responses but got: {responses}"
-        )
+        assert 429 in responses, f"Expected 429 in responses but got: {responses}"
 
     def test_rate_limited_response_has_retry_after(self, client: TestClient):
         """After hitting the limit, response should have Retry-After header."""
@@ -296,10 +298,12 @@ class TestRateLimiting:
 class TestCache:
     def test_cache_module_importable(self):
         from backend.middleware import cache
+
         assert cache.size >= 0
 
     def test_cache_set_and_get(self):
         from backend.middleware import InMemoryCache
+
         c = InMemoryCache(default_ttl=60)
         c.set("key1", {"data": "value"})
         assert c.get("key1") == {"data": "value"}
@@ -307,6 +311,7 @@ class TestCache:
     def test_cache_expires(self):
         from backend.middleware import InMemoryCache
         import time
+
         c = InMemoryCache(default_ttl=0)
         c.set("expire_me", "gone")
         time.sleep(0.01)
@@ -314,6 +319,7 @@ class TestCache:
 
     def test_cache_invalidate(self):
         from backend.middleware import InMemoryCache
+
         c = InMemoryCache(default_ttl=60)
         c.set("to_invalidate", "value")
         c.invalidate("to_invalidate")
@@ -321,6 +327,7 @@ class TestCache:
 
     def test_cache_clear(self):
         from backend.middleware import InMemoryCache
+
         c = InMemoryCache(default_ttl=60)
         c.set("a", 1)
         c.set("b", 2)

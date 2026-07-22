@@ -29,7 +29,9 @@ class EvaluationRepository(BaseRepository[EvaluationResultModel]):
         )
         return result.scalar_one_or_none()
 
-    async def get_by_assessment(self, assessment_id: str) -> list[EvaluationResultModel]:
+    async def get_by_assessment(
+        self, assessment_id: str
+    ) -> list[EvaluationResultModel]:
         result = await self.session.execute(
             select(EvaluationResultModel)
             .join(

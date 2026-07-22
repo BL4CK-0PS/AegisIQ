@@ -4,7 +4,6 @@ AegisIQ Core Flow Tests
 Covers authentication, in-memory session lifecycle, metrics, and rubric registry.
 """
 
-import pytest
 from fastapi.testclient import TestClient
 
 
@@ -39,7 +38,10 @@ class TestAuthentication:
         }
         client.post("/api/v1/auth/register", json=reg)
 
-        login_payload = {"email": "test_auth_login@example.com", "password": "secure_password_123"}
+        login_payload = {
+            "email": "test_auth_login@example.com",
+            "password": "secure_password_123",
+        }
         resp = client.post("/api/v1/auth/login", json=login_payload)
         assert resp.status_code == 200
         data = resp.json()
@@ -98,7 +100,10 @@ class TestSessionLifecycle:
 
         start_resp = client.post(
             "/api/v1/ai/session/start",
-            json={"domain": "Web Application Security", "initial_difficulty": "beginner"},
+            json={
+                "domain": "Web Application Security",
+                "initial_difficulty": "beginner",
+            },
             headers=headers,
         )
         assert start_resp.status_code == 200

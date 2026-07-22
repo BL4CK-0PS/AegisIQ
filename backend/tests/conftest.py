@@ -17,7 +17,9 @@ from backend.middleware import clear_rate_limits
 def client():
     """Create a FastAPI TestClient backed by an in-memory SQLite DB."""
     engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
-    session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    session_factory = async_sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
 
     async def override_get_session():
         async with session_factory() as session:

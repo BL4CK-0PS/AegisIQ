@@ -242,9 +242,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         path = request.url.path
 
         if self._is_rate_limited(client_ip, path):
-            logger.warning(
-                "Rate limit exceeded for %s on %s", client_ip, path
-            )
+            logger.warning("Rate limit exceeded for %s on %s", client_ip, path)
             return JSONResponse(
                 status_code=429,
                 content={
