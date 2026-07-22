@@ -80,27 +80,47 @@ class MockProvider(BaseAIProvider):
 
         if schema and "overall_score" in str(schema):
             score = round(random.uniform(60, 95), 1)
-            criteria_names = ["foundational_knowledge", "tool_familiarity", "guided_analysis", "communication", "situational_awareness"]
+            criteria_names = [
+                "foundational_knowledge",
+                "tool_familiarity",
+                "guided_analysis",
+                "communication",
+                "situational_awareness",
+            ]
             return json.dumps(
                 {
                     "overall_score": score,
                     "confidence": round(random.uniform(0.6, 0.95), 2),
                     "passed": score >= 70,
-                    "proficiency_level": random.choice(["beginner", "intermediate", "advanced"]),
+                    "proficiency_level": random.choice(
+                        ["beginner", "intermediate", "advanced"]
+                    ),
                     "criteria_scores": [
                         {
                             "criterion_name": cn,
                             "score": int(round(random.uniform(2, 5))),
-                            "justification": f"Demo evaluation for {cn}."
+                            "justification": f"Demo evaluation for {cn}.",
                         }
                         for cn in criteria_names
                     ],
                     "missing_concepts": random.sample(
-                        ["Advanced threat modeling", "Zero trust architecture", "Threat hunting", "Malware reverse engineering", "Cloud forensics"],
+                        [
+                            "Advanced threat modeling",
+                            "Zero trust architecture",
+                            "Threat hunting",
+                            "Malware reverse engineering",
+                            "Cloud forensics",
+                        ],
                         k=random.randint(1, 3),
                     ),
                     "demonstrated_skills": random.sample(
-                        ["Incident response", "Log analysis", "SIEM operations", "Network monitoring", "Vulnerability assessment"],
+                        [
+                            "Incident response",
+                            "Log analysis",
+                            "SIEM operations",
+                            "Network monitoring",
+                            "Vulnerability assessment",
+                        ],
                         k=random.randint(2, 4),
                     ),
                     "mitre_technique_ids": random.sample(
@@ -168,6 +188,7 @@ def create_provider(
         base = base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
         try:
             import urllib.request
+
             req = urllib.request.Request(f"{base}/api/tags", method="GET")
             urllib.request.urlopen(req, timeout=3)
             return OllamaProvider(
@@ -177,7 +198,9 @@ def create_provider(
                 max_retries=int(os.getenv("LLM_MAX_RETRIES", "3")),
             )
         except Exception:
-            logger.warning("Ollama not reachable at %s, falling back to MockProvider", base)
+            logger.warning(
+                "Ollama not reachable at %s, falling back to MockProvider", base
+            )
             return MockProvider()
 
     elif provider == "mock":

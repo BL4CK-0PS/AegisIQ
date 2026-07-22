@@ -23,7 +23,7 @@ export interface TokenResponse {
   display_name: string;
 }
 
-export interface LoginResponse extends TokenResponse {}
+export type LoginResponse = TokenResponse;
 
 export interface RegisterRequest {
   display_name: string;
