@@ -1,9 +1,17 @@
 import { apiClient } from "@/lib/api-client";
+import type { RoleDefinition } from "@/types";
 
-interface RoleDefinition {
-  role_definition_id: string;
-  filename: string;
-  status: string;
+interface ParsedCapability {
+  name: string;
+  weight: number;
+}
+
+export interface ParsedRoleDefinition {
+  role: string;
+  skills: string[];
+  capabilities: ParsedCapability[];
+  experience: string;
+  certifications: string[];
 }
 
 export const roleDefinitionService = {
@@ -16,8 +24,8 @@ export const roleDefinitionService = {
     return response.data;
   },
 
-  async parse(roleDefinitionId: string): Promise<RoleDefinition> {
-    const response = await apiClient.post<RoleDefinition>(
+  async parse(roleDefinitionId: string): Promise<ParsedRoleDefinition> {
+    const response = await apiClient.post<ParsedRoleDefinition>(
       `/role-definitions/${roleDefinitionId}/parse`,
     );
     return response.data;

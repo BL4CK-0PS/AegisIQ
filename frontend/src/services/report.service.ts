@@ -14,6 +14,13 @@ export const reportService = {
     return response.data;
   },
 
+  async getByAssessmentId(assessmentId: string): Promise<Report> {
+    const response = await apiClient.get<Report>(
+      `/reports/assessment/${assessmentId}`,
+    );
+    return response.data;
+  },
+
   async exportPdf(reportId: string): Promise<Blob> {
     const response = await apiClient.get(`/reports/${reportId}/pdf`, {
       responseType: "blob",

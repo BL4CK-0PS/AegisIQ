@@ -6,19 +6,17 @@ import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { JobDescriptionUpload } from "@/components/forms/JobDescriptionUpload";
 import { ParseResult } from "../components/ParseResult";
-import { roleDefinitionService } from "@/services/role-definition.service";
+import { roleDefinitionService, type ParsedRoleDefinition } from "@/services/role-definition.service";
 
 export default function JobDescriptionPage() {
   const navigate = useNavigate();
-  const [_uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [parseResult, setParseResult] = useState<any>(null);
+  const [parseResult, setParseResult] = useState<ParsedRoleDefinition | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [roleDefinitionId, setRoleDefinitionId] = useState<string | null>(null);
 
   const handleUpload = async (file: File) => {
-    setUploadedFile(file);
     setIsUploading(true);
     setError(null);
     try {

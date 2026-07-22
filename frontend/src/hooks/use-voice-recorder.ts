@@ -60,7 +60,7 @@ export function useVoiceRecorder(): UseVoiceRecorderReturn {
       recognition.start();
       setIsRecording(true);
       setError(null);
-    } catch (err) {
+    } catch {
       setError("Failed to start speech recognition");
       setIsRecording(false);
     }

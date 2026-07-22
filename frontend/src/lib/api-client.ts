@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { LoginResponse } from "@/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
 
@@ -29,9 +30,10 @@ apiClient.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem("refresh_token");
         if (refreshToken) {
-          const { data } = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-            refresh_token: refreshToken,
-          });
+          const { data } = await axios.post<LoginResponse>(
+            `${API_BASE_URL}/auth/refresh`,
+            { refresh_token: refreshToken },
+          );
           localStorage.setItem("access_token", data.access_token);
           localStorage.setItem("refresh_token", data.refresh_token);
           originalRequest.headers.Authorization = `Bearer ${data.access_token}`;

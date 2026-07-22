@@ -1,7 +1,17 @@
 import { apiClient } from "@/lib/api-client";
 import type { Assessment, Challenge, Response, Evaluation } from "@/types";
 
+export interface SubmitResponseRequest {
+  response_type: "voice" | "text";
+  transcript: string;
+}
+
 export const assessmentService = {
+  async list(): Promise<Assessment[]> {
+    const response = await apiClient.get<Assessment[]>("/capability-assessments");
+    return response.data;
+  },
+
   async create(skillDnaProfileId: string): Promise<Assessment> {
     const response = await apiClient.post<Assessment>("/capability-assessments", {
       skill_dna_profile_id: skillDnaProfileId,
@@ -46,7 +56,7 @@ export const assessmentService = {
 
   async submitResponse(
     challengeId: string,
-    data: { response_type: "voice" | "text"; transcript: string },
+    data: SubmitResponseRequest,
   ): Promise<Response> {
     const response = await apiClient.post<Response>(
       `/challenges/${challengeId}/responses`,
