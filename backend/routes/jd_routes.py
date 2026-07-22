@@ -7,38 +7,20 @@ Parses job descriptions, extracts Skill DNA profiles, and maps to MITRE.
 import logging
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.auth import get_current_user
 from backend.database import get_session
 from backend.models import UserModel
+from backend.schemas import ParseJDRequest, ParseJDResponse
 
 from src.core.knowledge.taxonomy import SkillDnaProfile, ProficiencyLevel
 from src.core.knowledge.seed_data import ALL_DOMAINS, SEED_SKILLS, SEED_MITRE_TECHNIQUES
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
-
-
-class ParseJDRequest(BaseModel):
-    jd_text: str = Field(..., min_length=20, description="Raw job description text")
-    title: str = Field(default="Parsed Job Description")
-
-
-class ParseJDResponse(BaseModel):
-    status: str
-    profile_id: str
-    title: str
-    difficulty: str
-    capabilities: list[dict[str, Any]] = Field(default_factory=list)
-    knowledge_areas: list[dict[str, Any]] = Field(default_factory=list)
-    responsibilities: list[str] = Field(default_factory=list)
-    assessment_objectives: list[str] = Field(default_factory=list)
-    estimated_duration_minutes: int
-    recommended_rubric: str
-    mitre_technique_ids: list[str] = Field(default_factory=list)
 
 
 class SkillDNARequest(BaseModel):
@@ -142,8 +124,11 @@ async def parse_jd(
 
 
 @router.get("/skills", summary="List all available skills")
-async def list_skills() -> list[dict[str, Any]]:
-    return [
+async def list_skills(
+    limit: int = Query(50, ge=1, le=200, description="Max results"),
+    offset: int = Query(0, ge=0, description="Results to skip"),
+) -> dict[str, Any]:
+    all_skills = [
         {
             "id": s.id,
             "name": s.name,
@@ -153,16 +138,25 @@ async def list_skills() -> list[dict[str, Any]]:
         }
         for s in SEED_SKILLS.values()
     ]
+    return {
+        "skills": all_skills[offset : offset + limit],
+        "total": len(all_skills),
+        "limit": limit,
+        "offset": offset,
+    }
 
 
 @router.get("/techniques", summary="List all MITRE ATT&CK techniques")
-async def list_techniques() -> list[dict[str, Any]]:
-    seen = set()
-    result = []
+async def list_techniques(
+    limit: int = Query(50, ge=1, le=200, description="Max results"),
+    offset: int = Query(0, ge=0, description="Results to skip"),
+) -> dict[str, Any]:
+    seen: set[str] = set()
+    all_techniques: list[dict[str, Any]] = []
     for t in SEED_MITRE_TECHNIQUES.values():
         if t.id not in seen:
             seen.add(t.id)
-            result.append(
+            all_techniques.append(
                 {
                     "id": t.id,
                     "name": t.name,
@@ -171,12 +165,20 @@ async def list_techniques() -> list[dict[str, Any]]:
                     "sub_techniques": [st.id for st in t.sub_techniques],
                 }
             )
-    return result
+    return {
+        "techniques": all_techniques[offset : offset + limit],
+        "total": len(all_techniques),
+        "limit": limit,
+        "offset": offset,
+    }
 
 
 @router.get("/domains", summary="List all cybersecurity domains")
-async def list_domains() -> list[dict[str, Any]]:
-    return [
+async def list_domains(
+    limit: int = Query(20, ge=1, le=100, description="Max results"),
+    offset: int = Query(0, ge=0, description="Results to skip"),
+) -> dict[str, Any]:
+    all_domains = [
         {
             "id": d.id,
             "name": d.name,
@@ -186,3 +188,9 @@ async def list_domains() -> list[dict[str, Any]]:
         }
         for d in ALL_DOMAINS
     ]
+    return {
+        "domains": all_domains[offset : offset + limit],
+        "total": len(all_domains),
+        "limit": limit,
+        "offset": offset,
+    }

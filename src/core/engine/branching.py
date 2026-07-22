@@ -108,6 +108,7 @@ class AdaptiveSessionManager:
         self._mastery_threshold = mastery_threshold
         self._mastery_consecutive = mastery_consecutive
         self._rolling_window = rolling_window
+        self._sessions: dict[str, AdaptiveSession] = {}
 
     # ------------------------------------------------------------------
     # Session lifecycle
@@ -118,10 +119,15 @@ class AdaptiveSessionManager:
         domain: str,
         initial_difficulty: ProficiencyLevel = ProficiencyLevel.BEGINNER,
     ) -> AdaptiveSession:
-        return AdaptiveSession(
+        session = AdaptiveSession(
             domain=domain,
             current_difficulty=initial_difficulty,
         )
+        self._sessions[session.id] = session
+        return session
+
+    def get_session(self, session_id: str) -> AdaptiveSession | None:
+        return self._sessions.get(session_id)
 
     def complete_session(self, session: AdaptiveSession) -> AdaptiveSession:
         return AdaptiveSession(
@@ -169,7 +175,7 @@ class AdaptiveSessionManager:
         skill_statuses = dict(session.skill_statuses)
         self._update_skill_status(skill_statuses, skill, difficulty, score, passed)
 
-        return AdaptiveSession(
+        updated = AdaptiveSession(
             id=session.id,
             state=session.state,
             current_difficulty=session.current_difficulty,
@@ -179,6 +185,8 @@ class AdaptiveSessionManager:
             started_at=session.started_at,
             completed_at=session.completed_at,
         )
+        self._sessions[session.id] = updated
+        return updated
 
     @staticmethod
     def _update_skill_status(

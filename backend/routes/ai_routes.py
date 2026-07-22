@@ -5,10 +5,13 @@ Wires src/core/ai, engine, evaluation, mentor modules into FastAPI endpoints.
 """
 
 import logging
+import os
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
+from backend.auth import require_role
+from backend.models import UserModel
 from backend.orchestrator import (
     generate_skill_assessment,
     build_incident_scenario,
@@ -18,6 +21,7 @@ from backend.orchestrator import (
     start_session,
     record_answer,
     complete_session,
+    _get_session_manager,
 )
 from backend.schemas import (
     GenerateAssessmentRequest,
@@ -32,6 +36,7 @@ from backend.schemas import (
     RepairGuideResponse,
     StartSessionRequest,
     RecordAnswerRequest,
+    CompleteSessionRequest,
     SessionResponse,
 )
 from backend.config import get_settings
@@ -46,7 +51,10 @@ settings = get_settings()
 @router.post(
     "/parse-jd", response_model=ParseJDResponse, status_code=status.HTTP_200_OK
 )
-async def parse_jd_endpoint(payload: ParseJDRequest) -> dict[str, Any]:
+async def parse_jd_endpoint(
+    payload: ParseJDRequest,
+    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+) -> dict[str, Any]:
     try:
         profile = await parse_jd(jd_text=payload.jd_text, title=payload.title)
         return {
@@ -72,7 +80,10 @@ async def parse_jd_endpoint(payload: ParseJDRequest) -> dict[str, Any]:
     response_model=GenerateAssessmentResponse,
     status_code=status.HTTP_200_OK,
 )
-async def generate_assessment(payload: GenerateAssessmentRequest) -> dict[str, Any]:
+async def generate_assessment(
+    payload: GenerateAssessmentRequest,
+    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+) -> dict[str, Any]:
     try:
         qset = await generate_skill_assessment(
             domain_name=payload.domain,
@@ -98,7 +109,10 @@ async def generate_assessment(payload: GenerateAssessmentRequest) -> dict[str, A
 
 
 @router.post("/incident-scenario", response_model=IncidentScenarioResponse)
-async def incident_scenario(payload: IncidentScenarioRequest) -> dict[str, Any]:
+async def incident_scenario(
+    payload: IncidentScenarioRequest,
+    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+) -> dict[str, Any]:
     try:
         scenario = build_incident_scenario(payload.technique_id, payload.difficulty)
         return {"status": "success", "scenario": scenario.model_dump()}
@@ -109,7 +123,10 @@ async def incident_scenario(payload: IncidentScenarioRequest) -> dict[str, Any]:
 @router.post(
     "/evaluate", response_model=EvaluateResponseResponse, status_code=status.HTTP_200_OK
 )
-async def evaluate(payload: EvaluateResponseRequest) -> dict[str, Any]:
+async def evaluate(
+    payload: EvaluateResponseRequest,
+    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+) -> dict[str, Any]:
     try:
         result: EvaluationResult = await evaluate_response(
             question_text=payload.question_text,
@@ -138,7 +155,10 @@ async def evaluate(payload: EvaluateResponseRequest) -> dict[str, Any]:
 
 
 @router.post("/repair-guide", response_model=RepairGuideResponse)
-async def repair_guide(payload: RepairGuideRequest) -> dict[str, Any]:
+async def repair_guide(
+    payload: RepairGuideRequest,
+    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+) -> dict[str, Any]:
     try:
         dummy_eval = EvaluationResult(
             question_text=payload.question_text,
@@ -170,7 +190,10 @@ async def repair_guide(payload: RepairGuideRequest) -> dict[str, Any]:
 
 
 @router.post("/session/start", response_model=SessionResponse)
-async def session_start(payload: StartSessionRequest) -> dict[str, Any]:
+async def session_start(
+    payload: StartSessionRequest,
+    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+) -> dict[str, Any]:
     session = start_session(
         domain=payload.domain, difficulty=payload.initial_difficulty
     )
@@ -178,10 +201,19 @@ async def session_start(payload: StartSessionRequest) -> dict[str, Any]:
 
 
 @router.post("/session/record", response_model=SessionResponse)
-async def session_record(payload: RecordAnswerRequest) -> dict[str, Any]:
-    session_ref = start_session(payload.domain)
+async def session_record(
+    payload: RecordAnswerRequest,
+    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+) -> dict[str, Any]:
+    mgr = _get_session_manager()
+    session = mgr.get_session(payload.session_id)
+    if session is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Session '{payload.session_id}' not found",
+        )
     updated = record_answer(
-        session=session_ref,
+        session=session,
         question_id=payload.question_id,
         question_text=payload.question_text,
         domain=payload.domain,
@@ -195,17 +227,24 @@ async def session_record(payload: RecordAnswerRequest) -> dict[str, Any]:
     return {"status": "success", "session": updated.model_dump()}
 
 
-@router.post("/session/complete")
-async def session_complete(payload: StartSessionRequest) -> dict[str, Any]:
-    session = start_session(payload.domain)
+@router.post("/session/complete", response_model=SessionResponse)
+async def session_complete(
+    payload: CompleteSessionRequest,
+    current_user: UserModel = Depends(require_role("admin", "capability_analyst", "professional")),
+) -> dict[str, Any]:
+    mgr = _get_session_manager()
+    session = mgr.get_session(payload.session_id)
+    if session is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Session '{payload.session_id}' not found",
+        )
     completed = complete_session(session)
     return {"status": "success", "session": completed.model_dump()}
 
 
 @router.get("/providers")
 async def list_providers() -> dict[str, Any]:
-    import os
-
     providers = {
         "gemini": bool(os.getenv("GEMINI_API_KEY")),
         "mistral": bool(os.getenv("MISTRAL_API_KEY")),

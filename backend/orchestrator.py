@@ -99,16 +99,139 @@ async def parse_jd(
     jd_text: str,
     title: str = "Parsed Job Description",
 ) -> SkillDnaProfile:
-    domain = ALL_DOMAINS[0]
-    ka = domain.capabilities[0].skills[0].knowledge_areas if domain.capabilities else []
+    client = _get_client()
+    loader = _get_loader()
+
+    variables: dict[str, Any] = {
+        "jd_text": jd_text,
+        "title": title,
+        "domain_list": ", ".join(d.name for d in ALL_DOMAINS),
+    }
+    try:
+        rendered: str = loader.render("jd_parsing", variables)
+    except Exception:
+        rendered = (
+            "Analyse the following job description and extract structured data.\n\n"
+            f"Job Description:\n{jd_text}\n\n"
+            "Return a JSON object with keys: title, domain, skills (list of strings), "
+            "mitre_techniques (list of technique IDs like T1190), technologies (list of strings), "
+            "difficulty (beginner|intermediate|advanced|expert), responsibilities (list of strings), "
+            "assessment_objectives (list of strings)."
+        )
+
+    try:
+        raw: str = await client.generate(prompt=rendered, schema=_JD_PARSE_SCHEMA)
+    except Exception as exc:
+        logger.warning("LLM JD parse failed, falling back to keyword matching: %s", exc)
+        return _fallback_jd_parse(jd_text, title)
+
+    import json as _json
+
+    cleaned = raw.strip()
+    if cleaned.startswith("```"):
+        lines = cleaned.splitlines()
+        start = 1 if lines[0].startswith("```") else 0
+        end = -1 if lines[-1].strip() == "```" else len(lines)
+        cleaned = "\n".join(lines[start:end]).strip()
+
+    try:
+        data: dict[str, Any] = _json.loads(cleaned)
+    except _json.JSONDecodeError:
+        logger.warning("Failed to parse JD JSON from LLM, falling back")
+        return _fallback_jd_parse(jd_text, title)
+
+    domain_name: str = data.get("domain", ALL_DOMAINS[0].name)
+    domain = _find_domain(domain_name)
+    skills_names: list[str] = data.get("skills", [])
+    matched_skills: list[Skill] = []
+    for sname in skills_names:
+        try:
+            matched_skills.append(_find_skill(sname))
+        except ValueError:
+            pass
+
+    difficulty_str: str = data.get("difficulty", "intermediate")
+    difficulty = _resolve_difficulty(difficulty_str)
+
+    knowledge_areas = [
+        ka
+        for cap in domain.capabilities
+        for skill in cap.skills
+        for ka in skill.knowledge_areas
+    ]
+
+    return SkillDnaProfile(
+        title=data.get("title", title),
+        capabilities=domain.capabilities,
+        knowledge_areas=knowledge_areas,
+        responsibilities=data.get("responsibilities", jd_text.split("\n")[:20]),
+        assessment_objectives=data.get(
+            "assessment_objectives",
+            [f"Assess {s.name} capability" for s in matched_skills[:10]],
+        ),
+        difficulty=difficulty,
+        recommended_rubric=difficulty.value,
+    )
+
+
+def _fallback_jd_parse(jd_text: str, title: str) -> SkillDnaProfile:
+    text_lower = jd_text.lower()
+    matched_domains = [
+        d
+        for d in ALL_DOMAINS
+        if any(
+            keyword in text_lower
+            for keyword in d.name.lower().split()
+            for cap in d.capabilities
+            for s in cap.skills
+            for keyword in s.name.lower().split() + s.alternative_labels
+        )
+    ]
+    profile_domain = matched_domains[0] if matched_domains else ALL_DOMAINS[0]
+
+    difficulty = ProficiencyLevel.INTERMEDIATE
+    if "senior" in text_lower or "advanced" in text_lower or "lead" in text_lower:
+        difficulty = ProficiencyLevel.ADVANCED
+    if "expert" in text_lower or "architect" in text_lower or "principal" in text_lower:
+        difficulty = ProficiencyLevel.EXPERT
+    if "junior" in text_lower or "entry" in text_lower or "tier 1" in text_lower:
+        difficulty = ProficiencyLevel.BEGINNER
+
+    knowledge_areas = [
+        ka
+        for cap in profile_domain.capabilities
+        for skill in cap.skills
+        for ka in skill.knowledge_areas
+    ]
+
     return SkillDnaProfile(
         title=title,
-        capabilities=domain.capabilities,
-        knowledge_areas=ka,
-        responsibilities=[jd_text[:200]],
+        capabilities=profile_domain.capabilities,
+        knowledge_areas=knowledge_areas,
+        responsibilities=[line.strip() for line in jd_text.split("\n") if line.strip()][:20],
         assessment_objectives=["Analyse job description for skill requirements"],
-        difficulty=ProficiencyLevel.INTERMEDIATE,
+        difficulty=difficulty,
+        recommended_rubric=difficulty.value,
     )
+
+
+_JD_PARSE_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "title": {"type": "string"},
+        "domain": {"type": "string"},
+        "skills": {"type": "array", "items": {"type": "string"}},
+        "mitre_techniques": {"type": "array", "items": {"type": "string"}},
+        "technologies": {"type": "array", "items": {"type": "string"}},
+        "difficulty": {
+            "type": "string",
+            "enum": ["beginner", "intermediate", "advanced", "expert"],
+        },
+        "responsibilities": {"type": "array", "items": {"type": "string"}},
+        "assessment_objectives": {"type": "array", "items": {"type": "string"}},
+    },
+    "required": ["title", "domain", "skills", "difficulty"],
+}
 
 
 # ---------------------------------------------------------------------------

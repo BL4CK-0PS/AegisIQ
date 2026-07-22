@@ -2,13 +2,19 @@
 AegisIQ Evaluation Routes
 
 Profile consolidation, Cyber Twin, and reporting endpoints.
+Uses EvaluationRepository for clean database access.
 """
 
 import logging
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.auth import get_current_user
+from backend.database import get_session
+from backend.models import UserModel
+from backend.repositories.evaluation_repository import EvaluationRepository
 from backend.orchestrator import (
     build_profile,
     build_cyber_twin,
@@ -28,19 +34,71 @@ from backend.schemas import (
 )
 from src.core.evaluation.dna_engine import (
     ConsolidatedProfile,
+    CapabilityEngine,
     CyberTwinModel as CTModel,
 )
+from src.core.evaluation.evaluator import EvaluationResult
+from src.core.knowledge.taxonomy import ProficiencyLevel
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.post("/profile/build", response_model=BuildProfileResponse)
-async def build_profile_endpoint(payload: BuildProfileRequest) -> dict[str, Any]:
-    from src.core.evaluation.evaluator import EvaluationResult
+async def _fetch_evaluations(
+    db: AsyncSession,
+    evaluation_ids: list[str],
+    current_user: UserModel,
+) -> list[EvaluationResult]:
+    """Fetch EvaluationResultModel rows via repository and convert to DTOs."""
+    repo = EvaluationRepository(db)
 
-    evals: list[EvaluationResult] = []
+    if evaluation_ids:
+        rows = []
+        for eid in evaluation_ids:
+            row = await repo.get_by_id(eid)
+            if row is not None:
+                rows.append(row)
+    else:
+        rows = await repo.get_by_candidate(candidate_id=current_user.id)
+
+    evaluations: list[EvaluationResult] = []
+    for row in rows:
+        try:
+            evaluations.append(
+                EvaluationResult(
+                    question_text="",
+                    domain=row.proficiency_level,
+                    skill=(row.demonstrated_skills[0] if row.demonstrated_skills else ""),
+                    overall_score=row.overall_score,
+                    confidence=row.confidence,
+                    proficiency_level=ProficiencyLevel(row.proficiency_level),
+                    passed=row.passed,
+                    criteria_scores=[],
+                    missing_concepts=row.missing_concepts or [],
+                    demonstrated_skills=row.demonstrated_skills or [],
+                    mitre_technique_ids=row.mitre_technique_ids or [],
+                    overall_justification=row.overall_justification or "",
+                )
+            )
+        except Exception as exc:
+            logger.warning("Skipping malformed evaluation %s: %s", row.id, exc)
+            continue
+    return evaluations
+
+
+@router.post("/profile/build", response_model=BuildProfileResponse)
+async def build_profile_endpoint(
+    payload: BuildProfileRequest,
+    db: AsyncSession = Depends(get_session),
+    current_user: UserModel = Depends(get_current_user),
+) -> dict[str, Any]:
     try:
+        evals = await _fetch_evaluations(db, payload.evaluation_ids, current_user)
+        if not evals:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No evaluation results found. Complete an assessment first.",
+            )
         profile: ConsolidatedProfile = build_profile(evals)
         return {
             "status": "success",
@@ -54,6 +112,8 @@ async def build_profile_endpoint(payload: BuildProfileRequest) -> dict[str, Any]
             "weaknesses": [w.model_dump() for w in profile.weaknesses],
             "evaluation_count": profile.evaluation_count,
         }
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.error("Profile build failed: %s", exc)
         raise HTTPException(
@@ -62,10 +122,19 @@ async def build_profile_endpoint(payload: BuildProfileRequest) -> dict[str, Any]
 
 
 @router.post("/cyber-twin/build", response_model=CyberTwinResponse)
-async def build_cyber_twin_endpoint() -> dict[str, Any]:
+async def build_cyber_twin_endpoint(
+    db: AsyncSession = Depends(get_session),
+    current_user: UserModel = Depends(get_current_user),
+) -> dict[str, Any]:
     try:
-        profile: ConsolidatedProfile = build_profile([])
-        twin: CTModel = build_cyber_twin(profile, label="Anonymous")
+        evals = await _fetch_evaluations(db, [], current_user)
+        if not evals:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No evaluation results found. Complete an assessment first.",
+            )
+        profile: ConsolidatedProfile = build_profile(evals)
+        twin: CTModel = build_cyber_twin(profile, label=current_user.display_name)
         return {
             "status": "success",
             "twin_id": twin.id,
@@ -78,6 +147,8 @@ async def build_cyber_twin_endpoint() -> dict[str, Any]:
             "weakness_areas": [w.model_dump() for w in twin.weakness_areas],
             "last_updated": twin.last_updated,
         }
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.error("Cyber Twin build failed: %s", exc)
         raise HTTPException(
@@ -86,12 +157,24 @@ async def build_cyber_twin_endpoint() -> dict[str, Any]:
 
 
 @router.post("/career-compass/analyze", response_model=CareerCompassResponse)
-async def career_compass_analyze(payload: CareerCompassRequest) -> dict[str, Any]:
+async def career_compass_analyze(
+    payload: CareerCompassRequest,
+    db: AsyncSession = Depends(get_session),
+    current_user: UserModel = Depends(get_current_user),
+) -> dict[str, Any]:
     try:
-        from src.core.knowledge.taxonomy import SkillDnaProfile
+        evals = await _fetch_evaluations(db, [], current_user)
+        if evals:
+            profile: ConsolidatedProfile = build_profile(evals)
+            skill_profile = CapabilityEngine.build_skill_dna(
+                profile, title=current_user.display_name
+            )
+        else:
+            from src.core.knowledge.taxonomy import SkillDnaProfile
 
-        dummy = SkillDnaProfile(title="Candidate")
-        analysis = analyze_career_gaps(dummy, payload.target_role)
+            skill_profile = SkillDnaProfile(title=current_user.display_name)
+
+        analysis = analyze_career_gaps(skill_profile, payload.target_role)
         return {
             "status": "success",
             "target_role": analysis.target_role,
@@ -106,22 +189,43 @@ async def career_compass_analyze(payload: CareerCompassRequest) -> dict[str, Any
 
 
 @router.get("/career-compass/roles", response_model=BestFitRolesResponse)
-async def career_compass_roles() -> dict[str, Any]:
-    from src.core.knowledge.taxonomy import SkillDnaProfile
+async def career_compass_roles(
+    db: AsyncSession = Depends(get_session),
+    current_user: UserModel = Depends(get_current_user),
+) -> dict[str, Any]:
+    evals = await _fetch_evaluations(db, [], current_user)
+    if evals:
+        profile: ConsolidatedProfile = build_profile(evals)
+        skill_profile = CapabilityEngine.build_skill_dna(
+            profile, title=current_user.display_name
+        )
+    else:
+        from src.core.knowledge.taxonomy import SkillDnaProfile
 
-    dummy = SkillDnaProfile(title="Candidate")
-    roles = find_best_roles(dummy, top_n=7)
+        skill_profile = SkillDnaProfile(title=current_user.display_name)
+
+    roles = find_best_roles(skill_profile, top_n=7)
     return {"status": "success", "roles": roles}
 
 
 @router.post("/roadmap/generate", response_model=RoadmapResponse)
-async def generate_roadmap_endpoint(payload: RoadmapRequest) -> dict[str, Any]:
+async def generate_roadmap_endpoint(
+    payload: RoadmapRequest,
+    db: AsyncSession = Depends(get_session),
+    current_user: UserModel = Depends(get_current_user),
+) -> dict[str, Any]:
     try:
-        profile: ConsolidatedProfile = build_profile([])
+        evals = await _fetch_evaluations(db, [], current_user)
+        if not evals:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No evaluation results found. Complete an assessment first.",
+            )
+        profile: ConsolidatedProfile = build_profile(evals)
         roadmap = await generate_roadmap(
             profile=profile,
             timeline_weeks=payload.timeline_weeks,
-            label=payload.candidate_label,
+            label=current_user.display_name,
         )
         return {
             "status": "success",
@@ -136,6 +240,8 @@ async def generate_roadmap_endpoint(payload: RoadmapRequest) -> dict[str, Any]:
             "focus_areas": roadmap.focus_areas,
             "generated_at": roadmap.generated_at,
         }
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.error("Roadmap generation failed: %s", exc)
         raise HTTPException(

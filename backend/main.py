@@ -12,7 +12,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.config import get_settings
-from backend.middleware import MonitoringMiddleware
+from backend.middleware import MonitoringMiddleware, RateLimitMiddleware, get_metrics
 from backend.routes.ai_routes import router as ai_router
 from backend.routes.evaluation_routes import router as evaluation_router
 from backend.routes.voice_routes import router as voice_router
@@ -60,8 +60,10 @@ app.add_middleware(
 )
 
 # --- Monitoring ---
-_monitoring = MonitoringMiddleware(app)
 app.add_middleware(MonitoringMiddleware)
+
+# --- Rate Limiting ---
+app.add_middleware(RateLimitMiddleware)
 
 # --- API v1 Routes ---
 API_V1_PREFIX = "/api/v1"
@@ -104,5 +106,5 @@ async def metrics():
     return {
         "service": settings.app_name,
         "version": settings.app_version,
-        **_monitoring.metrics,
+        **get_metrics(),
     }

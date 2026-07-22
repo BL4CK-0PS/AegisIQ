@@ -2,54 +2,38 @@
 AegisIQ Assessment Routes
 
 Full session lifecycle: create, record answers, evaluate, complete, get results.
+Uses repositories for clean database access.
 """
 
 import logging
+from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.auth import get_current_user
 from backend.database import get_session
-from backend.models import (
-    UserModel,
-    AssessmentModel,
-    QuestionRecordModel,
-    EvaluationResultModel,
+from backend.models import UserModel
+from backend.repositories.assessment_repository import (
+    AssessmentRepository,
+    QuestionRecordRepository,
 )
+from backend.repositories.evaluation_repository import EvaluationRepository
 from backend.orchestrator import (
     start_session,
     get_session_summary,
     evaluate_response,
 )
+from backend.schemas import (
+    CreateAssessmentRequest,
+    RecordAssessmentAnswerRequest,
+    PaginatedAssessmentsResponse,
+)
 from src.core.engine.branching import AdaptiveSession
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
-
-
-class CreateAssessmentRequest(BaseModel):
-    domain: str = Field(default="Web Application Security")
-    skill: str = Field(default="Web Vulnerability Scanning")
-    difficulty: str = Field(default="beginner")
-    question_count: int = Field(default=5, ge=1, le=10)
-
-
-class RecordAnswerRequest(BaseModel):
-    assessment_id: str
-    question_id: str
-    question_text: str
-    domain: str
-    skill: str
-    difficulty: str
-    candidate_answer: str = Field(default="")
-
-
-class CompleteAssessmentRequest(BaseModel):
-    assessment_id: str
 
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
@@ -64,7 +48,8 @@ async def create_assessment(
             difficulty=payload.difficulty,
         )
 
-        assessment = AssessmentModel(
+        repo = AssessmentRepository(db)
+        assessment = await repo.create(
             id=session.id,
             candidate_id=current_user.id,
             domain=payload.domain,
@@ -72,8 +57,6 @@ async def create_assessment(
             current_difficulty=session.current_difficulty.value,
             summary=get_session_summary(session),
         )
-        db.add(assessment)
-        await db.commit()
 
         logger.info(
             "Assessment created: %s for user %s",
@@ -97,16 +80,45 @@ async def create_assessment(
         )
 
 
+@router.get("/", response_model=PaginatedAssessmentsResponse)
+async def list_assessments(
+    limit: int = Query(20, ge=1, le=100, description="Max results to return"),
+    offset: int = Query(0, ge=0, description="Number of results to skip"),
+    db: AsyncSession = Depends(get_session),
+    current_user: UserModel = Depends(get_current_user),
+) -> dict[str, Any]:
+    repo = AssessmentRepository(db)
+    assessments = await repo.get_by_candidate(
+        candidate_id=current_user.id, limit=limit, offset=offset
+    )
+    total = await repo.get_by_candidate_count(current_user.id)
+    return {
+        "assessments": [
+            {
+                "id": a.id,
+                "domain": a.domain,
+                "status": a.status,
+                "current_difficulty": a.current_difficulty,
+                "started_at": a.started_at.isoformat() if a.started_at else None,
+                "completed_at": a.completed_at.isoformat() if a.completed_at else None,
+                "question_count": len(a.questions) if a.questions else 0,
+            }
+            for a in assessments
+        ],
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }
+
+
 @router.get("/{assessment_id}")
 async def get_assessment(
     assessment_id: str,
     db: AsyncSession = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
 ) -> dict[str, Any]:
-    result = await db.execute(
-        select(AssessmentModel).where(AssessmentModel.id == assessment_id)
-    )
-    assessment = result.scalar_one_or_none()
+    repo = AssessmentRepository(db)
+    assessment = await repo.get_with_questions(assessment_id)
     if assessment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
@@ -129,20 +141,19 @@ async def get_assessment(
 
 @router.post("/record")
 async def record_answer_endpoint(
-    payload: RecordAnswerRequest,
+    payload: RecordAssessmentAnswerRequest,
     db: AsyncSession = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
 ) -> dict[str, Any]:
-    result = await db.execute(
-        select(AssessmentModel).where(AssessmentModel.id == payload.assessment_id)
-    )
-    assessment = result.scalar_one_or_none()
+    repo = AssessmentRepository(db)
+    assessment = await repo.get_by_id(payload.assessment_id)
     if assessment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
         )
 
-    record = QuestionRecordModel(
+    qr_repo = QuestionRecordRepository(db)
+    record = await qr_repo.create(
         assessment_id=assessment.id,
         question_text=payload.question_text,
         domain=payload.domain,
@@ -150,9 +161,6 @@ async def record_answer_endpoint(
         difficulty=payload.difficulty,
         candidate_answer=payload.candidate_answer,
     )
-    db.add(record)
-    await db.commit()
-    await db.refresh(record)
 
     logger.debug(
         "Answer recorded for assessment %s, question %s", assessment.id, record.id
@@ -171,22 +179,21 @@ async def evaluate_assessment(
     db: AsyncSession = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
 ) -> dict[str, Any]:
-    result = await db.execute(
-        select(AssessmentModel).where(AssessmentModel.id == assessment_id)
-    )
-    assessment = result.scalar_one_or_none()
+    repo = AssessmentRepository(db)
+    assessment = await repo.get_with_questions(assessment_id)
     if assessment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
         )
 
-    questions: list[QuestionRecordModel] = assessment.questions or []
+    questions = assessment.questions or []
     if not questions:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No answers recorded for this assessment",
         )
 
+    eval_repo = EvaluationRepository(db)
     evaluation_results = []
     for q in questions:
         if not q.candidate_answer:
@@ -199,7 +206,7 @@ async def evaluate_assessment(
                 skill=q.skill,
                 difficulty=q.difficulty,
             )
-            eval_record = EvaluationResultModel(
+            eval_record = await eval_repo.create(
                 question_id=q.id,
                 overall_score=evaluation.overall_score,
                 confidence=evaluation.confidence,
@@ -211,13 +218,10 @@ async def evaluate_assessment(
                 mitre_technique_ids=evaluation.mitre_technique_ids,
                 overall_justification=evaluation.overall_justification,
             )
-            db.add(eval_record)
             evaluation_results.append(eval_record)
         except Exception as exc:
             logger.warning("Evaluation failed for question %s: %s", q.id, exc)
             continue
-
-    await db.commit()
 
     avg_score = (
         sum(e.overall_score for e in evaluation_results) / len(evaluation_results)
@@ -250,18 +254,14 @@ async def complete_assessment_endpoint(
     db: AsyncSession = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
 ) -> dict[str, Any]:
-    result = await db.execute(
-        select(AssessmentModel).where(AssessmentModel.id == assessment_id)
-    )
-    assessment = result.scalar_one_or_none()
+    repo = AssessmentRepository(db)
+    assessment = await repo.get_by_id(assessment_id)
     if assessment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
         )
 
     assessment.status = "completed"
-    from datetime import datetime, timezone
-
     assessment.completed_at = datetime.now(timezone.utc)
 
     session_ref = AdaptiveSession(
@@ -282,19 +282,8 @@ async def get_assessment_results(
     db: AsyncSession = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
 ) -> dict[str, Any]:
-    evals_result = await db.execute(
-        select(EvaluationResultModel)
-        .join(
-            QuestionRecordModel,
-            EvaluationResultModel.question_id == QuestionRecordModel.id,
-        )
-        .join(
-            AssessmentModel,
-            QuestionRecordModel.assessment_id == AssessmentModel.id,
-        )
-        .where(AssessmentModel.id == assessment_id)
-    )
-    evals = evals_result.scalars().all()
+    eval_repo = EvaluationRepository(db)
+    evals = await eval_repo.get_by_assessment(assessment_id)
 
     return {
         "assessment_id": assessment_id,

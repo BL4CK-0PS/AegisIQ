@@ -93,39 +93,6 @@ class Capability(BaseModel):
     model_config = {"frozen": True}
 
 
-class Role(BaseModel):
-    id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
-    title: str
-    description: str
-    capability_ids: list[str] = Field(default_factory=list)
-    typical_progression_ids: list[str] = Field(default_factory=list)
-    average_experience_years: int = 3
-
-    model_config = {"frozen": True}
-
-
-class Assessment(BaseModel):
-    id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
-    name: str
-    description: str
-    skill_ids: list[str] = Field(default_factory=list)
-    difficulty_level: ProficiencyLevel = ProficiencyLevel.INTERMEDIATE
-    duration_minutes: int = 60
-
-    model_config = {"frozen": True}
-
-
-class LearningResource(BaseModel):
-    id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
-    title: str
-    resource_type: str = "article"
-    url: str
-    skill_ids: list[str] = Field(default_factory=list)
-    difficulty_level: ProficiencyLevel = ProficiencyLevel.BEGINNER
-
-    model_config = {"frozen": True}
-
-
 class CyberDomain(BaseModel):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
     name: str
