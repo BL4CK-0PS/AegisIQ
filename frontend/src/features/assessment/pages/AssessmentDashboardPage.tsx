@@ -1,6 +1,10 @@
-import { ClipboardCheck, Target, Zap } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ClipboardCheck, Target, Zap, Loader2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/feedback/EmptyState";
+import { assessmentService } from "@/services/assessment.service";
 
 const missionTypes = [
   { type: "soc", label: "SOC Operations", icon: Target, color: "text-primary-400", bg: "bg-primary-900/30" },
@@ -9,6 +13,29 @@ const missionTypes = [
 ];
 
 export default function AssessmentDashboardPage() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [creatingDomain, setCreatingDomain] = useState<string | null>(null);
+
+  const createMutation = useMutation({
+    mutationFn: (domain: string) => assessmentService.create(domain),
+    onSuccess: (data) => {
+      const id = data.assessment_id;
+      queryClient.invalidateQueries({ queryKey: ["assessments"] });
+      navigate(`/assessment/${id}`);
+    },
+    onError: (err: any) => {
+      console.error("Failed to create assessment:", err);
+      setCreatingDomain(null);
+    },
+  });
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["assessments"],
+    queryFn: () => assessmentService.list(20, 0),
+  });
+
+  const assessments = data?.assessments ?? [];
 
   return (
     <div className="space-y-8">
@@ -20,19 +47,38 @@ export default function AssessmentDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {missionTypes.map((m) => (
-          <Card key={m.type} variant="elevated" className="cursor-pointer transition-colors hover:border-surface-600">
-            <div className="flex items-center gap-4">
-              <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${m.bg}`}>
-                <m.icon className={`h-6 w-6 ${m.color}`} />
+        {missionTypes.map((m) => {
+          const isCreating = creatingDomain === m.type && createMutation.isPending;
+          return (
+            <Card
+              key={m.type}
+              variant="elevated"
+              className={`cursor-pointer transition-colors hover:border-surface-600 ${isCreating ? "pointer-events-none opacity-60" : ""}`}
+              onClick={() => {
+                if (!isCreating) {
+                  setCreatingDomain(m.type);
+                  createMutation.mutate(m.type);
+                }
+              }}
+            >
+              <div className="flex items-center gap-4">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${m.bg}`}>
+                  {isCreating ? (
+                    <Loader2 className={`h-6 w-6 ${m.color} animate-spin`} />
+                  ) : (
+                    <m.icon className={`h-6 w-6 ${m.color}`} />
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-surface-200">{m.label}</p>
+                  <p className="text-xs text-surface-500">
+                    {isCreating ? "Starting session..." : "Start new mission"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-surface-200">{m.label}</p>
-                <p className="text-xs text-surface-500">Start new mission</p>
-              </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
 
       <Card variant="elevated">
@@ -41,11 +87,45 @@ export default function AssessmentDashboardPage() {
           <CardDescription>Your recent assessment sessions</CardDescription>
         </CardHeader>
         <CardContent>
-          <EmptyState
-            icon={<ClipboardCheck className="h-8 w-8" />}
-            title="No assessments yet"
-            description="Start your first assessment mission above"
-          />
+          {isLoading ? (
+            <div className="py-8 text-center text-sm text-surface-500">Loading assessments...</div>
+          ) : assessments.length === 0 ? (
+            <EmptyState
+              icon={<ClipboardCheck className="h-8 w-8" />}
+              title="No assessments yet"
+              description="Start your first assessment mission above"
+            />
+          ) : (
+            <div className="space-y-3">
+              {assessments.map((a) => (
+                <button
+                  key={a.id}
+                  onClick={() => navigate(`/report/${a.id}`)}
+                  className="flex w-full items-center justify-between rounded-lg border border-surface-700/50 p-4 text-left transition-colors hover:bg-surface-800/50"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-surface-200">
+                      {a.domain ?? "Assessment"}
+                    </p>
+                    <p className="text-xs text-surface-500">
+                      {a.started_at ? new Date(a.started_at).toLocaleDateString() : "Unknown date"}
+                    </p>
+                  </div>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      a.status === "completed"
+                        ? "bg-success-900/30 text-success-400"
+                        : a.status === "active"
+                          ? "bg-primary-900/30 text-primary-400"
+                          : "bg-surface-700/30 text-surface-400"
+                    }`}
+                  >
+                    {a.status}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

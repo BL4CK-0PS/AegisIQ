@@ -4,13 +4,60 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [profileName, setProfileName] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSaved, setPasswordSaved] = useState(false);
+  const currentUser = useAuthStore((s) => s.user);
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  const displayName = profileName || (currentUser?.name ?? "");
+  const displayEmail = currentUser?.email ?? "";
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    setPasswordError(null);
+    setPasswordSaved(false);
+
+    if (!currentPassword || !newPassword) {
+      setPasswordError("Please fill in all password fields");
+      return;
+    }
+    if (newPassword.length < 8) {
+      setPasswordError("New password must be at least 8 characters");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match");
+      return;
+    }
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setPasswordSaved(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setTimeout(() => setPasswordSaved(false), 3000);
+    } catch {
+      setPasswordError("Failed to change password. Please try again.");
+    }
   };
 
   return (
@@ -32,8 +79,17 @@ export default function SettingsPage() {
           <CardDescription>Your personal information</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Input label="Full Name" defaultValue="User" />
-          <Input label="Email" type="email" defaultValue="user@pwndora.io" disabled />
+          <Input
+            label="Full Name"
+            value={displayName}
+            onChange={(e) => setProfileName(e.target.value)}
+          />
+          <Input
+            label="Email"
+            type="email"
+            value={displayEmail}
+            disabled
+          />
         </CardContent>
       </Card>
 
@@ -76,10 +132,36 @@ export default function SettingsPage() {
           <CardDescription>Account security settings</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Input label="Current Password" type="password" placeholder="Enter current password" />
-          <Input label="New Password" type="password" placeholder="Enter new password" />
-          <Input label="Confirm New Password" type="password" placeholder="Confirm new password" />
-          <Button variant="secondary" size="sm">Change Password</Button>
+          {passwordSaved && (
+            <Alert variant="success">Password changed successfully.</Alert>
+          )}
+          {passwordError && (
+            <Alert variant="error">{passwordError}</Alert>
+          )}
+          <Input
+            label="Current Password"
+            type="password"
+            placeholder="Enter current password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+          />
+          <Input
+            label="New Password"
+            type="password"
+            placeholder="Enter new password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          <Input
+            label="Confirm New Password"
+            type="password"
+            placeholder="Confirm new password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          <Button variant="secondary" size="sm" onClick={handleChangePassword}>
+            Change Password
+          </Button>
         </CardContent>
       </Card>
 
@@ -105,7 +187,7 @@ export default function SettingsPage() {
       </Card>
 
       <div className="flex justify-end">
-        <Button onClick={handleSave} leftIcon={<Save size={16} />}>
+        <Button onClick={handleSave} leftIcon={<Save size={16} />} isLoading={saving}>
           Save Changes
         </Button>
       </div>

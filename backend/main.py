@@ -12,6 +12,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.config import get_settings
+from backend.database import init_db, close_db
 from backend.middleware import MonitoringMiddleware, RateLimitMiddleware, get_metrics
 from backend.routes.ai_routes import router as ai_router
 from backend.routes.evaluation_routes import router as evaluation_router
@@ -37,15 +38,18 @@ async def lifespan(app: FastAPI):
     logger.info("Starting %s v%s", settings.app_name, settings.app_version)
     logger.info("AI Provider: %s", settings.llm_provider)
     logger.info("Demo Mode: %s", settings.demo_mode)
+    await init_db()
     yield
+    await close_db()
     logger.info("Shutting down %s", settings.app_name)
 
 
 app = FastAPI(
-    title="PWNDORA SkillScan X",
+    title="AegisIQ",
     description="Adaptive Cybersecurity Capability Intelligence Platform",
     version=settings.app_version,
     lifespan=lifespan,
+    redirect_slashes=False,
     docs_url="/api/docs" if settings.debug else None,
     redoc_url="/api/redoc" if settings.debug else None,
 )

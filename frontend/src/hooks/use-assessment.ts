@@ -29,8 +29,8 @@ export function useAssessment(assessmentId?: string) {
 
   const startMutation = useMutation({
     mutationFn: (id: string) => assessmentService.start(id),
-    onSuccess: (data) => {
-      setState((prev) => ({ ...prev, assessmentId: data.id }));
+    onSuccess: (data: any) => {
+      setState((prev) => ({ ...prev, assessmentId: data.assessment_id ?? data.id }));
       queryClient.invalidateQueries({ queryKey: ["assessment"] });
     },
   });

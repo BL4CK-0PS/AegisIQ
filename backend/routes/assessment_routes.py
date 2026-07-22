@@ -193,6 +193,19 @@ async def evaluate_assessment(
             detail="No answers recorded for this assessment",
         )
 
+    logger.info(
+        "Evaluating assessment %s with %d questions",
+        assessment_id,
+        len(questions),
+    )
+    for q in questions:
+        logger.info(
+            "Question %s: has_answer=%s answer_len=%d",
+            q.id,
+            bool(q.candidate_answer),
+            len(q.candidate_answer) if q.candidate_answer else 0,
+        )
+
     eval_repo = EvaluationRepository(db)
     evaluation_results = []
     for q in questions:

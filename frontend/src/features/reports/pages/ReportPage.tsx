@@ -1,44 +1,259 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { EmptyState } from '@/components/feedback/EmptyState';
+import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { ClipboardCheck, AlertTriangle, ShieldCheck, Target } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
+import { EmptyState } from "@/components/feedback/EmptyState";
+import { assessmentService } from "@/services/assessment.service";
+
+interface EvaluationResult {
+  id: string;
+  overall_score: number;
+  confidence: number;
+  proficiency_level: string;
+  passed: boolean;
+  criteria_scores: { name: string; score: number; max_score: number; comment: string }[];
+  missing_concepts: string[];
+  demonstrated_skills: string[];
+  mitre_technique_ids: string[];
+  overall_justification: string;
+}
+
+interface ResultsResponse {
+  assessment_id: string;
+  evaluation_count: number;
+  results: EvaluationResult[];
+}
+
+function ScoreBar({ score, maxScore = 100 }: { score: number; maxScore?: number }) {
+  const pct = Math.min((score / maxScore) * 100, 100);
+  const color =
+    pct >= 80 ? "bg-success-500" : pct >= 60 ? "bg-warning-500" : "bg-danger-500";
+  return (
+    <div className="h-2 w-full overflow-hidden rounded-full bg-surface-700">
+      <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
+    </div>
+  );
+}
 
 export default function ReportPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(-1)}
-              className="shrink-0"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Assessment Report</h1>
-              <p className="text-sm text-muted-foreground">
-                Report ID: {id || 'N/A'}
-              </p>
-            </div>
-          </div>
-        </div>
+  const { data, isLoading, error } = useQuery<ResultsResponse>({
+    queryKey: ["assessment-results", id],
+    queryFn: () => assessmentService.getResults(id!),
+    enabled: !!id,
+  });
 
+  if (!id) {
+    return (
+      <div className="space-y-6">
         <EmptyState
-          icon={<FileText className="h-8 w-8" />}
-          title="No report available"
-          description="Complete an assessment to view your report"
-          action={{
-            label: "Start Assessment",
-            onClick: () => navigate("/assessment"),
-          }}
+          icon={<ClipboardCheck className="h-8 w-8" />}
+          title="No assessment selected"
+          description="Navigate to an assessment to view its report"
         />
       </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-sm text-surface-500">Loading report...</div>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="space-y-6">
+        <EmptyState
+          icon={<AlertTriangle className="h-8 w-8" />}
+          title="Unable to load report"
+          description="This assessment may not have been evaluated yet"
+        />
+      </div>
+    );
+  }
+
+  const results = data.results ?? [];
+
+  const avgScore =
+    results.length > 0
+      ? results.reduce((sum, r) => sum + r.overall_score, 0) / results.length
+      : 0;
+
+  const avgConfidence =
+    results.length > 0
+      ? results.reduce((sum, r) => sum + r.confidence, 0) / results.length
+      : 0;
+
+  const allDemonstrated = [...new Set(results.flatMap((r) => r.demonstrated_skills ?? []))];
+  const allMissing = [...new Set(results.flatMap((r) => r.missing_concepts ?? []))];
+  const allMitres = [...new Set(results.flatMap((r) => r.mitre_technique_ids ?? []))];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-surface-100">Assessment Report</h1>
+        <p className="text-sm text-surface-400">
+          Evaluation results for assessment {id.slice(0, 8)}...
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card variant="elevated">
+          <CardContent className="flex items-center gap-4 py-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-900/30">
+              <Target className="h-6 w-6 text-primary-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-surface-100">{avgScore.toFixed(1)}</p>
+              <p className="text-xs text-surface-500">Average Score</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card variant="elevated">
+          <CardContent className="flex items-center gap-4 py-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-success-900/30">
+              <ShieldCheck className="h-6 w-6 text-success-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-surface-100">
+                {(avgConfidence * 100).toFixed(0)}%
+              </p>
+              <p className="text-xs text-surface-500">Confidence</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card variant="elevated">
+          <CardContent className="flex items-center gap-4 py-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyber-900/30">
+              <ClipboardCheck className="h-6 w-6 text-cyber-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-surface-100">{data.evaluation_count}</p>
+              <p className="text-xs text-surface-500">Questions Evaluated</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card variant="elevated">
+        <CardHeader>
+          <CardTitle>Evaluation Breakdown</CardTitle>
+          <CardDescription>Score and confidence per evaluated question</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {results.length === 0 ? (
+            <p className="text-sm text-surface-500 py-4 text-center">No evaluation results yet</p>
+          ) : results.map((r) => (
+            <div key={r.id} className="rounded-lg border border-surface-700/50 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-surface-200">
+                  Question {r.id.slice(0, 8)}...
+                </span>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                    r.passed
+                      ? "bg-success-900/30 text-success-400"
+                      : "bg-danger-900/30 text-danger-400"
+                  }`}
+                >
+                  {r.proficiency_level}
+                </span>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs text-surface-400">
+                  <span>Score: {r.overall_score.toFixed(1)}</span>
+                  <span>Confidence: {(r.confidence * 100).toFixed(0)}%</span>
+                </div>
+                <ScoreBar score={r.overall_score} />
+              </div>
+              {r.overall_justification && (
+                <p className="text-xs text-surface-500 italic">{r.overall_justification}</p>
+              )}
+              {(r.criteria_scores ?? []).length > 0 && (
+                <div className="space-y-1">
+                  {(r.criteria_scores ?? []).map((c, i) => (
+                    <div key={i} className="flex items-center justify-between text-xs">
+                      <span className="text-surface-400">{c.name}</span>
+                      <span className="text-surface-300">
+                        {c.score}/{c.max_score}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Card variant="elevated">
+          <CardHeader>
+            <CardTitle>Demonstrated Skills</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {allDemonstrated.length === 0 ? (
+              <p className="text-sm text-surface-500">None recorded</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {allDemonstrated.map((skill) => (
+                  <span
+                    key={skill}
+                    className="rounded-full bg-success-900/20 px-3 py-1 text-xs text-success-400"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        <Card variant="elevated">
+          <CardHeader>
+            <CardTitle>Missing Concepts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {allMissing.length === 0 ? (
+              <p className="text-sm text-surface-500">None identified</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {allMissing.map((concept) => (
+                  <span
+                    key={concept}
+                    className="rounded-full bg-warning-900/20 px-3 py-1 text-xs text-warning-400"
+                  >
+                    {concept}
+                  </span>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {allMitres.length > 0 && (
+        <Card variant="elevated">
+          <CardHeader>
+            <CardTitle>MITRE ATT&CK Mapping</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {allMitres.map((technique) => (
+                <span
+                  key={technique}
+                  className="rounded bg-cyber-900/20 px-2 py-1 font-mono text-xs text-cyber-400"
+                >
+                  {technique}
+                </span>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

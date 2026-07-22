@@ -1,4 +1,4 @@
-export type { User, LoginRequest, LoginResponse, RegisterRequest } from "./user";
+export type { User, LoginRequest, LoginResponse, TokenResponse, RegisterRequest } from "./user";
 export type {
   Assessment,
   AssessmentStatus,

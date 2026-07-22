@@ -4,47 +4,45 @@ import { Upload, CheckCircle, FileText, ArrowRight } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
+import { LoadingSpinner } from "@/components/feedback/LoadingSpinner";
 import { JobDescriptionUpload } from "@/components/forms/JobDescriptionUpload";
 import { ParseResult } from "../components/ParseResult";
-import { roleDefinitionService } from "@/services/role-definition.service";
+import { roleDefinitionService, type SkillDNAParseResult } from "@/services/role-definition.service";
 
 export default function JobDescriptionPage() {
   const navigate = useNavigate();
-  const [_uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [parseResult, setParseResult] = useState<any>(null);
+  const [parseResult, setParseResult] = useState<SkillDNAParseResult | null>(null);
+  const [fileName, setFileName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [roleDefinitionId, setRoleDefinitionId] = useState<string | null>(null);
 
   const handleUpload = async (file: File) => {
-    setUploadedFile(file);
-    setIsUploading(true);
+    setFileName(file.name);
     setError(null);
+    setParseResult(null);
+    setIsUploading(true);
+
     try {
-      const result = await roleDefinitionService.upload(file);
-      setRoleDefinitionId(result.role_definition_id);
-      const parsed = await roleDefinitionService.parse(result.role_definition_id);
-      setParseResult(parsed);
-    } catch {
-      setError("API not configured yet. Please try again later.");
+      const text = await file.text();
+      setIsUploading(false);
+      setIsProcessing(true);
+
+      const result = await roleDefinitionService.parseText(text, file.name);
+      setParseResult(result);
+    } catch (err: any) {
+      const detail = err?.response?.data?.detail;
+      setError(typeof detail === "string" ? detail : "Failed to process job description. Please try again.");
     } finally {
       setIsUploading(false);
+      setIsProcessing(false);
     }
   };
 
-  const handleGenerateSkillDNA = async () => {
-    setIsProcessing(true);
-    try {
-      if (roleDefinitionId) {
-        await roleDefinitionService.get(roleDefinitionId);
-      }
-      navigate("/skill-dna-profile");
-    } catch {
-      setError("Failed to generate Skill DNA Profile.");
-    } finally {
-      setIsProcessing(false);
-    }
+  const handleClear = () => {
+    setParseResult(null);
+    setFileName("");
+    setError(null);
   };
 
   return (
@@ -64,18 +62,42 @@ export default function JobDescriptionPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-6">
-          <Card variant="elevated">
-            <CardHeader>
-              <CardTitle>Upload Job Description</CardTitle>
-              <CardDescription>
-                PDF, DOCX, or TXT files are supported
-              </CardDescription>
-            </CardHeader>
-            <JobDescriptionUpload onUpload={handleUpload} isLoading={isUploading} />
-          </Card>
-
-          {parseResult && (
-            <ParseResult result={parseResult} />
+          {isProcessing ? (
+            <Card variant="elevated">
+              <CardContent className="py-12">
+                <div className="text-center space-y-3">
+                  <LoadingSpinner size="md" />
+                  <p className="text-sm text-surface-400">
+                    Analyzing "{fileName}" — extracting capabilities and skills...
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : parseResult ? (
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-surface-500">Analyzed</p>
+                  <p className="text-sm font-medium text-surface-200">{fileName}</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={handleClear}>
+                  Parse Another
+                </Button>
+              </div>
+              <ParseResult result={parseResult} />
+            </>
+          ) : (
+            <>
+              <Card variant="elevated">
+                <CardHeader>
+                  <CardTitle>Upload Job Description</CardTitle>
+                  <CardDescription>
+                    PDF, DOCX, or TXT files are supported
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              <JobDescriptionUpload onUpload={handleUpload} isLoading={isUploading} />
+            </>
           )}
         </div>
 
@@ -107,12 +129,11 @@ export default function JobDescriptionPage() {
 
           {parseResult && (
             <Button
-              onClick={handleGenerateSkillDNA}
-              isLoading={isProcessing}
+              onClick={() => navigate("/skill-dna-profile")}
               className="w-full"
               rightIcon={<ArrowRight size={16} />}
             >
-              Generate Skill DNA Profile
+              View Skill DNA Profile
             </Button>
           )}
         </div>

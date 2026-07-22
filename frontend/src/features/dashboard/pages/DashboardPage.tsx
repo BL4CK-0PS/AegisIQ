@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   ClipboardCheck,
   Dna,
@@ -10,9 +11,31 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { RecentAssessments } from "../components/RecentAssessments";
 import { SkillOverview } from "../components/SkillOverview";
+import { assessmentService } from "@/services/assessment.service";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+
+  const { data } = useQuery({
+    queryKey: ["assessments"],
+    queryFn: () => assessmentService.list(100, 0),
+  });
+
+  const assessments = data?.assessments ?? [];
+  const completedCount = assessments.filter((a) => a.status === "completed").length;
+  const activeCount = assessments.filter((a) => a.status === "active").length;
+  const totalCount = assessments.length;
+
+  const completedWithScores = assessments.filter(
+    (a) => a.status === "completed" && a.question_count > 0,
+  );
+  const avgScore =
+    completedWithScores.length > 0
+      ? Math.round(
+          completedWithScores.reduce((sum, a) => sum + (a.question_count ?? 0), 0) /
+            completedWithScores.length,
+        )
+      : 0;
 
   return (
     <div className="space-y-8">
@@ -37,7 +60,7 @@ export default function DashboardPage() {
               <ClipboardCheck className="h-6 w-6 text-primary-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-surface-100">0</p>
+              <p className="text-2xl font-bold text-surface-100">{completedCount}</p>
               <p className="text-xs text-surface-400">Completed Assessments</p>
             </div>
           </div>
@@ -49,7 +72,7 @@ export default function DashboardPage() {
               <TrendingUp className="h-6 w-6 text-cyber-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-surface-100">0%</p>
+              <p className="text-2xl font-bold text-surface-100">{avgScore}%</p>
               <p className="text-xs text-surface-400">Average Score</p>
             </div>
           </div>
@@ -61,8 +84,8 @@ export default function DashboardPage() {
               <Dna className="h-6 w-6 text-warning-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-surface-100">0</p>
-              <p className="text-xs text-surface-400">Skill DNA Profiles</p>
+              <p className="text-2xl font-bold text-surface-100">{activeCount}</p>
+              <p className="text-xs text-surface-400">Active Assessments</p>
             </div>
           </div>
         </Card>
@@ -73,7 +96,7 @@ export default function DashboardPage() {
               <FileText className="h-6 w-6 text-danger-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-surface-100">0</p>
+              <p className="text-2xl font-bold text-surface-100">{totalCount}</p>
               <p className="text-xs text-surface-400">Total Assessments</p>
             </div>
           </div>

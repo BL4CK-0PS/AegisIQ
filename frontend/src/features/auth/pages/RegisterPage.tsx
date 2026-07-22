@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { extractErrorDetail } from "@/services/auth.service";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
@@ -13,7 +14,7 @@ const registerSchema = z
   .object({
     name: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Invalid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -36,19 +37,21 @@ export default function RegisterPage() {
   });
 
   const onSubmit = (data: RegisterForm) => {
-    registerUser({ name: data.name, email: data.email, password: data.password });
+    registerUser({ display_name: data.name, email: data.email, password: data.password });
   };
+
+  const errorMessage = extractErrorDetail(registerError) || "Registration failed. Please try again.";
 
   return (
     <div>
       <h2 className="mb-2 text-2xl font-bold text-surface-100">Create account</h2>
       <p className="mb-8 text-sm text-surface-400">
-        Join PWNDORA SkillScan X and start assessing your cybersecurity capability
+        Join AegisIQ and start assessing your cybersecurity capability
       </p>
 
       {registerError && (
         <Alert variant="error" className="mb-6">
-          Registration failed. Please try again.
+          {errorMessage}
         </Alert>
       )}
 
@@ -87,6 +90,7 @@ export default function RegisterPage() {
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
+        <p className="text-xs text-surface-500">Must be at least 8 characters</p>
 
         <Input
           label="Confirm password"

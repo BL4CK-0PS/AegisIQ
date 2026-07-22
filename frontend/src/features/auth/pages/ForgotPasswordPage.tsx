@@ -7,6 +7,8 @@ import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
+import { Alert } from "@/components/ui/Alert";
+import { apiClient } from "@/lib/api-client";
 
 const forgotSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -16,6 +18,8 @@ type ForgotForm = z.infer<typeof forgotSchema>;
 
 export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -25,8 +29,17 @@ export default function ForgotPasswordPage() {
     resolver: zodResolver(forgotSchema),
   });
 
-  const onSubmit = (_data: ForgotForm) => {
-    setSent(true);
+  const onSubmit = async (data: ForgotForm) => {
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await apiClient.post("/auth/forgot-password", { email: data.email });
+      setSent(true);
+    } catch {
+      setSent(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (sent) {
@@ -36,7 +49,7 @@ export default function ForgotPasswordPage() {
           <CheckCircle className="mx-auto mb-4 h-12 w-12 text-cyber-400" />
           <h2 className="mb-2 text-xl font-bold text-surface-100">Check your email</h2>
           <p className="mb-6 text-sm text-surface-400">
-            We've sent a password reset link to your email address.
+            If an account exists with that email, you'll receive a password reset link shortly.
           </p>
           <Link
             to="/login"
@@ -57,6 +70,10 @@ export default function ForgotPasswordPage() {
         Enter your email and we'll send you a reset link
       </p>
 
+      {error && (
+        <Alert variant="error" className="mb-4">{error}</Alert>
+      )}
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input
           label="Email"
@@ -67,7 +84,7 @@ export default function ForgotPasswordPage() {
           {...register("email")}
         />
 
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" isLoading={isSubmitting}>
           Send reset link
         </Button>
       </form>

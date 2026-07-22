@@ -8,7 +8,7 @@ export function AuthLayout() {
         <div className="max-w-md text-center">
           <Shield className="mx-auto mb-6 h-16 w-16 text-primary-500" />
           <h1 className="mb-3 text-3xl font-bold text-surface-100">
-            PWNDORA SkillScan X
+            AegisIQ
           </h1>
           <p className="text-lg text-surface-400">
             Adaptive Cybersecurity Capability Intelligence Platform
@@ -22,7 +22,7 @@ export function AuthLayout() {
         <div className="w-full max-w-md">
           <div className="mb-8 flex items-center gap-2 lg:hidden">
             <Shield className="h-8 w-8 text-primary-500" />
-            <span className="text-xl font-bold text-surface-100">PWNDORA</span>
+            <span className="text-xl font-bold text-surface-100">AegisIQ</span>
           </div>
           <Outlet />
         </div>

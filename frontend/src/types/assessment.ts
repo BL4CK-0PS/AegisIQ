@@ -6,16 +6,19 @@ export type ResponseType = "voice" | "text";
 
 export interface Assessment {
   id: string;
-  professional_id: string;
-  skill_dna_profile_id: string;
-  status: AssessmentStatus;
+  professional_id?: string;
+  skill_dna_profile_id?: string;
+  domain?: string;
+  status: string;
+  current_difficulty?: string;
+  question_count?: number;
   started_at: string | null;
   completed_at: string | null;
-  current_challenge_index: number;
-  total_challenges: number;
-  progress: number;
-  duration_seconds: number | null;
-  challenges: Challenge[];
+  current_challenge_index?: number;
+  total_challenges?: number;
+  progress?: number;
+  duration_seconds?: number | null;
+  challenges?: Challenge[];
 }
 
 export interface Challenge {

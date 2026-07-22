@@ -53,14 +53,23 @@ _settings = get_settings()
 def _get_client() -> AIClient:
     global _ai_client
     if _ai_client is None:
-        _ai_client, _ = create_ai_client()
+        try:
+            _ai_client, _ = create_ai_client()
+        except Exception as exc:
+            logger.warning(
+                "Primary AI provider failed (%s), falling back to MockProvider", exc
+            )
+            _ai_client, _ = create_ai_client(provider_name="mock")
     return _ai_client
 
 
 def _get_loader() -> PromptLoader:
     global _prompt_loader
     if _prompt_loader is None:
-        _, _prompt_loader = create_ai_client()
+        try:
+            _, _prompt_loader = create_ai_client()
+        except Exception:
+            _, _prompt_loader = create_ai_client(provider_name="mock")
     return _prompt_loader
 
 

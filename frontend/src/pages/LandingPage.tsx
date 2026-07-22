@@ -33,8 +33,8 @@ export default function LandingPage() {
       <nav className="flex items-center justify-between px-8 py-4">
         <div className="flex items-center gap-2">
           <Shield className="h-8 w-8 text-primary-500" />
-          <span className="text-xl font-bold text-surface-100">PWNDORA</span>
-          <span className="text-xs font-medium text-primary-400">SkillScan X</span>
+          <span className="text-xl font-bold text-surface-100">AegisIQ</span>
+          <span className="text-xs font-medium text-primary-400"></span>
         </div>
         <div className="flex items-center gap-3">
           <Button onClick={() => navigate("/dashboard")}>Go to Dashboard</Button>
@@ -51,7 +51,7 @@ export default function LandingPage() {
           <span className="text-primary-400">We assess cybersecurity capability.</span>
         </h1>
         <p className="mb-10 max-w-2xl text-lg text-surface-400">
-          PWNDORA SkillScan X evaluates your real cybersecurity skills through adaptive
+          AegisIQ evaluates your real cybersecurity skills through adaptive
           practical challenges, AI-powered reasoning evaluation, and explainable capability scoring.
         </p>
         <div className="flex items-center gap-4">
@@ -94,7 +94,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="border-t border-surface-800 px-8 py-6 text-center text-sm text-surface-500">
-        PWNDORA SkillScan X &copy; {new Date().getFullYear()} &middot; Adaptive Cybersecurity Capability Intelligence
+        AegisIQ &copy; {new Date().getFullYear()} &middot; Adaptive Cybersecurity Capability Intelligence
       </footer>
     </div>
   );

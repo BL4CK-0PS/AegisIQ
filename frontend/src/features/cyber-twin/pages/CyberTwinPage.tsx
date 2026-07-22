@@ -8,12 +8,12 @@ export default function CyberTwinPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="rounded-lg bg-primary/10 p-2">
-          <Fingerprint className="h-6 w-6 text-primary" />
+        <div className="rounded-lg bg-primary-900/30 p-2">
+          <Fingerprint className="h-6 w-6 text-primary-400" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Cyber Twin</h1>
-          <p className="text-sm text-muted-foreground">Your digital capability identity</p>
+          <h1 className="text-2xl font-bold text-surface-100">Cyber Twin</h1>
+          <p className="text-sm text-surface-400">Your digital capability identity</p>
         </div>
       </div>
 
