@@ -58,7 +58,6 @@ class AssessmentModel(Base):
     started_at = Column(DateTime(timezone=True), default=_utcnow)
     completed_at = Column(DateTime(timezone=True), nullable=True)
     summary = Column(JSON, default=dict)
-    proctoring_summary = Column(JSON, nullable=True)
 
     candidate = relationship("UserModel", back_populates="assessments", lazy="selectin")
     questions = relationship(

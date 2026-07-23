@@ -189,13 +189,11 @@ def _fallback_jd_parse(jd_text: str, title: str) -> SkillDnaProfile:
         d
         for d in ALL_DOMAINS
         if any(
-            kw in text_lower
-            for kw in d.name.lower().split()
-        ) or any(
-            kw in text_lower
+            keyword in text_lower
+            for keyword in d.name.lower().split()
             for cap in d.capabilities
             for s in cap.skills
-            for kw in s.name.lower().split() + s.alternative_labels
+            for keyword in s.name.lower().split() + s.alternative_labels
         )
     ]
     profile_domain = matched_domains[0] if matched_domains else ALL_DOMAINS[0]
