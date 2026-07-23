@@ -68,6 +68,25 @@ export interface ResultsResponse {
     mitre_technique_ids: string[];
     overall_justification: string;
   }[];
+  proctoring_summary?: ProctoringSummary;
+}
+
+export interface ProctoringViolation {
+  type: "tab_switch" | "fullscreen_exit" | "screen_share_stopped" | "clipboard_attempt" | "context_menu" | "audio_anomaly";
+  timestamp: number;
+  detail: string;
+}
+
+export interface ProctoringSummary {
+  assessment_id: string;
+  violation_count: number;
+  violations: ProctoringViolation[];
+  integrity_score: number;
+  cheating_risk_flagged: boolean;
+  tab_switches: number;
+  fullscreen_exits: number;
+  screen_share_stops: number;
+  audio_anomalies: number;
 }
 
 export const assessmentService = {

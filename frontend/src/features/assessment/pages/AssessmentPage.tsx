@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { Alert } from "@/components/ui/Alert";
 import { assessmentService } from "@/services/assessment.service";
+import { useProctoring } from "../hooks/useProctoring";
+import { ProctoringGuard } from "../components/ProctoringGuard";
+import { ProctorStatusBadge } from "../components/ProctorStatusBadge";
+import { FullscreenWarningModal } from "../components/FullscreenWarningModal";
+import { VoiceInput } from "../components/VoiceInput";
 
 interface ApiError {
   response?: { data?: { detail?: string } };
@@ -22,6 +27,9 @@ export default function AssessmentPage() {
   const queryClient = useQueryClient();
   const [answer, setAnswer] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [proctoringReady, setProctoringReady] = useState(false);
+
+  const proctoring = useProctoring(id ?? "");
 
   const {
     data: assessment,
@@ -56,6 +64,7 @@ export default function AssessmentPage() {
   const evaluateMutation = useMutation({
     mutationFn: () => assessmentService.evaluate(id!),
     onSuccess: () => {
+      proctoring.stopMic();
       queryClient.invalidateQueries({ queryKey: ["assessment", id] });
       navigate(`/report/${id}`);
     },
@@ -67,6 +76,7 @@ export default function AssessmentPage() {
   const completeMutation = useMutation({
     mutationFn: () => assessmentService.complete(id!),
     onSuccess: () => {
+      proctoring.stopMic();
       queryClient.invalidateQueries({ queryKey: ["assessment", id] });
       navigate(`/report/${id}`);
     },
@@ -77,11 +87,13 @@ export default function AssessmentPage() {
 
   if (!id) {
     return (
-      <EmptyState
-        icon={<ClipboardCheck className="h-8 w-8" />}
-        title="No assessment selected"
-        description="Navigate to an assessment to view its details"
-      />
+      <div className="space-y-6">
+        <EmptyState
+          icon={<ClipboardCheck className="h-8 w-8" />}
+          title="No assessment selected"
+          description="Navigate to an assessment to view its details"
+        />
+      </div>
     );
   }
 
@@ -131,19 +143,48 @@ export default function AssessmentPage() {
     });
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/assessment")}>
-          <ArrowLeft size={16} />
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold text-surface-100">{domain}</h1>
-          <p className="text-sm text-surface-400">
-            ID: {assessmentId.slice(0, 8)}...
-          </p>
+  const handleVoiceTranscript = (text: string) => {
+    setAnswer((prev) => (prev ? prev + " " + text : text));
+  };
+
+  const innerContent = (
+    <div className="space-y-6" data-proctoring-zone>
+      <FullscreenWarningModal
+        isOpen={!proctoring.isFullscreen && proctoringReady && isActive}
+        onReenterFullscreen={proctoring.enterFullscreen}
+        violationCount={proctoring.violationCount}
+      />
+
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="sm" onClick={() => navigate("/assessment")}>
+            <ArrowLeft size={16} />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-surface-100">{domain}</h1>
+            <p className="text-sm text-surface-400">
+              ID: {assessmentId.slice(0, 8)}...
+            </p>
+          </div>
         </div>
+        {isActive && (
+          <ProctorStatusBadge
+            isFullscreen={proctoring.isFullscreen}
+            isScreenSharing={proctoring.isScreenSharing}
+            isMicActive={proctoring.isMicActive}
+            isTabFocused={proctoring.isTabFocused}
+            violationCount={proctoring.violationCount}
+            isLocked={proctoring.isLocked}
+            audioLevel={proctoring.audioLevel}
+          />
+        )}
       </div>
+
+      {proctoring.violationCount > 0 && !proctoring.isLocked && (
+        <Alert variant="warning" title="Proctoring Warning">
+          {proctoring.violationCount}/{3} violations recorded. Maintain fullscreen and stay focused to avoid automatic submission.
+        </Alert>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card variant="elevated">
@@ -220,13 +261,24 @@ export default function AssessmentPage() {
                 at <span className="font-medium text-primary-400">{difficulty}</span> difficulty.
                 Record your analysis, response steps, or reasoning below.
               </p>
-              <textarea
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Describe your analysis, response steps, and reasoning..."
-                rows={5}
-                className="w-full rounded-lg border border-surface-600 bg-surface-800 px-3 py-2 text-sm text-surface-100 placeholder:text-surface-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              />
+              <div className="space-y-2">
+                <textarea
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  placeholder="Describe your analysis, response steps, and reasoning..."
+                  rows={5}
+                  className="w-full rounded-lg border border-surface-600 bg-surface-800 px-3 py-2 text-sm text-surface-100 placeholder:text-surface-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                />
+                <div className="flex items-center gap-2">
+                  <VoiceInput
+                    onTranscript={handleVoiceTranscript}
+                    disabled={recordMutation.isPending}
+                  />
+                  <span className="text-[11px] text-surface-500">
+                    {recordMutation.isPending ? "Dictation unavailable" : "Voice dictation (English)"}
+                  </span>
+                </div>
+              </div>
               <div className="flex items-center gap-3">
                 <Button
                   onClick={handleSubmitAnswer}
@@ -269,4 +321,17 @@ export default function AssessmentPage() {
       )}
     </div>
   );
+
+  if (!proctoringReady && isActive) {
+    return (
+      <ProctoringGuard
+        proctoring={proctoring}
+        onReady={() => setProctoringReady(true)}
+      >
+        {innerContent}
+      </ProctoringGuard>
+    );
+  }
+
+  return innerContent;
 }

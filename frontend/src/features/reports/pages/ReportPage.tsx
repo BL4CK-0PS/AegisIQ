@@ -1,9 +1,11 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ClipboardCheck, AlertTriangle, ShieldCheck, Target } from "lucide-react";
+import { ClipboardCheck, AlertTriangle, ShieldCheck, Target, Eye, Monitor, Mic, Maximize, AlertCircle } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { assessmentService, type ResultsResponse } from "@/services/assessment.service";
+import { assessmentService, type ResultsResponse, type ProctoringSummary } from "@/services/assessment.service";
+import { Badge } from "@/components/ui/Badge";
+import { cn } from "@/lib/utils";
 
 function formatCriterionName(raw: string): string {
   return raw
@@ -19,6 +21,97 @@ function ScoreBar({ score, maxScore = 100 }: { score: number; maxScore?: number 
     <div className="h-2 w-full overflow-hidden rounded-full bg-surface-700">
       <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
     </div>
+  );
+}
+
+function ProctoringSummaryCard({ summary }: { summary: ProctoringSummary }) {
+  const integrityColor = summary.integrity_score >= 80
+    ? "text-success-400"
+    : summary.integrity_score >= 50
+      ? "text-warning-400"
+      : "text-danger-400";
+
+  const stats = [
+    { label: "Tab Switches", count: summary.tab_switches, icon: Monitor, active: summary.tab_switches > 0 },
+    { label: "Fullscreen Exits", count: summary.fullscreen_exits, icon: Maximize, active: summary.fullscreen_exits > 0 },
+    { label: "Screen Share Stops", count: summary.screen_share_stops, icon: Monitor, active: summary.screen_share_stops > 0 },
+    { label: "Audio Anomalies", count: summary.audio_anomalies, icon: Mic, active: summary.audio_anomalies > 0 },
+  ];
+
+  return (
+    <Card variant="elevated">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Eye size={18} className="text-primary-400" />
+              Proctoring & Integrity Summary
+            </CardTitle>
+            <CardDescription>Monitoring data recorded during the assessment session</CardDescription>
+          </div>
+          {summary.cheating_risk_flagged && (
+            <Badge variant="danger" size="md">
+              <AlertCircle size={12} className="mr-1" />
+              Risk Flagged
+            </Badge>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center gap-6">
+          <div>
+            <p className={cn("text-3xl font-bold", integrityColor)}>
+              {summary.integrity_score}%
+            </p>
+            <p className="text-xs text-surface-500">Integrity Score</p>
+          </div>
+          <div className="flex-1">
+            <div className="h-3 w-full overflow-hidden rounded-full bg-surface-700">
+              <div
+                className={cn("h-full rounded-full transition-all", integrityColor.replace("text-", "bg-"))}
+                style={{ width: `${summary.integrity_score}%` }}
+              />
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-sm font-medium text-surface-200">{summary.violation_count} violation{summary.violation_count !== 1 ? "s" : ""}</p>
+            <p className="text-xs text-surface-500">Total violations</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {stats.map((s) => (
+            <div
+              key={s.label}
+              className={cn(
+                "rounded-lg border p-3 text-center",
+                s.active ? "border-danger-700/50 bg-danger-900/10" : "border-surface-700/50 bg-surface-800/50",
+              )}
+            >
+              <s.icon size={14} className={cn("mx-auto mb-1", s.active ? "text-danger-400" : "text-surface-500")} />
+              <p className="text-lg font-bold text-surface-100">{s.count}</p>
+              <p className="text-[10px] text-surface-500">{s.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {summary.violations.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-surface-400">Violation Log</p>
+            <div className="max-h-40 space-y-1 overflow-y-auto rounded-lg border border-surface-700/50 p-2">
+              {summary.violations.map((v, i) => (
+                <div key={i} className="flex items-center justify-between text-xs">
+                  <span className="text-surface-300">{v.detail}</span>
+                  <span className="text-surface-500">
+                    {new Date(v.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -254,6 +347,10 @@ export default function ReportPage() {
           )}
         </CardContent>
       </Card>
+
+      {data.proctoring_summary && (
+        <ProctoringSummaryCard summary={data.proctoring_summary} />
+      )}
     </div>
   );
 }
