@@ -8,5 +8,5 @@ export type {
 } from "./assessment";
 export type { SkillDNAProfile } from "./skill-dna";
 export type { Report } from "./report";
-export type { CareerCompass } from "./career-compass";
+export type { CareerCompass, WeakSkill, Lab, LearningRecommendation, RoadmapItem } from "./career-compass";
 export type { RoleDefinition } from "./role-definition";

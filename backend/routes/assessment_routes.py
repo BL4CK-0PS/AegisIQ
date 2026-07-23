@@ -277,14 +277,32 @@ async def complete_assessment_endpoint(
     assessment.status = "completed"
     assessment.completed_at = datetime.now(timezone.utc)
 
-    session_ref = AdaptiveSession(
-        id=assessment.id,
-        domain=assessment.domain,
-    )
-    summary = get_session_summary(session_ref)
+    try:
+        repo2 = AssessmentRepository(db)
+        full_assessment = await repo2.get_with_questions(assessment_id)
+        question_count = len(full_assessment.questions) if full_assessment and full_assessment.questions else 0
+        domains = list({q.domain for q in (full_assessment.questions or []) if q.domain})
+        difficulties = list({q.difficulty for q in (full_assessment.questions or []) if q.difficulty})
+        summary = {
+            "total_questions": question_count,
+            "domain": assessment.domain,
+            "domains_covered": domains,
+            "difficulties_covered": difficulties,
+        }
+    except Exception:
+        summary = {"total_questions": 0, "domain": assessment.domain}
+
     assessment.summary = summary
 
-    await db.commit()
+    try:
+        await db.commit()
+    except Exception as exc:
+        logger.error("Failed to commit assessment completion %s: %s", assessment_id, exc)
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to save assessment completion",
+        )
 
     return {"status": "success", "assessment_id": assessment_id, "summary": summary}
 

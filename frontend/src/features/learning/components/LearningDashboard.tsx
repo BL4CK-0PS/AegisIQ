@@ -2,33 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { learningService } from "@/services/learning.service";
-
-interface LearningRecommendation {
-  topic: string;
-  reason: string;
-  difficulty: string;
-  estimated_hours: number;
-  resources: { type: string; title: string }[];
-}
-
-interface LearningRoadmapItem {
-  phase: number;
-  title: string;
-  description: string;
-  duration_weeks: number;
-  skills_focus: string[];
-}
-
-interface CareerCompassData {
-  weak_skills: { name: string; priority: string; current_level: number; target_level: number; gap: number }[];
-  recommendations: LearningRecommendation[];
-  roadmap: LearningRoadmapItem[];
-}
+import type { WeakSkill, Lab } from "@/types";
 
 export default function LearningDashboard() {
   const { data: compasses, isLoading } = useQuery({
     queryKey: ["career-compasses"],
-    queryFn: () => learningService.listCompasses() as Promise<CareerCompassData[]>,
+    queryFn: () => learningService.listCompasses(),
   });
 
   const latest = compasses?.[0];
@@ -51,9 +30,31 @@ export default function LearningDashboard() {
             <CardTitle>Weak Skills</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-surface-400">
-              No skill gaps identified yet. Complete an assessment to get personalized recommendations.
-            </p>
+            {latest && latest.weak_skills.length > 0 ? (
+              <div className="space-y-2">
+                {latest.weak_skills.map((skill: WeakSkill, i: number) => (
+                  <div key={i} className="flex items-center justify-between rounded-lg bg-surface-800/50 p-3">
+                    <div>
+                      <p className="text-sm font-medium text-surface-200">{skill.name}</p>
+                      <p className="text-xs text-surface-400">
+                        Current: {skill.current_level} / Target: {skill.target_level} — Gap: {skill.gap}
+                      </p>
+                    </div>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      skill.priority === "critical" ? "bg-danger-900/30 text-danger-400"
+                        : skill.priority === "high" ? "bg-warning-900/30 text-warning-400"
+                          : "bg-surface-700 text-surface-400"
+                    }`}>
+                      {skill.priority}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-surface-400">
+                No skill gaps identified yet. Complete an assessment to get personalized recommendations.
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -123,9 +124,37 @@ export default function LearningDashboard() {
             <CardTitle>Recommended Labs</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-surface-400">
-              No labs recommended yet. Complete an assessment to get lab recommendations.
-            </p>
+            {latest && latest.labs.length > 0 ? (
+              <div className="space-y-2">
+                {latest.labs.map((lab: Lab, i: number) => (
+                  <div key={i} className="rounded-lg bg-surface-800/50 p-3">
+                    <p className="text-sm font-medium text-surface-200">{lab.title}</p>
+                    <p className="mt-1 text-xs text-surface-400">{lab.description}</p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="text-xs text-surface-500">~{lab.estimated_hours}h</span>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                        lab.difficulty === "advanced" ? "bg-danger-900/30 text-danger-400"
+                          : lab.difficulty === "intermediate" ? "bg-warning-900/30 text-warning-400"
+                            : "bg-success-900/30 text-success-400"
+                      }`}>
+                        {lab.difficulty}
+                      </span>
+                    </div>
+                    {lab.skills_practiced.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {lab.skills_practiced.map((s, j) => (
+                          <span key={j} className="rounded bg-primary-900/20 px-2 py-0.5 text-xs text-primary-400">{s}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-surface-400">
+                No labs recommended yet. Complete an assessment to get lab recommendations.
+              </p>
+            )}
           </CardContent>
         </Card>
 
