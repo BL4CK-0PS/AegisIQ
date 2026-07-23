@@ -3,25 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { ClipboardCheck, AlertTriangle, ShieldCheck, Target } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { assessmentService } from "@/services/assessment.service";
+import { assessmentService, type ResultsResponse } from "@/services/assessment.service";
 
-interface EvaluationResult {
-  id: string;
-  overall_score: number;
-  confidence: number;
-  proficiency_level: string;
-  passed: boolean;
-  criteria_scores: { name: string; score: number; max_score: number; comment: string }[];
-  missing_concepts: string[];
-  demonstrated_skills: string[];
-  mitre_technique_ids: string[];
-  overall_justification: string;
-}
-
-interface ResultsResponse {
-  assessment_id: string;
-  evaluation_count: number;
-  results: EvaluationResult[];
+function formatCriterionName(raw: string): string {
+  return raw
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function ScoreBar({ score, maxScore = 100 }: { score: number; maxScore?: number }) {
@@ -94,10 +81,10 @@ export default function ReportPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-surface-100">Assessment Report</h1>
-        <p className="text-sm text-surface-400">
-          Evaluation results for assessment {id.slice(0, 8)}...
+      <div className="min-h-14">
+        <h1 className="text-2xl font-bold text-surface-100 leading-tight">Assessment Report</h1>
+        <p className="text-sm text-surface-400 mt-0.5">
+          Evaluation results for assessment {id.slice(0, 8)}…
         </p>
       </div>
 
@@ -174,13 +161,21 @@ export default function ReportPage() {
                 <p className="text-xs text-surface-500 italic">{r.overall_justification}</p>
               )}
               {(r.criteria_scores ?? []).length > 0 && (
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {(r.criteria_scores ?? []).map((c, i) => (
-                    <div key={i} className="flex items-center justify-between text-xs">
-                      <span className="text-surface-400">{c.name}</span>
-                      <span className="text-surface-300">
-                        {c.score}/{c.max_score}
-                      </span>
+                    <div key={i} className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-surface-300 font-medium">
+                          {formatCriterionName(c.name)}
+                        </span>
+                        <span className="text-surface-400">
+                          {c.score}/{c.max_score}
+                        </span>
+                      </div>
+                      <ScoreBar score={c.score} maxScore={c.max_score} />
+                      {c.comment && (
+                        <p className="text-[11px] text-surface-500 italic">{c.comment}</p>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -235,12 +230,17 @@ export default function ReportPage() {
         </Card>
       </div>
 
-      {allMitres.length > 0 && (
-        <Card variant="elevated">
-          <CardHeader>
-            <CardTitle>MITRE ATT&CK Mapping</CardTitle>
-          </CardHeader>
-          <CardContent>
+      <Card variant="elevated">
+        <CardHeader>
+          <CardTitle>MITRE ATT&CK Mapping</CardTitle>
+          <CardDescription>Techniques identified from evaluated responses</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {allMitres.length === 0 ? (
+            <p className="text-sm text-surface-500 py-2 text-center">
+              No MITRE techniques identified for this assessment
+            </p>
+          ) : (
             <div className="flex flex-wrap gap-2">
               {allMitres.map((technique) => (
                 <span
@@ -251,9 +251,9 @@ export default function ReportPage() {
                 </span>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

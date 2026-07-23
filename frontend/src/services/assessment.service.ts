@@ -26,6 +26,50 @@ export interface CreateAssessmentResponse {
   state: string;
 }
 
+export interface RecordAnswerResponse {
+  status: string;
+  record_id: string;
+  question_text: string;
+}
+
+export interface EvaluateResponse {
+  status: string;
+  assessment_id: string;
+  evaluations_count: number;
+  average_score: number;
+  evaluations: {
+    id: string;
+    score: number;
+    confidence: number;
+    proficiency_level: string;
+    passed: boolean;
+    mitre_technique_ids: string[];
+  }[];
+}
+
+export interface CompleteResponse {
+  status: string;
+  assessment_id: string;
+  summary: Record<string, unknown>;
+}
+
+export interface ResultsResponse {
+  assessment_id: string;
+  evaluation_count: number;
+  results: {
+    id: string;
+    overall_score: number;
+    confidence: number;
+    proficiency_level: string;
+    passed: boolean;
+    criteria_scores: { name: string; score: number; max_score: number; comment: string }[];
+    missing_concepts: string[];
+    demonstrated_skills: string[];
+    mitre_technique_ids: string[];
+    overall_justification: string;
+  }[];
+}
+
 export const assessmentService = {
   async list(limit = 20, offset = 0): Promise<PaginatedAssessments> {
     const response = await apiClient.get<PaginatedAssessments>("/assessments/", {
@@ -49,8 +93,10 @@ export const assessmentService = {
     return response.data;
   },
 
-  async start(assessmentId: string): Promise<any> {
-    const response = await apiClient.post(`/assessments/${assessmentId}/evaluate`);
+  async start(assessmentId: string): Promise<CreateAssessmentResponse> {
+    const response = await apiClient.post<CreateAssessmentResponse>(
+      `/assessments/${assessmentId}/evaluate`,
+    );
     return response.data;
   },
 
@@ -62,27 +108,27 @@ export const assessmentService = {
     skill: string;
     difficulty: string;
     candidate_answer: string;
-  }): Promise<any> {
-    const response = await apiClient.post("/assessments/record", data);
+  }): Promise<RecordAnswerResponse> {
+    const response = await apiClient.post<RecordAnswerResponse>("/assessments/record", data);
     return response.data;
   },
 
-  async evaluate(assessmentId: string): Promise<any> {
-    const response = await apiClient.post(
+  async evaluate(assessmentId: string): Promise<EvaluateResponse> {
+    const response = await apiClient.post<EvaluateResponse>(
       `/assessments/${assessmentId}/evaluate`,
     );
     return response.data;
   },
 
-  async complete(assessmentId: string): Promise<any> {
-    const response = await apiClient.post(
+  async complete(assessmentId: string): Promise<CompleteResponse> {
+    const response = await apiClient.post<CompleteResponse>(
       `/assessments/${assessmentId}/complete`,
     );
     return response.data;
   },
 
-  async getResults(assessmentId: string): Promise<any> {
-    const response = await apiClient.get(
+  async getResults(assessmentId: string): Promise<ResultsResponse> {
+    const response = await apiClient.get<ResultsResponse>(
       `/assessments/${assessmentId}/results`,
     );
     return response.data;

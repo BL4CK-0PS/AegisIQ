@@ -8,6 +8,14 @@ import { EmptyState } from "@/components/feedback/EmptyState";
 import { Alert } from "@/components/ui/Alert";
 import { assessmentService } from "@/services/assessment.service";
 
+interface ApiError {
+  response?: { data?: { detail?: string } };
+}
+
+function getErrorMessage(err: unknown, fallback: string): string {
+  return (err as ApiError)?.response?.data?.detail ?? fallback;
+}
+
 export default function AssessmentPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -40,8 +48,8 @@ export default function AssessmentPage() {
       setSubmitError(null);
       queryClient.invalidateQueries({ queryKey: ["assessment", id] });
     },
-    onError: (err: any) => {
-      setSubmitError(err?.response?.data?.detail ?? "Failed to submit answer");
+    onError: (err: unknown) => {
+      setSubmitError(getErrorMessage(err, "Failed to submit answer"));
     },
   });
 
@@ -51,8 +59,8 @@ export default function AssessmentPage() {
       queryClient.invalidateQueries({ queryKey: ["assessment", id] });
       navigate(`/report/${id}`);
     },
-    onError: (err: any) => {
-      setSubmitError(err?.response?.data?.detail ?? "Failed to evaluate assessment");
+    onError: (err: unknown) => {
+      setSubmitError(getErrorMessage(err, "Failed to evaluate assessment"));
     },
   });
 
@@ -62,8 +70,8 @@ export default function AssessmentPage() {
       queryClient.invalidateQueries({ queryKey: ["assessment", id] });
       navigate(`/report/${id}`);
     },
-    onError: (err: any) => {
-      setSubmitError(err?.response?.data?.detail ?? "Failed to complete assessment");
+    onError: (err: unknown) => {
+      setSubmitError(getErrorMessage(err, "Failed to complete assessment"));
     },
   });
 

@@ -1,9 +1,13 @@
 """AegisIQ Test Configuration
 
 Provides an in-memory SQLite async DB for integration tests.
+Mocks the production lifespan (init_db/close_db) so tests never
+attempt to connect to PostgreSQL.
 """
 
 import asyncio
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -41,7 +45,9 @@ def client():
 
     clear_rate_limits()
 
-    with TestClient(app) as c:
+    with patch("backend.main.init_db", new_callable=AsyncMock), \
+         patch("backend.main.close_db", new_callable=AsyncMock), \
+         TestClient(app) as c:
         yield c
 
     app.dependency_overrides.clear()

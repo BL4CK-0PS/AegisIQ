@@ -177,16 +177,22 @@ export default function SkillDNAProfilePage() {
               <CardTitle>MITRE ATT&CK Mapping</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {(result.mitre_technique_ids ?? []).map((technique) => (
-                  <span
-                    key={technique}
-                    className="rounded bg-cyber-900/20 px-2 py-1 font-mono text-xs text-cyber-400"
-                  >
-                    {technique}
-                  </span>
-                ))}
-              </div>
+              {(result.mitre_technique_ids ?? []).length === 0 ? (
+                <p className="text-sm text-surface-500 py-2 text-center">
+                  No MITRE techniques identified for this profile
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {(result.mitre_technique_ids ?? []).map((technique) => (
+                    <span
+                      key={technique}
+                      className="rounded bg-cyber-900/20 px-2 py-1 font-mono text-xs text-cyber-400"
+                    >
+                      {technique}
+                    </span>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

@@ -16,7 +16,7 @@ import { assessmentService } from "@/services/assessment.service";
 export default function DashboardPage() {
   const navigate = useNavigate();
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["assessments"],
     queryFn: () => assessmentService.list(100, 0),
   });
@@ -26,14 +26,11 @@ export default function DashboardPage() {
   const activeCount = assessments.filter((a) => a.status === "active").length;
   const totalCount = assessments.length;
 
-  const completedWithScores = assessments.filter(
-    (a) => a.status === "completed" && a.question_count > 0,
-  );
-  const avgScore =
-    completedWithScores.length > 0
+  const avgQuestionCount =
+    completedCount > 0
       ? Math.round(
-          completedWithScores.reduce((sum, a) => sum + (a.question_count ?? 0), 0) /
-            completedWithScores.length,
+          assessments.filter((a) => a.status === "completed")
+            .reduce((sum, a) => sum + (a.question_count ?? 0), 0) / completedCount,
         )
       : 0;
 
@@ -53,55 +50,71 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card variant="elevated">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-900/30">
-              <ClipboardCheck className="h-6 w-6 text-primary-400" />
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} variant="elevated">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 animate-pulse rounded-lg bg-surface-700" />
+                <div className="space-y-2">
+                  <div className="h-7 w-16 animate-pulse rounded bg-surface-700" />
+                  <div className="h-3 w-24 animate-pulse rounded bg-surface-700" />
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Card variant="elevated">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-900/30">
+                <ClipboardCheck className="h-6 w-6 text-primary-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-surface-100">{completedCount}</p>
+                <p className="text-xs text-surface-400">Completed Assessments</p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-surface-100">{completedCount}</p>
-              <p className="text-xs text-surface-400">Completed Assessments</p>
-            </div>
-          </div>
-        </Card>
+          </Card>
 
-        <Card variant="elevated">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyber-900/30">
-              <TrendingUp className="h-6 w-6 text-cyber-400" />
+          <Card variant="elevated">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyber-900/30">
+                <TrendingUp className="h-6 w-6 text-cyber-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-surface-100">{avgQuestionCount}</p>
+                <p className="text-xs text-surface-400">Avg. Questions per Assessment</p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-surface-100">{avgScore}%</p>
-              <p className="text-xs text-surface-400">Average Score</p>
-            </div>
-          </div>
-        </Card>
+          </Card>
 
-        <Card variant="elevated">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-warning-900/30">
-              <Dna className="h-6 w-6 text-warning-400" />
+          <Card variant="elevated">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-warning-900/30">
+                <Dna className="h-6 w-6 text-warning-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-surface-100">{activeCount}</p>
+                <p className="text-xs text-surface-400">Active Assessments</p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-surface-100">{activeCount}</p>
-              <p className="text-xs text-surface-400">Active Assessments</p>
-            </div>
-          </div>
-        </Card>
+          </Card>
 
-        <Card variant="elevated">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-danger-900/30">
-              <FileText className="h-6 w-6 text-danger-400" />
+          <Card variant="elevated">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-danger-900/30">
+                <FileText className="h-6 w-6 text-danger-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-surface-100">{totalCount}</p>
+                <p className="text-xs text-surface-400">Total Assessments</p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-surface-100">{totalCount}</p>
-              <p className="text-xs text-surface-400">Total Assessments</p>
-            </div>
-          </div>
-        </Card>
-      </div>
+          </Card>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">

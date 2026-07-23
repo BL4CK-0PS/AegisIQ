@@ -30,8 +30,9 @@ export default function JobDescriptionPage() {
 
       const result = await roleDefinitionService.parseText(text, file.name);
       setParseResult(result);
-    } catch (err: any) {
-      const detail = err?.response?.data?.detail;
+    } catch (err: unknown) {
+      const apiErr = err as { response?: { data?: { detail?: string } } };
+      const detail = apiErr?.response?.data?.detail;
       setError(typeof detail === "string" ? detail : "Failed to process job description. Please try again.");
     } finally {
       setIsUploading(false);

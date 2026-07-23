@@ -41,7 +41,7 @@ export default function AssessmentDashboardPage() {
       queryClient.invalidateQueries({ queryKey: ["assessments"] });
       navigate(`/assessment/${id}`);
     },
-    onError: (err: any) => {
+    onError: (err: unknown) => {
       console.error("Failed to create assessment:", err);
       setCreatingDomain(null);
     },
