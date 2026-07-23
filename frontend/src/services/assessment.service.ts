@@ -62,7 +62,7 @@ export interface ResultsResponse {
     confidence: number;
     proficiency_level: string;
     passed: boolean;
-    criteria_scores: { name: string; score: number; max_score: number; comment: string }[];
+    criteria_scores: { criterion_name: string; score: number; max_score: number; justification: string; passed: boolean }[];
     missing_concepts: string[];
     demonstrated_skills: string[];
     mitre_technique_ids: string[];

@@ -4,11 +4,12 @@ import { ClipboardCheck, AlertTriangle, ShieldCheck, Target, Eye, Monitor, Mic, 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { assessmentService, type ResultsResponse, type ProctoringSummary } from "@/services/assessment.service";
+import { ErrorBoundary } from "@/components/feedback/ErrorBoundary";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 
-function formatCriterionName(raw: string): string {
-  return raw
+function formatCriterionName(raw?: string): string {
+  return (raw ?? "")
     .replace(/_/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
@@ -95,11 +96,11 @@ function ProctoringSummaryCard({ summary }: { summary: ProctoringSummary }) {
           ))}
         </div>
 
-        {summary.violations.length > 0 && (
+        {(summary.violations ?? []).length > 0 && (
           <div className="space-y-2">
             <p className="text-xs font-medium text-surface-400">Violation Log</p>
             <div className="max-h-40 space-y-1 overflow-y-auto rounded-lg border border-surface-700/50 p-2">
-              {summary.violations.map((v, i) => (
+              {(summary.violations ?? []).map((v, i) => (
                 <div key={i} className="flex items-center justify-between text-xs">
                   <span className="text-surface-300">{v.detail}</span>
                   <span className="text-surface-500">
@@ -160,12 +161,12 @@ export default function ReportPage() {
 
   const avgScore =
     results.length > 0
-      ? results.reduce((sum, r) => sum + r.overall_score, 0) / results.length
+      ? results.reduce((sum, r) => sum + (r.overall_score ?? 0), 0) / results.length
       : 0;
 
   const avgConfidence =
     results.length > 0
-      ? results.reduce((sum, r) => sum + r.confidence, 0) / results.length
+      ? results.reduce((sum, r) => sum + (r.confidence ?? 0), 0) / results.length
       : 0;
 
   const allDemonstrated = [...new Set(results.flatMap((r) => r.demonstrated_skills ?? []))];
@@ -173,6 +174,7 @@ export default function ReportPage() {
   const allMitres = [...new Set(results.flatMap((r) => r.mitre_technique_ids ?? []))];
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       <div className="min-h-14">
         <h1 className="text-2xl font-bold text-surface-100 leading-tight">Assessment Report</h1>
@@ -230,9 +232,9 @@ export default function ReportPage() {
           ) : results.map((r) => (
             <div key={r.id} className="rounded-lg border border-surface-700/50 p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-surface-200">
-                  Question {r.id.slice(0, 8)}...
-                </span>
+                   <span className="text-sm font-medium text-surface-200">
+                   Question {(r.id ?? "").slice(0, 8)}...
+                 </span>
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                     r.passed
@@ -245,10 +247,10 @@ export default function ReportPage() {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs text-surface-400">
-                  <span>Score: {r.overall_score.toFixed(1)}</span>
-                  <span>Confidence: {(r.confidence * 100).toFixed(0)}%</span>
+                  <span>Score: {(r.overall_score ?? 0).toFixed(1)}</span>
+                  <span>Confidence: {((r.confidence ?? 0) * 100).toFixed(0)}%</span>
                 </div>
-                <ScoreBar score={r.overall_score} />
+                <ScoreBar score={r.overall_score ?? 0} />
               </div>
               {r.overall_justification && (
                 <p className="text-xs text-surface-500 italic">{r.overall_justification}</p>
@@ -259,15 +261,15 @@ export default function ReportPage() {
                     <div key={i} className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-surface-300 font-medium">
-                          {formatCriterionName(c.name)}
+                          {formatCriterionName(c.criterion_name)}
                         </span>
                         <span className="text-surface-400">
                           {c.score}/{c.max_score}
                         </span>
                       </div>
                       <ScoreBar score={c.score} maxScore={c.max_score} />
-                      {c.comment && (
-                        <p className="text-[11px] text-surface-500 italic">{c.comment}</p>
+                      {c.justification && (
+                        <p className="text-[11px] text-surface-500 italic">{c.justification}</p>
                       )}
                     </div>
                   ))}
@@ -352,5 +354,6 @@ export default function ReportPage() {
         <ProctoringSummaryCard summary={data.proctoring_summary} />
       )}
     </div>
+    </ErrorBoundary>
   );
 }
