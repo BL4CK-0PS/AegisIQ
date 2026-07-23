@@ -87,6 +87,9 @@ export interface ProctoringSummary {
   fullscreen_exits: number;
   screen_share_stops: number;
   audio_anomalies: number;
+  clipboard_attempts?: number;
+  context_menu_blocks?: number;
+  voice_enabled?: boolean;
 }
 
 export const assessmentService = {

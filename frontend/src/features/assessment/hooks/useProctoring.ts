@@ -274,6 +274,9 @@ export function useProctoring(assessmentId: string) {
     fullscreen_exits: state.violations.filter((v) => v.type === "fullscreen_exit").length,
     screen_share_stops: state.violations.filter((v) => v.type === "screen_share_stopped").length,
     audio_anomalies: state.violations.filter((v) => v.type === "audio_anomaly").length,
+    clipboard_attempts: state.violations.filter((v) => v.type === "clipboard_attempt").length,
+    context_menu_blocks: state.violations.filter((v) => v.type === "context_menu").length,
+    voice_enabled: state.requestedPermissions.mic,
   }), [assessmentId, state]);
 
   return {
