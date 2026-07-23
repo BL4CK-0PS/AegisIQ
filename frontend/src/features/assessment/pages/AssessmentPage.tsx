@@ -62,7 +62,11 @@ export default function AssessmentPage() {
   });
 
   const evaluateMutation = useMutation({
-    mutationFn: () => assessmentService.evaluate(id!),
+    mutationFn: async () => {
+      const summary = proctoring.getProctoringSummary();
+      await assessmentService.complete(id!, summary);
+      return assessmentService.evaluate(id!);
+    },
     onSuccess: () => {
       proctoring.stopMic();
       queryClient.invalidateQueries({ queryKey: ["assessment", id] });
@@ -74,7 +78,10 @@ export default function AssessmentPage() {
   });
 
   const completeMutation = useMutation({
-    mutationFn: () => assessmentService.complete(id!),
+    mutationFn: () => {
+      const summary = proctoring.getProctoringSummary();
+      return assessmentService.complete(id!, summary);
+    },
     onSuccess: () => {
       proctoring.stopMic();
       queryClient.invalidateQueries({ queryKey: ["assessment", id] });

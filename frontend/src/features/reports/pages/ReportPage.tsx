@@ -225,10 +225,19 @@ export default function ReportPage() {
       ? results.reduce((sum, r) => sum + (r.overall_score ?? 0), 0) / results.length
       : 0;
 
+  const avgPenalizedScore =
+    results.length > 0
+      ? results.reduce((sum, r) => sum + (r.penalized_score ?? r.overall_score ?? 0), 0) / results.length
+      : avgScore;
+
   const avgConfidence =
     results.length > 0
       ? results.reduce((sum, r) => sum + (r.confidence ?? 0), 0) / results.length
       : 0;
+
+  const proctoring = data.proctoring_summary;
+  const integrityScore = proctoring?.integrity_score ?? 100;
+  const isPenalized = integrityScore < 100;
 
   const allDemonstrated = [...new Set(results.flatMap((r) => r.demonstrated_skills ?? []))];
   const allMissing = [...new Set(results.flatMap((r) => r.missing_concepts ?? []))];
@@ -251,8 +260,20 @@ export default function ReportPage() {
               <Target className="h-6 w-6 text-primary-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-surface-100">{avgScore.toFixed(1)}</p>
-              <p className="text-xs text-surface-500">Average Score</p>
+              {isPenalized ? (
+                <>
+                  <p className="text-2xl font-bold text-surface-100">{avgPenalizedScore.toFixed(1)}</p>
+                  <p className="text-xs text-surface-500">
+                    Penalized Score
+                    <span className="ml-1 text-danger-400">(was {avgScore.toFixed(1)})</span>
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold text-surface-100">{avgScore.toFixed(1)}</p>
+                  <p className="text-xs text-surface-500">Average Score</p>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -310,10 +331,19 @@ export default function ReportPage() {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs text-surface-400">
-                  <span>Score: {(r.overall_score ?? 0).toFixed(1)}</span>
+                  <span>
+                    Score: {isPenalized ? (
+                      <>
+                        <span className="text-danger-400 font-medium">{(r.penalized_score ?? 0).toFixed(1)}</span>
+                        <span className="ml-1 line-through text-surface-600">{(r.overall_score ?? 0).toFixed(1)}</span>
+                      </>
+                    ) : (
+                      (r.overall_score ?? 0).toFixed(1)
+                    )}
+                  </span>
                   <span>Confidence: {((r.confidence ?? 0) * 100).toFixed(0)}%</span>
                 </div>
-                <ScoreBar score={r.overall_score ?? 0} />
+                <ScoreBar score={isPenalized ? (r.penalized_score ?? 0) : (r.overall_score ?? 0)} />
               </div>
               {r.overall_justification && (
                 <p className="text-xs text-surface-500 italic">{r.overall_justification}</p>

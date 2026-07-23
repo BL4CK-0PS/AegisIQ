@@ -59,6 +59,7 @@ export interface ResultsResponse {
   results: {
     id: string;
     overall_score: number;
+    penalized_score?: number;
     confidence: number;
     proficiency_level: string;
     passed: boolean;
@@ -142,9 +143,10 @@ export const assessmentService = {
     return response.data;
   },
 
-  async complete(assessmentId: string): Promise<CompleteResponse> {
+  async complete(assessmentId: string, proctoringSummary?: ProctoringSummary): Promise<CompleteResponse> {
     const response = await apiClient.post<CompleteResponse>(
       `/assessments/${assessmentId}/complete`,
+      { assessment_id: assessmentId, proctoring_summary: proctoringSummary ?? null },
     );
     return response.data;
   },
