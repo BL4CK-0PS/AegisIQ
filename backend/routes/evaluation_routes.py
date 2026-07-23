@@ -37,7 +37,7 @@ from src.core.evaluation.dna_engine import (
     CapabilityEngine,
     CyberTwinModel as CTModel,
 )
-from src.core.evaluation.evaluator import EvaluationResult, CriterionScore
+from src.core.evaluation.evaluator import EvaluationResult
 from src.core.knowledge.taxonomy import ProficiencyLevel
 
 logger = logging.getLogger(__name__)
@@ -64,37 +64,10 @@ async def _fetch_evaluations(
     evaluations: list[EvaluationResult] = []
     for row in rows:
         try:
-            question_domain = ""
-            if row.question_id:
-                from sqlalchemy import select as sa_select
-                from backend.models import QuestionRecordModel
-
-                q_result = await db.execute(
-                    sa_select(QuestionRecordModel).where(
-                        QuestionRecordModel.id == row.question_id
-                    )
-                )
-                q_row = q_result.scalar_one_or_none()
-                if q_row:
-                    question_domain = q_row.domain
-
-            raw_criteria = row.criteria_scores if row.criteria_scores else []
-            criteria_scores = [
-                CriterionScore(
-                    criterion_name=c.get("criterion_name", c.get("name", "")),
-                    score=c.get("score", 0),
-                    max_score=c.get("max_score", 10),
-                    justification=c.get("justification", c.get("comment", "")),
-                    passed=c.get("passed", False),
-                )
-                for c in raw_criteria
-                if isinstance(c, dict)
-            ]
-
             evaluations.append(
                 EvaluationResult(
                     question_text="",
-                    domain=question_domain,
+                    domain=row.proficiency_level,
                     skill=(
                         row.demonstrated_skills[0] if row.demonstrated_skills else ""
                     ),
@@ -102,7 +75,7 @@ async def _fetch_evaluations(
                     confidence=row.confidence,
                     proficiency_level=ProficiencyLevel(row.proficiency_level),
                     passed=row.passed,
-                    criteria_scores=criteria_scores,
+                    criteria_scores=[],
                     missing_concepts=row.missing_concepts or [],
                     demonstrated_skills=row.demonstrated_skills or [],
                     mitre_technique_ids=row.mitre_technique_ids or [],

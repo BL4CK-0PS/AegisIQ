@@ -7,6 +7,7 @@ import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
+import { Alert } from "@/components/ui/Alert";
 import { apiClient } from "@/lib/api-client";
 
 const forgotSchema = z.object({
@@ -18,6 +19,7 @@ type ForgotForm = z.infer<typeof forgotSchema>;
 export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -29,13 +31,14 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = async (data: ForgotForm) => {
     setIsSubmitting(true);
+    setError(null);
     try {
       await apiClient.post("/auth/forgot-password", { email: data.email });
+      setSent(true);
     } catch {
-      // Silently handle — don't reveal whether the email exists (anti-enumeration)
+      setSent(true);
     } finally {
       setIsSubmitting(false);
-      setSent(true);
     }
   };
 
@@ -66,6 +69,10 @@ export default function ForgotPasswordPage() {
       <p className="mb-6 text-sm text-surface-400">
         Enter your email and we'll send you a reset link
       </p>
+
+      {error && (
+        <Alert variant="error" className="mb-4">{error}</Alert>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input

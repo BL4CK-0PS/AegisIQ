@@ -1,15 +1,12 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ClipboardCheck, AlertTriangle, ShieldCheck, Target, Eye, Monitor, Mic, Maximize, AlertCircle, Shield, Copy, MousePointerClick, CheckCircle2 } from "lucide-react";
+import { ClipboardCheck, AlertTriangle, ShieldCheck, Target } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { assessmentService, type ResultsResponse, type ProctoringSummary } from "@/services/assessment.service";
-import { ErrorBoundary } from "@/components/feedback/ErrorBoundary";
-import { Badge } from "@/components/ui/Badge";
-import { cn } from "@/lib/utils";
+import { assessmentService, type ResultsResponse } from "@/services/assessment.service";
 
-function formatCriterionName(raw?: string): string {
-  return (raw ?? "")
+function formatCriterionName(raw: string): string {
+  return raw
     .replace(/_/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
@@ -22,158 +19,6 @@ function ScoreBar({ score, maxScore = 100 }: { score: number; maxScore?: number 
     <div className="h-2 w-full overflow-hidden rounded-full bg-surface-700">
       <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
     </div>
-  );
-}
-
-function ProctoringSummaryCard({ summary }: { summary?: ProctoringSummary }) {
-  const hasData = !!summary;
-
-  const integrityScore = summary?.integrity_score ?? 100;
-  const violationCount = summary?.violation_count ?? 0;
-  const isClean = violationCount === 0;
-
-  const integrityColor = isClean
-    ? "text-success-400"
-    : integrityScore >= 80
-      ? "text-success-400"
-      : integrityScore >= 50
-        ? "text-warning-400"
-        : "text-danger-400";
-
-  const integrityBarColor = isClean
-    ? "bg-success-400"
-    : integrityScore >= 80
-      ? "bg-success-400"
-      : integrityScore >= 50
-        ? "bg-warning-400"
-        : "bg-danger-400";
-
-  const stats = [
-    { label: "Tab Switches", count: summary?.tab_switches ?? 0, icon: Monitor, active: (summary?.tab_switches ?? 0) > 0 },
-    { label: "Fullscreen Exits", count: summary?.fullscreen_exits ?? 0, icon: Maximize, active: (summary?.fullscreen_exits ?? 0) > 0 },
-    { label: "Screen Share Stops", count: summary?.screen_share_stops ?? 0, icon: Monitor, active: (summary?.screen_share_stops ?? 0) > 0 },
-    { label: "Audio Anomalies", count: summary?.audio_anomalies ?? 0, icon: Mic, active: (summary?.audio_anomalies ?? 0) > 0 },
-    { label: "Clipboard Attempts", count: summary?.clipboard_attempts ?? 0, icon: Copy, active: (summary?.clipboard_attempts ?? 0) > 0 },
-    { label: "Context Menu Blocks", count: summary?.context_menu_blocks ?? 0, icon: MousePointerClick, active: (summary?.context_menu_blocks ?? 0) > 0 },
-  ];
-
-  return (
-    <Card variant="elevated">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <Eye size={18} className="text-primary-400" />
-              Proctoring & Anti-Cheat Summary
-            </CardTitle>
-            <CardDescription>Monitoring data recorded during the assessment session</CardDescription>
-          </div>
-          {summary?.cheating_risk_flagged && (
-            <Badge variant="danger" size="md">
-              <AlertCircle size={12} className="mr-1" />
-              Risk Flagged
-            </Badge>
-          )}
-          {!hasData && (
-            <Badge variant="success" size="md">
-              <CheckCircle2 size={12} className="mr-1" />
-              Clean
-            </Badge>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center gap-6">
-          <div>
-            <p className={cn("text-3xl font-bold", integrityColor)}>
-              {integrityScore}%
-            </p>
-            <p className="text-xs text-surface-500">Integrity Score</p>
-          </div>
-          <div className="flex-1">
-            <div className="h-3 w-full overflow-hidden rounded-full bg-surface-700">
-              <div
-                className={cn("h-full rounded-full transition-all", integrityBarColor)}
-                style={{ width: `${integrityScore}%` }}
-              />
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-sm font-medium text-surface-200">
-              {isClean ? (
-                <span className="text-success-400">No Violations</span>
-              ) : (
-                <>{violationCount} violation{violationCount !== 1 ? "s" : ""}</>
-              )}
-            </p>
-            <p className="text-xs text-surface-500">Total violations</p>
-          </div>
-        </div>
-
-        {isClean && (
-          <div className="rounded-lg border border-success-700/30 bg-success-900/10 p-4 text-center">
-            <Shield size={20} className="mx-auto mb-2 text-success-400" />
-            <p className="text-sm font-medium text-success-400">
-              No Anti-Cheat Violations Detected
-            </p>
-            <p className="mt-1 text-xs text-surface-400">
-              100% Integrity — Assessment completed with full compliance
-            </p>
-          </div>
-        )}
-
-        {!isClean && (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {stats.map((s) => (
-              <div
-                key={s.label}
-                className={cn(
-                  "rounded-lg border p-3 text-center",
-                  s.active ? "border-danger-700/50 bg-danger-900/10" : "border-surface-700/50 bg-surface-800/50",
-                )}
-              >
-                <s.icon size={14} className={cn("mx-auto mb-1", s.active ? "text-danger-400" : "text-surface-500")} />
-                <p className="text-lg font-bold text-surface-100">{s.count}</p>
-                <p className="text-[10px] text-surface-500">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div className="flex items-center gap-3 rounded-lg border border-surface-700/50 bg-surface-800/50 p-3">
-          <div className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-full",
-            summary?.voice_enabled ? "bg-success-900/20" : "bg-surface-700/50",
-          )}>
-            <Mic size={14} className={summary?.voice_enabled ? "text-success-400" : "text-surface-500"} />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-surface-200">Voice / Audio Input</p>
-            <p className="text-xs text-surface-500">
-              {summary?.voice_enabled
-                ? "Mic active — voice dictation was used during assessment"
-                : "No voice input recorded — text-only responses"}
-            </p>
-          </div>
-        </div>
-
-        {hasData && (summary?.violations ?? []).length > 0 && (
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-surface-400">Violation Log</p>
-            <div className="max-h-40 space-y-1 overflow-y-auto rounded-lg border border-surface-700/50 p-2">
-              {(summary?.violations ?? []).map((v, i) => (
-                <div key={i} className="flex items-center justify-between text-xs">
-                  <span className="text-surface-300">{v.detail}</span>
-                  <span className="text-surface-500">
-                    {new Date(v.timestamp).toLocaleTimeString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
   );
 }
 
@@ -222,29 +67,19 @@ export default function ReportPage() {
 
   const avgScore =
     results.length > 0
-      ? results.reduce((sum, r) => sum + (r.overall_score ?? 0), 0) / results.length
+      ? results.reduce((sum, r) => sum + r.overall_score, 0) / results.length
       : 0;
-
-  const avgPenalizedScore =
-    results.length > 0
-      ? results.reduce((sum, r) => sum + (r.penalized_score ?? r.overall_score ?? 0), 0) / results.length
-      : avgScore;
 
   const avgConfidence =
     results.length > 0
-      ? results.reduce((sum, r) => sum + (r.confidence ?? 0), 0) / results.length
+      ? results.reduce((sum, r) => sum + r.confidence, 0) / results.length
       : 0;
-
-  const proctoring = data.proctoring_summary;
-  const integrityScore = proctoring?.integrity_score ?? 100;
-  const isPenalized = integrityScore < 100;
 
   const allDemonstrated = [...new Set(results.flatMap((r) => r.demonstrated_skills ?? []))];
   const allMissing = [...new Set(results.flatMap((r) => r.missing_concepts ?? []))];
   const allMitres = [...new Set(results.flatMap((r) => r.mitre_technique_ids ?? []))];
 
   return (
-    <ErrorBoundary>
     <div className="space-y-6">
       <div className="min-h-14">
         <h1 className="text-2xl font-bold text-surface-100 leading-tight">Assessment Report</h1>
@@ -260,20 +95,8 @@ export default function ReportPage() {
               <Target className="h-6 w-6 text-primary-400" />
             </div>
             <div>
-              {isPenalized ? (
-                <>
-                  <p className="text-2xl font-bold text-surface-100">{avgPenalizedScore.toFixed(1)}</p>
-                  <p className="text-xs text-surface-500">
-                    Penalized Score
-                    <span className="ml-1 text-danger-400">(was {avgScore.toFixed(1)})</span>
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-2xl font-bold text-surface-100">{avgScore.toFixed(1)}</p>
-                  <p className="text-xs text-surface-500">Average Score</p>
-                </>
-              )}
+              <p className="text-2xl font-bold text-surface-100">{avgScore.toFixed(1)}</p>
+              <p className="text-xs text-surface-500">Average Score</p>
             </div>
           </CardContent>
         </Card>
@@ -303,8 +126,6 @@ export default function ReportPage() {
         </Card>
       </div>
 
-      <ProctoringSummaryCard summary={data.proctoring_summary} />
-
       <Card variant="elevated">
         <CardHeader>
           <CardTitle>Evaluation Breakdown</CardTitle>
@@ -316,9 +137,9 @@ export default function ReportPage() {
           ) : results.map((r) => (
             <div key={r.id} className="rounded-lg border border-surface-700/50 p-4 space-y-3">
               <div className="flex items-center justify-between">
-                   <span className="text-sm font-medium text-surface-200">
-                   Question {(r.id ?? "").slice(0, 8)}...
-                 </span>
+                <span className="text-sm font-medium text-surface-200">
+                  Question {r.id.slice(0, 8)}...
+                </span>
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                     r.passed
@@ -331,19 +152,10 @@ export default function ReportPage() {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs text-surface-400">
-                  <span>
-                    Score: {isPenalized ? (
-                      <>
-                        <span className="text-danger-400 font-medium">{(r.penalized_score ?? 0).toFixed(1)}</span>
-                        <span className="ml-1 line-through text-surface-600">{(r.overall_score ?? 0).toFixed(1)}</span>
-                      </>
-                    ) : (
-                      (r.overall_score ?? 0).toFixed(1)
-                    )}
-                  </span>
-                  <span>Confidence: {((r.confidence ?? 0) * 100).toFixed(0)}%</span>
+                  <span>Score: {r.overall_score.toFixed(1)}</span>
+                  <span>Confidence: {(r.confidence * 100).toFixed(0)}%</span>
                 </div>
-                <ScoreBar score={isPenalized ? (r.penalized_score ?? 0) : (r.overall_score ?? 0)} />
+                <ScoreBar score={r.overall_score} />
               </div>
               {r.overall_justification && (
                 <p className="text-xs text-surface-500 italic">{r.overall_justification}</p>
@@ -354,15 +166,15 @@ export default function ReportPage() {
                     <div key={i} className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-surface-300 font-medium">
-                          {formatCriterionName(c.criterion_name)}
+                          {formatCriterionName(c.name)}
                         </span>
                         <span className="text-surface-400">
                           {c.score}/{c.max_score}
                         </span>
                       </div>
                       <ScoreBar score={c.score} maxScore={c.max_score} />
-                      {c.justification && (
-                        <p className="text-[11px] text-surface-500 italic">{c.justification}</p>
+                      {c.comment && (
+                        <p className="text-[11px] text-surface-500 italic">{c.comment}</p>
                       )}
                     </div>
                   ))}
@@ -443,6 +255,5 @@ export default function ReportPage() {
         </CardContent>
       </Card>
     </div>
-    </ErrorBoundary>
   );
 }
