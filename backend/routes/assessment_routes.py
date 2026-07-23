@@ -28,6 +28,7 @@ from backend.orchestrator import (
 from backend.schemas import (
     CreateAssessmentRequest,
     RecordAssessmentAnswerRequest,
+    CompleteAssessmentRequest,
     PaginatedAssessmentsResponse,
 )
 from src.core.engine.branching import AdaptiveSession
@@ -264,6 +265,7 @@ async def evaluate_assessment(
 @router.post("/{assessment_id}/complete")
 async def complete_assessment_endpoint(
     assessment_id: str,
+    payload: CompleteAssessmentRequest | None = None,
     db: AsyncSession = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
 ) -> dict[str, Any]:
@@ -277,14 +279,87 @@ async def complete_assessment_endpoint(
     assessment.status = "completed"
     assessment.completed_at = datetime.now(timezone.utc)
 
-    session_ref = AdaptiveSession(
-        id=assessment.id,
-        domain=assessment.domain,
-    )
-    summary = get_session_summary(session_ref)
+    try:
+        repo2 = AssessmentRepository(db)
+        full_assessment = await repo2.get_with_questions(assessment_id)
+        question_count = len(full_assessment.questions) if full_assessment and full_assessment.questions else 0
+        domains = list({q.domain for q in (full_assessment.questions or []) if q.domain})
+        difficulties = list({q.difficulty for q in (full_assessment.questions or []) if q.difficulty})
+        summary = {
+            "total_questions": question_count,
+            "domain": assessment.domain,
+            "domains_covered": domains,
+            "difficulties_covered": difficulties,
+        }
+    except Exception:
+        summary = {"total_questions": 0, "domain": assessment.domain}
+
     assessment.summary = summary
 
-    await db.commit()
+    if payload and payload.proctoring_summary:
+        proctoring_data = payload.proctoring_summary
+        violations = proctoring_data.get("violations", [])
+        violation_count = proctoring_data.get("violation_count", len(violations))
+
+        integrity_score = 100.0
+        for v in violations:
+            vtype = v.get("type", "")
+            if vtype == "fullscreen_exit":
+                integrity_score -= 20.0
+            elif vtype == "tab_switch":
+                integrity_score -= 10.0
+            elif vtype == "screen_share_stopped":
+                integrity_score -= 15.0
+            elif vtype == "clipboard_attempt":
+                integrity_score -= 10.0
+            elif vtype == "context_menu":
+                integrity_score -= 5.0
+            elif vtype == "audio_anomaly":
+                integrity_score -= 5.0
+            else:
+                integrity_score -= 10.0
+
+        integrity_score = max(integrity_score, 0.0)
+
+        assessment.proctoring_summary = {
+            "assessment_id": assessment_id,
+            "violation_count": violation_count,
+            "violations": violations,
+            "integrity_score": integrity_score,
+            "cheating_risk_flagged": proctoring_data.get("cheating_risk_flagged", integrity_score < 70),
+            "tab_switches": proctoring_data.get("tab_switches", 0),
+            "fullscreen_exits": proctoring_data.get("fullscreen_exits", 0),
+            "screen_share_stops": proctoring_data.get("screen_share_stops", 0),
+            "audio_anomalies": proctoring_data.get("audio_anomalies", 0),
+            "clipboard_attempts": proctoring_data.get("clipboard_attempts", 0),
+            "context_menu_blocks": proctoring_data.get("context_menu_blocks", 0),
+            "voice_enabled": proctoring_data.get("voice_enabled", False),
+        }
+    else:
+        assessment.proctoring_summary = {
+            "assessment_id": assessment_id,
+            "violation_count": 0,
+            "violations": [],
+            "integrity_score": 100,
+            "cheating_risk_flagged": False,
+            "tab_switches": 0,
+            "fullscreen_exits": 0,
+            "screen_share_stops": 0,
+            "audio_anomalies": 0,
+            "clipboard_attempts": 0,
+            "context_menu_blocks": 0,
+            "voice_enabled": False,
+        }
+
+    try:
+        await db.commit()
+    except Exception as exc:
+        logger.error("Failed to commit assessment completion %s: %s", assessment_id, exc)
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to save assessment completion",
+        )
 
     return {"status": "success", "assessment_id": assessment_id, "summary": summary}
 
@@ -295,25 +370,54 @@ async def get_assessment_results(
     db: AsyncSession = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
 ) -> dict[str, Any]:
+    repo = AssessmentRepository(db)
+    assessment = await repo.get_by_id(assessment_id)
+    if assessment is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
+        )
+
     eval_repo = EvaluationRepository(db)
     evals = await eval_repo.get_by_assessment(assessment_id)
+
+    proctoring_summary = assessment.proctoring_summary or {
+        "assessment_id": assessment_id,
+        "violation_count": 0,
+        "violations": [],
+        "integrity_score": 100,
+        "cheating_risk_flagged": False,
+        "tab_switches": 0,
+        "fullscreen_exits": 0,
+        "screen_share_stops": 0,
+        "audio_anomalies": 0,
+        "clipboard_attempts": 0,
+        "context_menu_blocks": 0,
+        "voice_enabled": False,
+    }
+
+    integrity_score = proctoring_summary.get("integrity_score", 100)
+    integrity_multiplier = integrity_score / 100.0
+
+    results = []
+    for e in evals:
+        penalized_score = round(e.overall_score * integrity_multiplier, 2) if integrity_multiplier < 1.0 else e.overall_score
+        results.append({
+            "id": e.id,
+            "overall_score": e.overall_score,
+            "penalized_score": penalized_score,
+            "confidence": e.confidence,
+            "proficiency_level": e.proficiency_level,
+            "passed": e.passed,
+            "criteria_scores": e.criteria_scores,
+            "missing_concepts": e.missing_concepts,
+            "demonstrated_skills": e.demonstrated_skills,
+            "mitre_technique_ids": e.mitre_technique_ids,
+            "overall_justification": e.overall_justification,
+        })
 
     return {
         "assessment_id": assessment_id,
         "evaluation_count": len(evals),
-        "results": [
-            {
-                "id": e.id,
-                "overall_score": e.overall_score,
-                "confidence": e.confidence,
-                "proficiency_level": e.proficiency_level,
-                "passed": e.passed,
-                "criteria_scores": e.criteria_scores,
-                "missing_concepts": e.missing_concepts,
-                "demonstrated_skills": e.demonstrated_skills,
-                "mitre_technique_ids": e.mitre_technique_ids,
-                "overall_justification": e.overall_justification,
-            }
-            for e in evals
-        ],
+        "results": results,
+        "proctoring_summary": proctoring_summary,
     }

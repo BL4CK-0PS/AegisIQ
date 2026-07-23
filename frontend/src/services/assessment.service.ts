@@ -59,15 +59,38 @@ export interface ResultsResponse {
   results: {
     id: string;
     overall_score: number;
+    penalized_score?: number;
     confidence: number;
     proficiency_level: string;
     passed: boolean;
-    criteria_scores: { name: string; score: number; max_score: number; comment: string }[];
+    criteria_scores: { criterion_name: string; score: number; max_score: number; justification: string; passed: boolean }[];
     missing_concepts: string[];
     demonstrated_skills: string[];
     mitre_technique_ids: string[];
     overall_justification: string;
   }[];
+  proctoring_summary?: ProctoringSummary;
+}
+
+export interface ProctoringViolation {
+  type: "tab_switch" | "fullscreen_exit" | "screen_share_stopped" | "clipboard_attempt" | "context_menu" | "audio_anomaly";
+  timestamp: number;
+  detail: string;
+}
+
+export interface ProctoringSummary {
+  assessment_id: string;
+  violation_count: number;
+  violations: ProctoringViolation[];
+  integrity_score: number;
+  cheating_risk_flagged: boolean;
+  tab_switches: number;
+  fullscreen_exits: number;
+  screen_share_stops: number;
+  audio_anomalies: number;
+  clipboard_attempts?: number;
+  context_menu_blocks?: number;
+  voice_enabled?: boolean;
 }
 
 export const assessmentService = {
@@ -120,9 +143,10 @@ export const assessmentService = {
     return response.data;
   },
 
-  async complete(assessmentId: string): Promise<CompleteResponse> {
+  async complete(assessmentId: string, proctoringSummary?: ProctoringSummary): Promise<CompleteResponse> {
     const response = await apiClient.post<CompleteResponse>(
       `/assessments/${assessmentId}/complete`,
+      { assessment_id: assessmentId, proctoring_summary: proctoringSummary ?? null },
     );
     return response.data;
   },

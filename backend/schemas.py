@@ -250,6 +250,7 @@ class RecordAssessmentAnswerRequest(BaseModel):
 
 class CompleteAssessmentRequest(BaseModel):
     assessment_id: str
+    proctoring_summary: dict | None = None
 
 
 class PaginatedAssessmentsResponse(BaseModel):
