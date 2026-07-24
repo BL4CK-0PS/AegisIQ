@@ -42,6 +42,9 @@ apiClient.interceptors.response.use(
       } catch {
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
+        import("@/store/auth-store").then(({ useAuthStore }) => {
+          useAuthStore.getState().logout();
+        });
         window.location.href = "/login";
       }
     }

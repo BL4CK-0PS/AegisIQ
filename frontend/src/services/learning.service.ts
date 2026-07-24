@@ -1,21 +1,29 @@
 import { apiClient } from "@/lib/api-client";
-import type { CareerCompass } from "@/types";
+
+export interface CareerCompassAnalysis {
+  status: string;
+  target_role: string;
+  overall_match_percentage: number;
+  domain_results: Record<string, unknown>[];
+  critical_gaps: Record<string, unknown>[];
+  progression_steps: string[];
+}
+
+export interface CareerCompassRoles {
+  status: string;
+  roles: Record<string, unknown>[];
+}
 
 export const learningService = {
-  async generateCompass(assessmentId: string): Promise<CareerCompass> {
-    const response = await apiClient.post<CareerCompass>("/career-compass", {
-      assessment_id: assessmentId,
+  async analyzeCareerCompass(targetRole: string): Promise<CareerCompassAnalysis> {
+    const response = await apiClient.post<CareerCompassAnalysis>("/career-compass/analyze", {
+      target_role: targetRole,
     });
     return response.data;
   },
 
-  async getCompass(compassId: string): Promise<CareerCompass> {
-    const response = await apiClient.get<CareerCompass>(`/career-compass/${compassId}`);
-    return response.data;
-  },
-
-  async listCompasses(): Promise<CareerCompass[]> {
-    const response = await apiClient.get<CareerCompass[]>("/career-compass");
+  async getBestFitRoles(): Promise<CareerCompassRoles> {
+    const response = await apiClient.get<CareerCompassRoles>("/career-compass/roles");
     return response.data;
   },
 };

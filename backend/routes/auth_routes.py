@@ -7,17 +7,20 @@ Registration, login, token refresh, and logout endpoints.
 import logging
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.auth import (
+    blacklist_token,
     create_access_token,
     create_refresh_token,
     decode_token,
     get_current_user,
     hash_password,
+    security as bearer_security,
     verify_password,
 )
 from backend.database import get_session
@@ -160,7 +163,12 @@ async def refresh(
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
-async def logout(current_user: UserModel = Depends(get_current_user)) -> None:
+async def logout(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_security),
+    current_user: UserModel = Depends(get_current_user),
+) -> None:
+    if credentials and credentials.credentials:
+        blacklist_token(credentials.credentials)
     logger.info("User logged out: %s", current_user.email)
     return None
 

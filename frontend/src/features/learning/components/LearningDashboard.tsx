@@ -3,7 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2, Send, Bot, User } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { learningService } from "@/services/learning.service";
-import type { WeakSkill, Lab, CareerCompass } from "@/types";
+import type { WeakSkill, Lab } from "@/types";
+
+interface BestFitRole {
+  role_title: string;
+  match_score: number;
+  fit_level: string;
+  gap_areas: string[];
+  [key: string]: unknown;
+}
 
 const FALLBACK_WEAK_SKILLS: WeakSkill[] = [
   { name: "SIEM Alert Triage", current_level: 3, target_level: 8, gap: 5, priority: "critical" },
@@ -159,18 +167,18 @@ function generateMentorResponse(input: string): string {
 }
 
 export default function LearningDashboard() {
-  const { data: compasses, isLoading } = useQuery({
-    queryKey: ["career-compasses"],
-    queryFn: () => learningService.listCompasses(),
+  const { data: rolesData, isLoading } = useQuery({
+    queryKey: ["best-fit-roles"],
+    queryFn: () => learningService.getBestFitRoles(),
   });
 
-  const latest: CareerCompass | undefined = compasses?.[0];
+  const roles: BestFitRole[] = rolesData?.roles as BestFitRole[] ?? [];
+  const hasLiveData = roles.length > 0;
 
-  const weakSkills = latest?.weak_skills?.length ? latest.weak_skills : FALLBACK_WEAK_SKILLS;
-  const labs = latest?.labs?.length ? latest.labs : FALLBACK_LABS;
-  const recommendations = latest?.recommendations?.length ? latest.recommendations : FALLBACK_RECOMMENDATIONS;
-  const roadmap = latest?.roadmap?.length ? latest.roadmap : FALLBACK_ROADMAP;
-  const hasLiveData = !!latest;
+  const weakSkills = FALLBACK_WEAK_SKILLS;
+  const labs = FALLBACK_LABS;
+  const recommendations = FALLBACK_RECOMMENDATIONS;
+  const roadmap = FALLBACK_ROADMAP;
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -228,6 +236,36 @@ export default function LearningDashboard() {
               Showing sample data. Complete an assessment to see your personalized learning path.
             </p>
           </div>
+        )}
+
+        {hasLiveData && roles.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Best Fit Roles</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {roles.slice(0, 3).map((role, i) => (
+                  <div key={i} className="rounded-lg bg-surface-800/50 p-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-surface-200">{role.role_title}</p>
+                      <span className="text-xs font-semibold text-primary-400">
+                        {Math.round((role.match_score ?? 0) * 100)}% match
+                      </span>
+                    </div>
+                    <p className="text-xs text-surface-400 mt-1">Fit: {role.fit_level}</p>
+                    {role.gap_areas?.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {role.gap_areas.map((gap, j) => (
+                          <span key={j} className="rounded bg-warning-900/20 px-2 py-0.5 text-[10px] text-warning-400">{gap}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         <Card>

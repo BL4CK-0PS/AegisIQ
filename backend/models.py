@@ -51,7 +51,7 @@ class AssessmentModel(Base):
     __tablename__ = "assessments"
 
     id = Column(String(12), primary_key=True, default=_uuid12)
-    candidate_id = Column(String(12), ForeignKey("users.id"), nullable=False)
+    candidate_id = Column(String(12), ForeignKey("users.id"), nullable=False, index=True)
     domain = Column(String(255), nullable=False)
     status = Column(String(50), default="active")
     current_difficulty = Column(String(20), default="beginner")
@@ -73,7 +73,7 @@ class QuestionRecordModel(Base):
     __tablename__ = "question_records"
 
     id = Column(String(12), primary_key=True, default=_uuid12)
-    assessment_id = Column(String(12), ForeignKey("assessments.id"), nullable=False)
+    assessment_id = Column(String(12), ForeignKey("assessments.id"), nullable=False, index=True)
     question_text = Column(Text, nullable=False)
     domain = Column(String(255), nullable=False)
     skill = Column(String(255), nullable=False)
@@ -94,7 +94,7 @@ class EvaluationResultModel(Base):
     __tablename__ = "evaluation_results"
 
     id = Column(String(12), primary_key=True, default=_uuid12)
-    question_id = Column(String(12), ForeignKey("question_records.id"), nullable=True)
+    question_id = Column(String(12), ForeignKey("question_records.id"), nullable=True, index=True)
     overall_score = Column(Float, default=0.0)
     confidence = Column(Float, default=0.0)
     proficiency_level = Column(String(20), default="beginner")
@@ -111,6 +111,7 @@ class CyberTwinModel(Base):
     __tablename__ = "cyber_twins"
 
     id = Column(String(12), primary_key=True, default=_uuid12)
+    user_id = Column(String(12), ForeignKey("users.id"), nullable=True, index=True)
     candidate_label = Column(String(255), default="Anonymous")
     overall_score = Column(Float, default=0.0)
     overall_confidence = Column(Float, default=0.0)
@@ -125,6 +126,7 @@ class LearningRoadmapModel(Base):
     __tablename__ = "learning_roadmaps"
 
     id = Column(String(12), primary_key=True, default=_uuid12)
+    user_id = Column(String(12), ForeignKey("users.id"), nullable=True, index=True)
     candidate_label = Column(String(255), default="Anonymous")
     overall_score = Column(Float, default=0.0)
     proficiency_level = Column(String(20), default="beginner")
@@ -140,6 +142,7 @@ class AnswerRepairGuideModel(Base):
     __tablename__ = "answer_repair_guides"
 
     id = Column(String(12), primary_key=True, default=_uuid12)
+    user_id = Column(String(12), ForeignKey("users.id"), nullable=True, index=True)
     question_text = Column(Text, default="")
     domain = Column(String(255), default="")
     skill = Column(String(255), default="")

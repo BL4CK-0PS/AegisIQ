@@ -48,6 +48,9 @@ export default function ForgotPasswordPage() {
           <p className="mb-6 text-sm text-surface-400">
             If an account exists with that email, you'll receive a password reset link shortly.
           </p>
+          <p className="mb-4 text-xs text-surface-500">
+            Note: Password reset is not yet configured on this server. Contact your administrator for assistance.
+          </p>
           <Link
             to="/login"
             className="inline-flex items-center gap-2 text-sm text-primary-400 hover:text-primary-300"

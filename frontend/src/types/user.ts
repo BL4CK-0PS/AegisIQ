@@ -3,7 +3,7 @@ export interface User {
   name: string;
   display_name?: string;
   email: string;
-  role: "professional" | "capability_analyst" | "trainer" | "administrator";
+  role: "admin" | "capability_analyst" | "professional" | "reviewer";
   status?: "active" | "inactive" | "suspended";
   created_at: string;
   updated_at?: string;

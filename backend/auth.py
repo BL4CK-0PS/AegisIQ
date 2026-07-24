@@ -25,6 +25,16 @@ settings = get_settings()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer(auto_error=False)
 
+_token_blacklist: set[str] = set()
+
+
+def blacklist_token(token: str) -> None:
+    _token_blacklist.add(token)
+
+
+def is_token_blacklisted(token: str) -> bool:
+    return token in _token_blacklist
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -86,6 +96,12 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     payload = decode_token(credentials.credentials)
+    if is_token_blacklisted(credentials.credentials):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has been revoked",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     user_id: str = payload.get("sub", "")
     if not user_id:
         raise HTTPException(

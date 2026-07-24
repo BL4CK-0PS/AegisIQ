@@ -222,19 +222,25 @@ async def career_compass_roles(
     db: AsyncSession = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
 ) -> dict[str, Any]:
-    evals = await _fetch_evaluations(db, [], current_user)
-    if evals:
-        profile: ConsolidatedProfile = build_profile(evals)
-        skill_profile = CapabilityEngine.build_skill_dna(
-            profile, title=current_user.display_name
+    try:
+        evals = await _fetch_evaluations(db, [], current_user)
+        if evals:
+            profile: ConsolidatedProfile = build_profile(evals)
+            skill_profile = CapabilityEngine.build_skill_dna(
+                profile, title=current_user.display_name
+            )
+        else:
+            from src.core.knowledge.taxonomy import SkillDnaProfile
+
+            skill_profile = SkillDnaProfile(title=current_user.display_name)
+
+        roles = find_best_roles(skill_profile, top_n=7)
+        return {"status": "success", "roles": roles}
+    except Exception as exc:
+        logger.error("Career compass roles failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
         )
-    else:
-        from src.core.knowledge.taxonomy import SkillDnaProfile
-
-        skill_profile = SkillDnaProfile(title=current_user.display_name)
-
-    roles = find_best_roles(skill_profile, top_n=7)
-    return {"status": "success", "roles": roles}
 
 
 @router.post("/roadmap/generate", response_model=RoadmapResponse)

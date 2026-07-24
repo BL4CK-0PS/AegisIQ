@@ -1,5 +1,4 @@
 import { apiClient } from "@/lib/api-client";
-import type { Assessment, Challenge, Response, Evaluation } from "@/types";
 
 export interface AssessmentListItem {
   id: string;
@@ -116,13 +115,6 @@ export const assessmentService = {
     return response.data;
   },
 
-  async start(assessmentId: string): Promise<CreateAssessmentResponse> {
-    const response = await apiClient.post<CreateAssessmentResponse>(
-      `/assessments/${assessmentId}/evaluate`,
-    );
-    return response.data;
-  },
-
   async recordAnswer(data: {
     assessment_id: string;
     question_id: string;
@@ -155,36 +147,6 @@ export const assessmentService = {
     const response = await apiClient.get<ResultsResponse>(
       `/assessments/${assessmentId}/results`,
     );
-    return response.data;
-  },
-
-  async resume(assessmentId: string): Promise<Assessment> {
-    const response = await apiClient.post<Assessment>(
-      `/assessments/${assessmentId}/resume`,
-    );
-    return response.data;
-  },
-
-  async getNextChallenge(assessmentId: string): Promise<Challenge> {
-    const response = await apiClient.get<Challenge>(
-      `/assessments/${assessmentId}/challenges/next`,
-    );
-    return response.data;
-  },
-
-  async submitResponse(
-    challengeId: string,
-    data: { response_type: "voice" | "text"; transcript: string },
-  ): Promise<Response> {
-    const response = await apiClient.post<Response>(
-      `/challenges/${challengeId}/responses`,
-      data,
-    );
-    return response.data;
-  },
-
-  async getEvaluation(responseId: string): Promise<Evaluation> {
-    const response = await apiClient.get<Evaluation>(`/evaluations/${responseId}`);
     return response.data;
   },
 };

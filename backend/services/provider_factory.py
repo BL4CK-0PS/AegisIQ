@@ -69,6 +69,71 @@ class GeminiProvider(BaseAIProvider):
         ) from last_exception
 
 
+JUSTIFICATION_POOL: dict[str, list[str]] = {
+    "foundational_knowledge": [
+        "Demonstrated a solid grasp of core cybersecurity concepts, including threat classification and basic defense mechanisms.",
+        "Answer reflected awareness of fundamental security principles, though some terminology was used imprecisely.",
+        "Candidate showed adequate understanding of baseline security practices relevant to the question domain.",
+    ],
+    "tool_familiarity": [
+        "Referenced appropriate security tooling and showed awareness of how they integrate into a SOC workflow.",
+        "Candidate demonstrated working knowledge of relevant tools but could improve on advanced configuration scenarios.",
+        "Indicated practical exposure to the tools in question, citing realistic use cases.",
+    ],
+    "guided_analysis": [
+        "Candidate followed a logical analytical approach, breaking the problem into identifiable investigation steps.",
+        "Analysis showed a methodical thought process with reasonable hypotheses and next steps.",
+        "The investigative approach was sound, though deeper triage criteria could have been applied.",
+    ],
+    "communication": [
+        "Response was clearly structured and conveyed findings in a concise, actionable manner.",
+        "Candidate communicated reasoning effectively, making the analysis easy to follow.",
+        "Articulated findings with appropriate detail, suitable for both technical and management audiences.",
+    ],
+    "situational_awareness": [
+        "Candidate demonstrated awareness of the operational context and prioritized actions appropriately.",
+        "Showed understanding of risk implications and real-world impact of the scenario described.",
+        "Response reflected a practical mindset with attention to escalation and containment procedures.",
+    ],
+}
+
+
+def _pick_justification(criterion_name: str) -> str:
+    import random
+
+    pool = JUSTIFICATION_POOL.get(criterion_name, [])
+    if not pool:
+        pool = [
+            f"Candidate addressed the {criterion_name.replace('_', ' ')} dimension with a reasonable level of detail.",
+            f"Response demonstrated competence in {criterion_name.replace('_', ' ')} aligned with the expected proficiency.",
+        ]
+    return random.choice(pool)
+
+
+_NONSENSE_PATTERNS = (
+    "idk", "i don't know", "i dont know", "dunno", "no idea",
+    "skip", "pass", "n/a", "none", "no answer", "nothing",
+    "idk how to answer", "not sure", "no comment", "test",
+    "asdf", "aaaa", "hello", "hi", "ok", "okay", "yes", "no",
+    "1", "2", "3", "abc",
+)
+
+
+def _extract_answer(prompt: str) -> str:
+    marker = "Candidate answer to evaluate:\n"
+    idx = prompt.rfind(marker)
+    if idx != -1:
+        return prompt[idx + len(marker):].strip()
+    return prompt[-500:].strip() if len(prompt) > 500 else prompt.strip()
+
+
+def _is_nonsense(answer: str) -> bool:
+    if len(answer) < 5:
+        return True
+    lower = answer.lower().strip()
+    return any(lower == p or lower.startswith(p) for p in _NONSENSE_PATTERNS)
+
+
 class MockProvider(BaseAIProvider):
     """Fallback provider returning structured mock responses for demos."""
 
@@ -79,7 +144,68 @@ class MockProvider(BaseAIProvider):
         logger.info("Using MockProvider fallback")
 
         if schema and "overall_score" in str(schema):
-            score = round(random.uniform(60, 95), 1)
+            candidate_answer = _extract_answer(prompt)
+            nonsense = _is_nonsense(candidate_answer)
+
+            if nonsense:
+                score = round(random.uniform(0, 10), 1)
+                crit_score_range = (0, 1)
+                crit_score_default = 1
+                confidence_range = (0.3, 0.55)
+                proficiency = "beginner"
+                justification_fn = lambda cn, s: f"Candidate did not provide a substantive answer for {cn.replace('_', ' ')}. The response lacked relevant technical content."
+                overall_justification = (
+                    f"Scored {score}/100. "
+                    "The candidate's response was empty, nonsensical, or indicated inability to answer. "
+                    "No meaningful cybersecurity knowledge was demonstrated."
+                )
+                demonstrated = random.sample(
+                    ["Incident response", "Log analysis"],
+                    k=min(1, 2),
+                )
+                missing = [
+                    "Advanced threat modeling",
+                    "Zero trust architecture",
+                    "Threat hunting",
+                    "Malware reverse engineering",
+                    "Cloud forensics",
+                ]
+                mitre = ["T1078"]
+            else:
+                score = round(random.uniform(60, 95), 1)
+                crit_score_range = (2, 5)
+                crit_score_default = 3
+                confidence_range = (0.6, 0.95)
+                proficiency = random.choice(["beginner", "intermediate", "advanced"])
+                justification_fn = lambda cn, s: _pick_justification(cn)
+                overall_justification = (
+                    f"Scored {score}/100. Demonstrated solid foundational knowledge with room for growth."
+                )
+                demonstrated = random.sample(
+                    [
+                        "Incident response",
+                        "Log analysis",
+                        "SIEM operations",
+                        "Network monitoring",
+                        "Vulnerability assessment",
+                    ],
+                    k=random.randint(2, 4),
+                )
+                missing = random.sample(
+                    [
+                        "Advanced threat modeling",
+                        "Zero trust architecture",
+                        "Threat hunting",
+                        "Malware reverse engineering",
+                        "Cloud forensics",
+                    ],
+                    k=random.randint(1, 3),
+                )
+                mitre = random.sample(
+                    ["T1078", "T1059", "T1566", "T1021", "T1053", "T1027"],
+                    k=random.randint(1, 3),
+                )
+
             criteria_names = [
                 "foundational_knowledge",
                 "tool_familiarity",
@@ -87,47 +213,25 @@ class MockProvider(BaseAIProvider):
                 "communication",
                 "situational_awareness",
             ]
+
             return json.dumps(
                 {
                     "overall_score": score,
-                    "confidence": round(random.uniform(0.6, 0.95), 2),
+                    "confidence": round(random.uniform(*confidence_range), 2),
                     "passed": score >= 70,
-                    "proficiency_level": random.choice(
-                        ["beginner", "intermediate", "advanced"]
-                    ),
+                    "proficiency_level": proficiency,
                     "criteria_scores": [
                         {
                             "criterion_name": cn,
-                            "score": int(round(random.uniform(2, 5))),
-                            "justification": f"Demo evaluation for {cn}.",
+                            "score": int(round(random.uniform(*crit_score_range))),
+                            "justification": justification_fn(cn, score),
                         }
                         for cn in criteria_names
                     ],
-                    "missing_concepts": random.sample(
-                        [
-                            "Advanced threat modeling",
-                            "Zero trust architecture",
-                            "Threat hunting",
-                            "Malware reverse engineering",
-                            "Cloud forensics",
-                        ],
-                        k=random.randint(1, 3),
-                    ),
-                    "demonstrated_skills": random.sample(
-                        [
-                            "Incident response",
-                            "Log analysis",
-                            "SIEM operations",
-                            "Network monitoring",
-                            "Vulnerability assessment",
-                        ],
-                        k=random.randint(2, 4),
-                    ),
-                    "mitre_technique_ids": random.sample(
-                        ["T1078", "T1059", "T1566", "T1021", "T1053", "T1027"],
-                        k=random.randint(1, 3),
-                    ),
-                    "overall_justification": f"Scored {score}/100. Demonstrated solid foundational knowledge with room for growth.",
+                    "missing_concepts": missing,
+                    "demonstrated_skills": demonstrated,
+                    "mitre_technique_ids": mitre,
+                    "overall_justification": overall_justification,
                 }
             )
 

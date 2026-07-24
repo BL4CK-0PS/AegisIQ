@@ -20,7 +20,7 @@ const actions = [
   {
     label: "View Reports",
     icon: BarChart3,
-    to: "/report",
+    to: "/assessment",
     color: "text-warning-400",
     bg: "bg-warning-900/30",
   },

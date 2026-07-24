@@ -124,6 +124,10 @@ async def get_assessment(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
         )
+    if assessment.candidate_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not your assessment"
+        )
 
     return {
         "id": assessment.id,
@@ -151,6 +155,10 @@ async def record_answer_endpoint(
     if assessment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
+        )
+    if assessment.candidate_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not your assessment"
         )
 
     qr_repo = QuestionRecordRepository(db)
@@ -185,6 +193,10 @@ async def evaluate_assessment(
     if assessment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
+        )
+    if assessment.candidate_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not your assessment"
         )
 
     questions = assessment.questions or []
@@ -274,6 +286,10 @@ async def complete_assessment_endpoint(
     if assessment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
+        )
+    if assessment.candidate_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not your assessment"
         )
 
     assessment.status = "completed"
@@ -375,6 +391,10 @@ async def get_assessment_results(
     if assessment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
+        )
+    if assessment.candidate_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not your assessment"
         )
 
     eval_repo = EvaluationRepository(db)

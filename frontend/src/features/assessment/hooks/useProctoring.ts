@@ -205,24 +205,33 @@ export function useProctoring(assessmentId: string) {
 
   // --- Tab Focus ---
   useEffect(() => {
+    const GRACE_MS = 3000;
+    let hiddenTimer: ReturnType<typeof setTimeout> | null = null;
+    let cooldownTimer: ReturnType<typeof setTimeout> | null = null;
+
     const handleVisibility = () => {
       const focused = document.visibilityState === "visible";
       setState((prev) => ({ ...prev, isTabFocused: focused }));
-      if (!focused) {
-        addViolationRef.current("tab_switch", "Candidate switched tabs or applications");
+
+      if (focused) {
+        if (hiddenTimer) {
+          clearTimeout(hiddenTimer);
+          hiddenTimer = null;
+        }
+      } else if (!hiddenTimer && !cooldownTimer) {
+        hiddenTimer = setTimeout(() => {
+          hiddenTimer = null;
+          addViolationRef.current("tab_switch", "Tab hidden for >3 seconds");
+          cooldownTimer = setTimeout(() => { cooldownTimer = null; }, GRACE_MS);
+        }, GRACE_MS);
       }
     };
 
-    const handleBlur = () => {
-      setState((prev) => ({ ...prev, isTabFocused: false }));
-      addViolationRef.current("tab_switch", "Window lost focus");
-    };
-
     document.addEventListener("visibilitychange", handleVisibility);
-    window.addEventListener("blur", handleBlur);
     return () => {
       document.removeEventListener("visibilitychange", handleVisibility);
-      window.removeEventListener("blur", handleBlur);
+      if (hiddenTimer) clearTimeout(hiddenTimer);
+      if (cooldownTimer) clearTimeout(cooldownTimer);
     };
   }, []);
 

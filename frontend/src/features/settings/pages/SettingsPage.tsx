@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
 import { useAuthStore } from "@/store/auth-store";
+import { apiClient } from "@/lib/api-client";
 
 export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
@@ -15,6 +16,7 @@ export default function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordSaved, setPasswordSaved] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
   const currentUser = useAuthStore((s) => s.user);
 
   const displayName = profileName || (currentUser?.name ?? "");
@@ -22,10 +24,15 @@ export default function SettingsPage() {
 
   const handleSave = async () => {
     setSaving(true);
+    setProfileError(null);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await apiClient.patch(`/users/${currentUser?.id}`, {
+        display_name: profileName || undefined,
+      });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+    } catch {
+      setProfileError("Failed to save profile. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -49,7 +56,10 @@ export default function SettingsPage() {
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await apiClient.post("/auth/change-password", {
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
       setPasswordSaved(true);
       setCurrentPassword("");
       setNewPassword("");

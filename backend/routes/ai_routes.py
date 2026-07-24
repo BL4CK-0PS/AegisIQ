@@ -170,15 +170,17 @@ async def repair_guide(
     ),
 ) -> dict[str, Any]:
     try:
-        dummy_eval = EvaluationResult(
+        result: EvaluationResult = await evaluate_response(
             question_text=payload.question_text,
+            candidate_answer=payload.candidate_answer,
             domain=payload.domain,
             skill=payload.skill,
+            difficulty="intermediate",
         )
         guide = await generate_repair_guide(
             question_text=payload.question_text,
             candidate_answer=payload.candidate_answer,
-            evaluation_result=dummy_eval,
+            evaluation_result=result,
             domain=payload.domain,
             skill=payload.skill,
             mitre_technique_id=payload.mitre_technique_id,
@@ -206,10 +208,16 @@ async def session_start(
         require_role("admin", "capability_analyst", "professional")
     ),
 ) -> dict[str, Any]:
-    session = start_session(
-        domain=payload.domain, difficulty=payload.initial_difficulty
-    )
-    return {"status": "success", "session": session.model_dump()}
+    try:
+        session = start_session(
+            domain=payload.domain, difficulty=payload.initial_difficulty
+        )
+        return {"status": "success", "session": session.model_dump()}
+    except Exception as exc:
+        logger.error("Session start failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        )
 
 
 @router.post("/session/record", response_model=SessionResponse)
@@ -219,26 +227,34 @@ async def session_record(
         require_role("admin", "capability_analyst", "professional")
     ),
 ) -> dict[str, Any]:
-    mgr = _get_session_manager()
-    session = mgr.get_session(payload.session_id)
-    if session is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Session '{payload.session_id}' not found",
+    try:
+        mgr = _get_session_manager()
+        session = mgr.get_session(payload.session_id)
+        if session is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Session '{payload.session_id}' not found",
+            )
+        updated = record_answer(
+            session=session,
+            question_id=payload.question_id,
+            question_text=payload.question_text,
+            domain=payload.domain,
+            skill=payload.skill,
+            difficulty=payload.difficulty,
+            score=payload.score,
+            confidence=payload.confidence,
+            passed=payload.passed,
+            is_follow_up=payload.is_follow_up,
         )
-    updated = record_answer(
-        session=session,
-        question_id=payload.question_id,
-        question_text=payload.question_text,
-        domain=payload.domain,
-        skill=payload.skill,
-        difficulty=payload.difficulty,
-        score=payload.score,
-        confidence=payload.confidence,
-        passed=payload.passed,
-        is_follow_up=payload.is_follow_up,
-    )
-    return {"status": "success", "session": updated.model_dump()}
+        return {"status": "success", "session": updated.model_dump()}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error("Session record failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        )
 
 
 @router.post("/session/complete", response_model=SessionResponse)
@@ -248,15 +264,23 @@ async def session_complete(
         require_role("admin", "capability_analyst", "professional")
     ),
 ) -> dict[str, Any]:
-    mgr = _get_session_manager()
-    session = mgr.get_session(payload.session_id)
-    if session is None:
+    try:
+        mgr = _get_session_manager()
+        session = mgr.get_session(payload.session_id)
+        if session is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Session '{payload.session_id}' not found",
+            )
+        completed = complete_session(session)
+        return {"status": "success", "session": completed.model_dump()}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error("Session complete failed: %s", exc)
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Session '{payload.session_id}' not found",
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
         )
-    completed = complete_session(session)
-    return {"status": "success", "session": completed.model_dump()}
 
 
 @router.get("/providers")

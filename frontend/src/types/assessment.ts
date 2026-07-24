@@ -1,4 +1,4 @@
-export type AssessmentStatus = "pending" | "in_progress" | "completed" | "paused" | "abandoned";
+export type AssessmentStatus = "pending" | "active" | "in_progress" | "completed" | "paused" | "abandoned";
 
 export type ChallengeType = "soc" | "dfir" | "threat_hunting" | "cloud" | "malware" | "iam";
 

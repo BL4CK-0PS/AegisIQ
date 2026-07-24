@@ -68,7 +68,8 @@ def _get_loader() -> PromptLoader:
     if _prompt_loader is None:
         try:
             _, _prompt_loader = create_ai_client()
-        except Exception:
+        except Exception as exc:
+            logger.warning("Prompt loader init failed (%s), falling back to MockProvider", exc)
             _, _prompt_loader = create_ai_client(provider_name="mock")
     return _prompt_loader
 

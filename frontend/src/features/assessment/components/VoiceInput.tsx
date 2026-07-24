@@ -14,7 +14,9 @@ export function VoiceInput({ onTranscript, disabled }: VoiceInputProps) {
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    const supported = typeof window !== "undefined" && "webkitSpeechRecognition" in window;
+    const supported =
+      typeof window !== "undefined" &&
+      ("webkitSpeechRecognition" in window || "SpeechRecognition" in window);
     setIsSupported(supported);
   }, []);
 
@@ -28,7 +30,9 @@ export function VoiceInput({ onTranscript, disabled }: VoiceInputProps) {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const SR = (window as unknown as Record<string, any>).webkitSpeechRecognition;
+    const SR = (window as unknown as Record<string, any>).webkitSpeechRecognition
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ?? (window as unknown as Record<string, any>).SpeechRecognition;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const recognition: any = new SR();
     recognition.continuous = true;
