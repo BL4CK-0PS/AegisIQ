@@ -22,8 +22,11 @@ from backend.repositories.assessment_repository import (
 from backend.repositories.evaluation_repository import EvaluationRepository
 from backend.orchestrator import (
     start_session,
+    get_session as get_adaptive_session,
     get_session_summary,
     evaluate_response,
+    record_answer as record_answer_on_session,
+    compute_next_difficulty,
 )
 from backend.schemas import (
     CreateAssessmentRequest,
@@ -31,7 +34,7 @@ from backend.schemas import (
     CompleteAssessmentRequest,
     PaginatedAssessmentsResponse,
 )
-from src.core.engine.branching import AdaptiveSession
+from src.core.engine.branching import AdaptiveSession, MIN_QUESTIONS_PER_SESSION
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -171,6 +174,32 @@ async def record_answer_endpoint(
         candidate_answer=payload.candidate_answer,
     )
 
+    # Wire up the in-memory adaptive session so branching logic stays current
+    adaptive_session = get_adaptive_session(assessment.id)
+    if adaptive_session is not None:
+        adaptive_session = record_answer_on_session(
+            session=adaptive_session,
+            question_id=record.id,
+            question_text=payload.question_text,
+            domain=payload.domain,
+            skill=payload.skill,
+            difficulty=payload.difficulty,
+            score=0.0,  # score assigned later during evaluation
+            confidence=0.0,
+            passed=False,
+        )
+        adjustment = compute_next_difficulty(
+            adaptive_session, current_skill=payload.skill
+        )
+        questions_remaining = max(
+            0, MIN_QUESTIONS_PER_SESSION - len(adaptive_session.questions)
+        )
+    else:
+        adjustment = None
+        questions_remaining = 0
+
+    question_count = len(adaptive_session.questions) if adaptive_session else 0
+
     logger.debug(
         "Answer recorded for assessment %s, question %s", assessment.id, record.id
     )
@@ -179,6 +208,12 @@ async def record_answer_endpoint(
         "status": "success",
         "record_id": record.id,
         "question_text": payload.question_text[:100],
+        "question_count": question_count,
+        "questions_remaining": questions_remaining,
+        "next_difficulty": adjustment.new_difficulty.value
+        if adjustment
+        else payload.difficulty,
+        "minimum_required": MIN_QUESTIONS_PER_SESSION,
     }
 
 
@@ -292,15 +327,40 @@ async def complete_assessment_endpoint(
             status_code=status.HTTP_403_FORBIDDEN, detail="Not your assessment"
         )
 
+    # Enforce minimum question count before allowing completion
+    adaptive_session = get_adaptive_session(assessment_id)
+    question_count = 0
+    if adaptive_session is not None:
+        question_count = len(adaptive_session.questions)
+    else:
+        # Fallback: count from DB
+        full = await repo.get_with_questions(assessment_id)
+        question_count = len(full.questions) if full and full.questions else 0
+
+    if question_count < MIN_QUESTIONS_PER_SESSION:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Minimum {MIN_QUESTIONS_PER_SESSION} questions required before completion. "
+            f"You have answered {question_count}.",
+        )
+
     assessment.status = "completed"
     assessment.completed_at = datetime.now(timezone.utc)
 
     try:
         repo2 = AssessmentRepository(db)
         full_assessment = await repo2.get_with_questions(assessment_id)
-        question_count = len(full_assessment.questions) if full_assessment and full_assessment.questions else 0
-        domains = list({q.domain for q in (full_assessment.questions or []) if q.domain})
-        difficulties = list({q.difficulty for q in (full_assessment.questions or []) if q.difficulty})
+        question_count = (
+            len(full_assessment.questions)
+            if full_assessment and full_assessment.questions
+            else 0
+        )
+        domains = list(
+            {q.domain for q in (full_assessment.questions or []) if q.domain}
+        )
+        difficulties = list(
+            {q.difficulty for q in (full_assessment.questions or []) if q.difficulty}
+        )
         summary = {
             "total_questions": question_count,
             "domain": assessment.domain,
@@ -342,7 +402,9 @@ async def complete_assessment_endpoint(
             "violation_count": violation_count,
             "violations": violations,
             "integrity_score": integrity_score,
-            "cheating_risk_flagged": proctoring_data.get("cheating_risk_flagged", integrity_score < 70),
+            "cheating_risk_flagged": proctoring_data.get(
+                "cheating_risk_flagged", integrity_score < 70
+            ),
             "tab_switches": proctoring_data.get("tab_switches", 0),
             "fullscreen_exits": proctoring_data.get("fullscreen_exits", 0),
             "screen_share_stops": proctoring_data.get("screen_share_stops", 0),
@@ -370,7 +432,9 @@ async def complete_assessment_endpoint(
     try:
         await db.commit()
     except Exception as exc:
-        logger.error("Failed to commit assessment completion %s: %s", assessment_id, exc)
+        logger.error(
+            "Failed to commit assessment completion %s: %s", assessment_id, exc
+        )
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -420,20 +484,26 @@ async def get_assessment_results(
 
     results = []
     for e in evals:
-        penalized_score = round(e.overall_score * integrity_multiplier, 2) if integrity_multiplier < 1.0 else e.overall_score
-        results.append({
-            "id": e.id,
-            "overall_score": e.overall_score,
-            "penalized_score": penalized_score,
-            "confidence": e.confidence,
-            "proficiency_level": e.proficiency_level,
-            "passed": e.passed,
-            "criteria_scores": e.criteria_scores,
-            "missing_concepts": e.missing_concepts,
-            "demonstrated_skills": e.demonstrated_skills,
-            "mitre_technique_ids": e.mitre_technique_ids,
-            "overall_justification": e.overall_justification,
-        })
+        penalized_score = (
+            round(e.overall_score * integrity_multiplier, 2)
+            if integrity_multiplier < 1.0
+            else e.overall_score
+        )
+        results.append(
+            {
+                "id": e.id,
+                "overall_score": e.overall_score,
+                "penalized_score": penalized_score,
+                "confidence": e.confidence,
+                "proficiency_level": e.proficiency_level,
+                "passed": e.passed,
+                "criteria_scores": e.criteria_scores,
+                "missing_concepts": e.missing_concepts,
+                "demonstrated_skills": e.demonstrated_skills,
+                "mitre_technique_ids": e.mitre_technique_ids,
+                "overall_justification": e.overall_justification,
+            }
+        )
 
     return {
         "assessment_id": assessment_id,

@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api-client";
+import type { Assessment } from "@/types/assessment";
 
 export interface AssessmentListItem {
   id: string;
@@ -29,6 +30,10 @@ export interface RecordAnswerResponse {
   status: string;
   record_id: string;
   question_text: string;
+  question_count: number;
+  questions_remaining: number;
+  next_difficulty: string;
+  minimum_required: number;
 }
 
 export interface EvaluateResponse {

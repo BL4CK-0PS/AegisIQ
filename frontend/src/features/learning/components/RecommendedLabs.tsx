@@ -3,15 +3,46 @@ import { Beaker, Loader2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { learningService } from "@/services/learning.service";
+import { learningService, type CareerCompassRoles } from "@/services/learning.service";
+
+interface LabRecommendation {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: string;
+  estimated_hours: number;
+  skills_practiced: string[];
+  role_name: string;
+}
+
+function deriveLabsFromRoles(data: CareerCompassRoles): LabRecommendation[] {
+  if (!data?.roles) return [];
+  const labs: LabRecommendation[] = [];
+  for (const role of data.roles) {
+    const roleName = (role.role_name as string) ?? "Unknown Role";
+    const learningPaths = (role.learning_paths as Record<string, string>[]) ?? [];
+    for (const path of learningPaths) {
+      labs.push({
+        id: `${roleName}-${path.topic ?? labs.length}`,
+        title: path.topic ?? "Lab Exercise",
+        description: path.description ?? `Hands-on lab for ${path.topic ?? roleName}`,
+        difficulty: path.difficulty ?? "beginner",
+        estimated_hours: Number(path.estimated_hours ?? 2),
+        skills_practiced: Array.isArray(path.skills) ? path.skills as string[] : [],
+        role_name: roleName,
+      });
+    }
+  }
+  return labs;
+}
 
 export default function RecommendedLabs() {
-  const { data: compasses, isLoading } = useQuery({
-    queryKey: ["career-compasses"],
-    queryFn: () => learningService.listCompasses(),
+  const { data: rolesData, isLoading } = useQuery({
+    queryKey: ["career-compass-roles"],
+    queryFn: () => learningService.getBestFitRoles(),
   });
 
-  const labs = compasses?.[0]?.labs || [];
+  const labs = deriveLabsFromRoles(rolesData ?? { status: "ok", roles: [] });
 
   if (isLoading) {
     return (
@@ -64,12 +95,15 @@ export default function RecommendedLabs() {
                   {lab.difficulty}
                 </Badge>
                 <span className="text-xs text-surface-500">~{lab.estimated_hours}h</span>
+                <Badge variant="outline" size="sm">{lab.role_name}</Badge>
               </div>
-              <div className="mt-2 flex flex-wrap gap-1">
-                {lab.skills_practiced.map((skill, j) => (
-                  <Badge key={j} variant="primary" size="sm">{skill}</Badge>
-                ))}
-              </div>
+              {lab.skills_practiced.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {lab.skills_practiced.map((skill: string, j: number) => (
+                    <Badge key={j} variant="primary" size="sm">{skill}</Badge>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>

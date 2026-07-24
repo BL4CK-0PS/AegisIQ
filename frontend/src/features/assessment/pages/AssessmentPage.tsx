@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ClipboardCheck, ArrowLeft, AlertTriangle, Send, CheckCircle } from "lucide-react";
+import { ClipboardCheck, ArrowLeft, AlertTriangle, Send, CheckCircle, Target } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/feedback/EmptyState";
@@ -28,6 +28,8 @@ export default function AssessmentPage() {
   const [answer, setAnswer] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [proctoringReady, setProctoringReady] = useState(false);
+  const [liveQuestionCount, setLiveQuestionCount] = useState<number | null>(null);
+  const [liveNextDifficulty, setLiveNextDifficulty] = useState<string | null>(null);
 
   const proctoring = useProctoring(id ?? "");
 
@@ -51,9 +53,11 @@ export default function AssessmentPage() {
       difficulty: string;
       candidate_answer: string;
     }) => assessmentService.recordAnswer(data),
-    onSuccess: () => {
+    onSuccess: (response) => {
       setAnswer("");
       setSubmitError(null);
+      setLiveQuestionCount(response.question_count);
+      setLiveNextDifficulty(response.next_difficulty);
       queryClient.invalidateQueries({ queryKey: ["assessment", id] });
     },
     onError: (err: unknown) => {
@@ -129,7 +133,8 @@ export default function AssessmentPage() {
   const status = assessment.status ?? "unknown";
   const domain = assessment.domain ?? "Assessment";
   const difficulty = assessment.current_difficulty ?? "Unknown";
-  const questionCount = assessment.question_count ?? 0;
+  const effectiveQuestionCount = liveQuestionCount ?? (assessment.question_count ?? 0);
+  const currentDifficulty = liveNextDifficulty ?? difficulty;
   const startedAt = assessment.started_at;
   const completedAt = assessment.completed_at;
   const assessmentId = assessment.id ?? id;
@@ -193,7 +198,7 @@ export default function AssessmentPage() {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
         <Card variant="elevated">
           <CardContent className="py-4">
             <p className="text-xs text-surface-500">Status</p>
@@ -207,13 +212,38 @@ export default function AssessmentPage() {
         <Card variant="elevated">
           <CardContent className="py-4">
             <p className="text-xs text-surface-500">Difficulty</p>
-            <p className="mt-1 text-sm font-medium text-surface-200">{difficulty}</p>
+            <p className="mt-1 text-sm font-medium text-surface-200">{currentDifficulty}</p>
           </CardContent>
         </Card>
         <Card variant="elevated">
           <CardContent className="py-4">
             <p className="text-xs text-surface-500">Questions Answered</p>
-            <p className="mt-1 text-sm font-medium text-surface-200">{questionCount}</p>
+            <p className="mt-1 text-sm font-medium text-surface-200">
+              {effectiveQuestionCount}
+              {!isCompleted && (
+                <span className="ml-1 text-xs text-surface-500">/ 5 min</span>
+              )}
+            </p>
+          </CardContent>
+        </Card>
+        <Card variant="elevated">
+          <CardContent className="py-4">
+            <p className="text-xs text-surface-500">Progress</p>
+            <div className="mt-2">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-700">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    effectiveQuestionCount >= 5 ? "bg-success-500" : "bg-primary-500"
+                  }`}
+                  style={{ width: `${Math.min((effectiveQuestionCount / 5) * 100, 100)}%` }}
+                />
+              </div>
+              <p className="mt-1 text-[11px] text-surface-500">
+                {effectiveQuestionCount >= 5
+                  ? "Ready to evaluate"
+                  : `${Math.max(0, 5 - effectiveQuestionCount)} more needed`}
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -260,14 +290,22 @@ export default function AssessmentPage() {
 
           <Card variant="elevated">
             <CardHeader>
-              <CardTitle>Answer Scenario Question</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Target size={16} className="text-primary-400" />
+                Answer Scenario Question
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-surface-300">
                 You are responding to a <span className="font-medium text-primary-400">{domain}</span> scenario
-                at <span className="font-medium text-primary-400">{difficulty}</span> difficulty.
+                at <span className="font-medium text-primary-400">{currentDifficulty}</span> difficulty.
                 Record your analysis, response steps, or reasoning below.
               </p>
+              {liveNextDifficulty && liveNextDifficulty !== difficulty && (
+                <p className="text-xs text-cyber-400">
+                  Adaptive engine adjusted difficulty to {liveNextDifficulty} based on your recent answers.
+                </p>
+              )}
               <div className="space-y-2">
                 <textarea
                   value={answer}
@@ -299,24 +337,31 @@ export default function AssessmentPage() {
             </CardContent>
           </Card>
 
-          {questionCount > 0 && (
+          {effectiveQuestionCount > 0 && (
             <Card variant="elevated">
               <CardContent className="py-4">
                 <p className="text-sm text-surface-400 mb-3">
-                  You have submitted {questionCount} response{questionCount !== 1 ? "s" : ""}.
+                  You have submitted {effectiveQuestionCount} response{effectiveQuestionCount !== 1 ? "s" : ""}.
+                  {effectiveQuestionCount < 5 && (
+                    <span className="ml-1 text-warning-400">
+                      Answer at least {5 - effectiveQuestionCount} more to unlock evaluation.
+                    </span>
+                  )}
                 </p>
                 <div className="flex items-center gap-3">
                   <Button
                     onClick={() => evaluateMutation.mutate()}
                     isLoading={evaluateMutation.isPending}
+                    disabled={effectiveQuestionCount < 5}
                     leftIcon={<CheckCircle size={16} />}
                   >
-                    Evaluate & View Report
+                    {effectiveQuestionCount < 5 ? "Minimum 5 Questions Required" : "Evaluate & View Report"}
                   </Button>
                   <Button
                     variant="secondary"
                     onClick={() => completeMutation.mutate()}
                     isLoading={completeMutation.isPending}
+                    disabled={effectiveQuestionCount < 5}
                   >
                     Complete Without Evaluation
                   </Button>

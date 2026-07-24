@@ -1,25 +1,9 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { assessmentService } from "@/services/assessment.service";
-import type { Challenge, Response, Evaluation } from "@/types";
-
-interface AssessmentState {
-  assessmentId: string | null;
-  currentChallenge: Challenge | null;
-  responses: Response[];
-  evaluations: Evaluation[];
-  isComplete: boolean;
-}
+import { assessmentService, type RecordAnswerResponse, type EvaluateResponse } from "@/services/assessment.service";
 
 export function useAssessment(assessmentId?: string) {
   const queryClient = useQueryClient();
-  const [state, setState] = useState<AssessmentState>({
-    assessmentId: assessmentId || null,
-    currentChallenge: null,
-    responses: [],
-    evaluations: [],
-    isComplete: false,
-  });
 
   const { data: assessment, isLoading } = useQuery({
     queryKey: ["assessment", assessmentId],
@@ -27,72 +11,59 @@ export function useAssessment(assessmentId?: string) {
     enabled: !!assessmentId,
   });
 
-  const startMutation = useMutation({
-    mutationFn: (id: string) => assessmentService.start(id),
-    onSuccess: (data) => {
-      setState((prev) => ({ ...prev, assessmentId: data.assessment_id ?? data.domain }));
-      queryClient.invalidateQueries({ queryKey: ["assessment"] });
+  const createMutation = useMutation({
+    mutationFn: ({ domain, difficulty }: { domain: string; difficulty?: string }) =>
+      assessmentService.create(domain, difficulty),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["assessments"] });
     },
   });
 
-  const nextChallengeMutation = useMutation({
-    mutationFn: (id: string) => assessmentService.getNextChallenge(id),
-    onSuccess: (challenge) => {
-      setState((prev) => ({ ...prev, currentChallenge: challenge }));
-    },
+  const recordAnswerMutation = useMutation({
+    mutationFn: (data: {
+      assessment_id: string;
+      question_id: string;
+      question_text: string;
+      domain: string;
+      skill: string;
+      difficulty: string;
+      candidate_answer: string;
+    }) => assessmentService.recordAnswer(data),
   });
 
-  const submitResponseMutation = useMutation({
-    mutationFn: ({
-      challengeId,
-      data,
-    }: {
-      challengeId: string;
-      data: { response_type: "voice" | "text"; transcript: string };
-    }) => assessmentService.submitResponse(challengeId, data),
-    onSuccess: (response) => {
-      setState((prev) => ({
-        ...prev,
-        responses: [...prev.responses, response],
-      }));
-    },
-  });
-
-  const getEvaluationMutation = useMutation({
-    mutationFn: (responseId: string) => assessmentService.getEvaluation(responseId),
-    onSuccess: (evaluation) => {
-      setState((prev) => ({
-        ...prev,
-        evaluations: [...prev.evaluations, evaluation],
-      }));
+  const evaluateMutation = useMutation({
+    mutationFn: (assessId: string) => assessmentService.evaluate(assessId),
+    onSuccess: (_data, assessId) => {
+      queryClient.invalidateQueries({ queryKey: ["assessment", assessId] });
     },
   });
 
   const completeMutation = useMutation({
-    mutationFn: (id: string) => assessmentService.complete(id),
+    mutationFn: ({ id, proctoringSummary }: { id: string; proctoringSummary?: Parameters<typeof assessmentService.complete>[1] }) =>
+      assessmentService.complete(id, proctoringSummary),
     onSuccess: () => {
-      setState((prev) => ({ ...prev, isComplete: true }));
-      queryClient.invalidateQueries({ queryKey: ["assessment"] });
+      queryClient.invalidateQueries({ queryKey: ["assessments"] });
     },
   });
 
-  const loadNextChallenge = useCallback(() => {
-    if (state.assessmentId) {
-      nextChallengeMutation.mutate(state.assessmentId);
-    }
-  }, [state.assessmentId, nextChallengeMutation]);
+  const getResults = useCallback(
+    (id: string) => assessmentService.getResults(id),
+    [],
+  );
 
   return {
     assessment,
     isLoading,
-    ...state,
-    start: startMutation.mutate,
-    loadNextChallenge,
-    submitResponse: submitResponseMutation.mutate,
-    getEvaluation: getEvaluationMutation.mutate,
+    create: createMutation.mutate,
+    recordAnswer: recordAnswerMutation.mutate,
+    evaluate: evaluateMutation.mutate,
     complete: completeMutation.mutate,
-    isStarting: startMutation.isPending,
-    isSubmitting: submitResponseMutation.isPending,
+    getResults,
+    isCreating: createMutation.isPending,
+    isRecording: recordAnswerMutation.isPending,
+    isEvaluating: evaluateMutation.isPending,
     isCompleting: completeMutation.isPending,
+    lastRecordResult: recordAnswerMutation.data as RecordAnswerResponse | undefined,
+    lastEvaluateResult: evaluateMutation.data as EvaluateResponse | undefined,
   };
 }

@@ -18,6 +18,7 @@ _DOWNGRADE_THRESHOLD: float = 35.0
 _FOLLOW_UP_THRESHOLD: float = 30.0
 _MASTERY_THRESHOLD: float = 80.0
 _MASTERY_CONSECUTIVE: int = 3
+MIN_QUESTIONS_PER_SESSION: int = 5
 
 
 class SessionState(str, Enum):
@@ -311,6 +312,33 @@ class AdaptiveSessionManager:
         if not records:
             return []
         return records[-self._rolling_window :]
+
+    # ------------------------------------------------------------------
+    # Minimum question checks
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def meets_minimum_questions(session: AdaptiveSession, minimum: int = MIN_QUESTIONS_PER_SESSION) -> bool:
+        """Return True if the session has at least *minimum* recorded answers."""
+        return len(session.questions) >= minimum
+
+    @staticmethod
+    def domain_question_counts(session: AdaptiveSession) -> dict[str, int]:
+        """Return a mapping of domain name -> number of questions asked."""
+        counts: dict[str, int] = {}
+        for q in session.questions:
+            counts[q.domain] = counts.get(q.domain, 0) + 1
+        return counts
+
+    @staticmethod
+    def domain_average_scores(session: AdaptiveSession) -> dict[str, float]:
+        """Return a mapping of domain name -> average score (0-100)."""
+        totals: dict[str, float] = {}
+        counts: dict[str, int] = {}
+        for q in session.questions:
+            totals[q.domain] = totals.get(q.domain, 0.0) + q.score
+            counts[q.domain] = counts.get(q.domain, 0) + 1
+        return {d: round(totals[d] / counts[d], 2) for d in totals if counts[d] > 0}
 
     # ------------------------------------------------------------------
     # Summary helpers

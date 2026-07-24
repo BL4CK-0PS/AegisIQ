@@ -2,6 +2,7 @@ import SkillDNAOverview from '../components/SkillDNAOverview';
 import AssessmentHistory from '../components/AssessmentHistory';
 import CareerCompass from '../components/CareerCompass';
 import GrowthTrajectory from '../components/GrowthTrajectory';
+import SkillGaps from '../components/SkillGaps';
 import { Fingerprint } from 'lucide-react';
 
 export default function CyberTwinPage() {
@@ -26,6 +27,9 @@ export default function CyberTwinPage() {
           <AssessmentHistory />
         </div>
         <GrowthTrajectory />
+        <div className="md:col-span-2">
+          <SkillGaps />
+        </div>
       </div>
     </div>
   );

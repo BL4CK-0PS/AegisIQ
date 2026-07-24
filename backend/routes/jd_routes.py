@@ -39,10 +39,8 @@ async def parse_jd(
         matched_domains = [
             d
             for d in ALL_DOMAINS
-            if any(
-                kw in text_lower
-                for kw in d.name.lower().split()
-            ) or any(
+            if any(kw in text_lower for kw in d.name.lower().split())
+            or any(
                 kw in text_lower
                 for cap in d.capabilities
                 for s in cap.skills

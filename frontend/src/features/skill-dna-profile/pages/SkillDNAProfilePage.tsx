@@ -38,7 +38,7 @@ interface SkillDNAResult {
 }
 
 export default function SkillDNAProfilePage() {
-  const [jdText, setJdText] = useState("");
+  const [jdText, setJdText] = useState(() => localStorage.getItem("aegisiq_jd_draft") || "");
   const [result, setResult] = useState<SkillDNAResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,6 +66,7 @@ export default function SkillDNAProfilePage() {
         recommended_rubric: raw.recommended_rubric ?? "",
         mitre_technique_ids: raw.mitre_technique_ids ?? [],
       });
+      localStorage.removeItem("aegisiq_jd_draft");
     } catch {
       setError("Failed to parse job description. Please try again.");
     } finally {
@@ -83,7 +84,7 @@ export default function SkillDNAProfilePage() {
               Extracted capability fingerprint for "{result.title}"
             </p>
           </div>
-          <Button variant="secondary" onClick={() => setResult(null)}>
+          <Button variant="secondary" onClick={() => { setResult(null); localStorage.removeItem("aegisiq_jd_draft"); setJdText(""); }}>
             Parse Another
           </Button>
         </div>
@@ -237,7 +238,10 @@ export default function SkillDNAProfilePage() {
         <CardContent className="space-y-4">
           <textarea
             value={jdText}
-            onChange={(e) => setJdText(e.target.value)}
+            onChange={(e) => {
+              setJdText(e.target.value);
+              localStorage.setItem("aegisiq_jd_draft", e.target.value);
+            }}
             placeholder="Paste the job description here (minimum 20 characters)..."
             className="h-40 w-full rounded-lg border border-surface-700 bg-surface-800 p-3 text-sm text-surface-200 placeholder-surface-500 focus:border-primary-500 focus:outline-none"
           />

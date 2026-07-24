@@ -80,6 +80,9 @@ export default function SettingsPage() {
       {saved && (
         <Alert variant="success">Settings saved successfully.</Alert>
       )}
+      {profileError && (
+        <Alert variant="error">{profileError}</Alert>
+      )}
 
       <Card variant="elevated">
         <CardHeader>

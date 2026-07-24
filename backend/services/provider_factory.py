@@ -111,11 +111,33 @@ def _pick_justification(criterion_name: str) -> str:
 
 
 _NONSENSE_PATTERNS = (
-    "idk", "i don't know", "i dont know", "dunno", "no idea",
-    "skip", "pass", "n/a", "none", "no answer", "nothing",
-    "idk how to answer", "not sure", "no comment", "test",
-    "asdf", "aaaa", "hello", "hi", "ok", "okay", "yes", "no",
-    "1", "2", "3", "abc",
+    "idk",
+    "i don't know",
+    "i dont know",
+    "dunno",
+    "no idea",
+    "skip",
+    "pass",
+    "n/a",
+    "none",
+    "no answer",
+    "nothing",
+    "idk how to answer",
+    "not sure",
+    "no comment",
+    "test",
+    "asdf",
+    "aaaa",
+    "hello",
+    "hi",
+    "ok",
+    "okay",
+    "yes",
+    "no",
+    "1",
+    "2",
+    "3",
+    "abc",
 )
 
 
@@ -123,7 +145,7 @@ def _extract_answer(prompt: str) -> str:
     marker = "Candidate answer to evaluate:\n"
     idx = prompt.rfind(marker)
     if idx != -1:
-        return prompt[idx + len(marker):].strip()
+        return prompt[idx + len(marker) :].strip()
     return prompt[-500:].strip() if len(prompt) > 500 else prompt.strip()
 
 
@@ -150,10 +172,13 @@ class MockProvider(BaseAIProvider):
             if nonsense:
                 score = round(random.uniform(0, 10), 1)
                 crit_score_range = (0, 1)
-                crit_score_default = 1
                 confidence_range = (0.3, 0.55)
                 proficiency = "beginner"
-                justification_fn = lambda cn, s: f"Candidate did not provide a substantive answer for {cn.replace('_', ' ')}. The response lacked relevant technical content."
+
+                def _nonsense_justification(cn: str, _s: float) -> str:
+                    return f"Candidate did not provide a substantive answer for {cn.replace('_', ' ')}. The response lacked relevant technical content."
+
+                justification_fn = _nonsense_justification
                 overall_justification = (
                     f"Scored {score}/100. "
                     "The candidate's response was empty, nonsensical, or indicated inability to answer. "
@@ -174,13 +199,14 @@ class MockProvider(BaseAIProvider):
             else:
                 score = round(random.uniform(60, 95), 1)
                 crit_score_range = (2, 5)
-                crit_score_default = 3
                 confidence_range = (0.6, 0.95)
                 proficiency = random.choice(["beginner", "intermediate", "advanced"])
-                justification_fn = lambda cn, s: _pick_justification(cn)
-                overall_justification = (
-                    f"Scored {score}/100. Demonstrated solid foundational knowledge with room for growth."
-                )
+
+                def _valid_justification(cn: str, _s: float) -> str:
+                    return _pick_justification(cn)
+
+                justification_fn = _valid_justification
+                overall_justification = f"Scored {score}/100. Demonstrated solid foundational knowledge with room for growth."
                 demonstrated = random.sample(
                     [
                         "Incident response",

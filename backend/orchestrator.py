@@ -69,7 +69,9 @@ def _get_loader() -> PromptLoader:
         try:
             _, _prompt_loader = create_ai_client()
         except Exception as exc:
-            logger.warning("Prompt loader init failed (%s), falling back to MockProvider", exc)
+            logger.warning(
+                "Prompt loader init failed (%s), falling back to MockProvider", exc
+            )
             _, _prompt_loader = create_ai_client(provider_name="mock")
     return _prompt_loader
 
@@ -189,10 +191,8 @@ def _fallback_jd_parse(jd_text: str, title: str) -> SkillDnaProfile:
     matched_domains = [
         d
         for d in ALL_DOMAINS
-        if any(
-            kw in text_lower
-            for kw in d.name.lower().split()
-        ) or any(
+        if any(kw in text_lower for kw in d.name.lower().split())
+        or any(
             kw in text_lower
             for cap in d.capabilities
             for s in cap.skills
@@ -411,6 +411,11 @@ def _get_session_manager() -> AdaptiveSessionManager:
 def start_session(domain: str, difficulty: str = "beginner") -> AdaptiveSession:
     diff = _resolve_difficulty(difficulty)
     return _get_session_manager().start_session(domain=domain, initial_difficulty=diff)
+
+
+def get_session(session_id: str) -> AdaptiveSession | None:
+    """Retrieve an in-memory adaptive session by its ID."""
+    return _get_session_manager().get_session(session_id)
 
 
 def record_answer(

@@ -45,9 +45,11 @@ def client():
 
     clear_rate_limits()
 
-    with patch("backend.main.init_db", new_callable=AsyncMock), \
-         patch("backend.main.close_db", new_callable=AsyncMock), \
-         TestClient(app) as c:
+    with (
+        patch("backend.main.init_db", new_callable=AsyncMock),
+        patch("backend.main.close_db", new_callable=AsyncMock),
+        TestClient(app) as c,
+    ):
         yield c
 
     app.dependency_overrides.clear()

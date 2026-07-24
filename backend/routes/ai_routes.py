@@ -215,9 +215,7 @@ async def session_start(
         return {"status": "success", "session": session.model_dump()}
     except Exception as exc:
         logger.error("Session start failed: %s", exc)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
 
 @router.post("/session/record", response_model=SessionResponse)
@@ -252,9 +250,7 @@ async def session_record(
         raise
     except Exception as exc:
         logger.error("Session record failed: %s", exc)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
 
 @router.post("/session/complete", response_model=SessionResponse)
@@ -278,9 +274,7 @@ async def session_complete(
         raise
     except Exception as exc:
         logger.error("Session complete failed: %s", exc)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
 
 @router.get("/providers")
